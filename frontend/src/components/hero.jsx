@@ -84,12 +84,7 @@ const Hero = () => {
         </a>
       </div>
 
-          {/** Trip Planner */}
-
-          <div className='absolute bottom-4 w-full px-4 md:px-0 md:bottom-8 lg:bottom-12 flex justify-center'>
-         <Search />
-           </div>
-
+        
       {/* Navigation Buttons */}
       <button
         onClick={handlePrevious}

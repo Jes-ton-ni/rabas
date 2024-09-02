@@ -11,8 +11,8 @@ const HeroDestination = () => {
     >
       <div className="absolute inset-0 bg-dark opacity-60"></div>
       
-      <div className="relative  flex flex-col items-center ">
-        <h1 className="text-light text-5xl mb-4">Create Memorable Experience</h1>
+      <div className=" relative flex flex-wrap justify-center items-center ">
+        <h1 className="text-light text-center text-5xl mb-4">Create Memorable Experience</h1>
         <nav aria-label="breadcrumb">
           <ol className="flex space-x-2 text-light">
             <li><a href="/" className="hover:underline duration-200">Home</a></li>
