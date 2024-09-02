@@ -108,7 +108,7 @@ const Activities = () => {
     },
   ];
 
-  // Filtering Logic
+  // Filtering 
   const filteredActivities = activityDetails.filter((activity) => {
     const matchesActivityType = 
       selectedActivities.length === 0 || 
@@ -156,13 +156,14 @@ const Activities = () => {
       <div><Search /></div>
 
       {/* Contents */}
-      <div className='m-4 mx-auto w-full container bg-light p-6 sm:p-9 rounded-lg'>
+      <div className='m-4 mx-auto w-full container bg-light p-4 sm:p-6 md:p-8 lg:p-10 rounded-lg'>
         <div className='flex p-4 ml-2 mb-3'>
           <h1 className='font-semibold text-2xl text-color1'>Things To Do in Sorsogon</h1>
         </div>
 
-        <div className='flex flex-col lg:flex-row p-4 gap-8 lg:gap-24'>
-          <div className='bg-light w-full  lg:w-[300px]'>
+        <div className='flex flex-col lg:flex-row gap-8 '>
+
+          <div className=' w-full  lg:w-[300px]'>
 
             {/* Destination Dropdown */}
             <div className='p-4 flex flex-wrap gap-4'>
@@ -245,7 +246,7 @@ const Activities = () => {
             <div className='flex justify-center flex-wrap overflow-y-auto max-h-full scrollbar-hide'>
               {filteredActivities.length > 0 ? (
                 filteredActivities.map((activity, index) => (
-                  <div key={index} className='bg-light w-full sm:w-[400px] m-2 hover:scale-105 duration-400 gap-4 p-3 rounded-lg shadow-slate-400 border-2 shadow-md mb-4'>
+                  <div key={index} className='bg-white  m-2 hover:scale-105 duration-400 gap-4 p-3 rounded-lg shadow-slate-400 border-2 shadow-md mb-4'>
                     {/* Main Image */}
                     <img 
                       src={activity.image} 
@@ -280,14 +281,15 @@ const Activities = () => {
                     </div>
 
                     {/* Ratings */}
-                    <div className='flex items-center mt-4'>
+                    <div className='flex justify-between items-center mt-4'>
                       <span className='text-yellow-500'>{'★'.repeat(activity.rating)}{'☆'.repeat(5 - activity.rating)}</span>
-                    </div>
 
-                    {/* View Details Button */}
-                    <Button onPress={onOpen} className='mt-4 text-color2 font-semibold'>
+                        {/* View Details Button */}
+                    <Button onPress={onOpen} className=' text-color2 font-semibold'>
                       VIEW DETAILS &gt;
                     </Button>
+                    </div>
+ 
 
                     {/* Modal */}
                     <Modal 
