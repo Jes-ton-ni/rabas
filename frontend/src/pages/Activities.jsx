@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import pic1 from '../assets/donsol.jpg';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
+import { GiPositionMarker } from "react-icons/gi";
 
 const Activities = () => {
   const [selectedActivities, setSelectedActivities] = useState([]);
@@ -276,7 +277,7 @@ const Activities = () => {
 
                     {/* Location / Destination */}
                     <div className='flex items-center gap-2 mt-2 text-sm text-gray-500'>
-                      <MdOutlineSurfing />
+                      <GiPositionMarker/>
                       <span>{activity.destination}</span>
                     </div>
 

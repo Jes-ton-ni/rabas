@@ -4,7 +4,7 @@ import hall from '../assets/hall.jpeg';
 import bulusan from '../assets/bulusan.jpg';
 import subic from '../assets/Subic.jpeg';
 import dancalan from '../assets/dancalan.png';
-import Search from '../components/Search'
+
 
 const Hero = () => {
   const images = [hall, bulusan, subic, dancalan];
