@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import Nav from '../components/nav';
 import Hero from '../components/heroaccomodation';
 import Search from '@/components/Search';
@@ -6,6 +7,7 @@ import Footer from '@/components/Footer';
 import Antonio from '../assets/antonio.jpg';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
+import { GiPositionMarker } from "react-icons/gi";
 
 const Accomodation = () => {
     const [selectedAccommodation, setSelectedAccommodation] = useState('All');
@@ -39,46 +41,7 @@ const Accomodation = () => {
             rating: 5,
             destination: 'Barcelona'
         },
-        {
-            name: 'Lodging House',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            image: Antonio,
-            tags: ['Lodging'],
-            rating: 5,
-            destination: 'Barcelona'
-        },
-        {
-            name: 'Lodging House',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            image: Antonio,
-            tags: ['Lodging'],
-            rating: 5,
-            destination: 'Barcelona'
-        },
-        {
-            name: 'Lodging House',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            image: Antonio,
-            tags: ['Lodging'],
-            rating: 5,
-            destination: 'Barcelona'
-        },
-        {
-            name: 'Lodging House',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            image: Antonio,
-            tags: ['Lodging'],
-            rating: 5,
-            destination: 'Barcelona'
-        },
-        {
-            name: 'Lodging House',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            image: Antonio,
-            tags: ['Lodging'],
-            rating: 5,
-            destination: 'Barcelona'
-        },
+        // ... more accommodation details ...
     ];
 
     const destinations = [
@@ -107,6 +70,31 @@ const Accomodation = () => {
         const matchRating = selectedRatings.length === 0 || selectedRatings.includes(accommodation.rating);
         return matchDestination && matchType && matchRating;
     });
+
+    // Animation variants for the container
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    // Animation variants for each accommodation card
+    const cardVariants = {
+        hidden: { opacity: 0, y: 50 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                type: 'spring',
+                stiffness: 100,
+                damping: 12
+            }
+        }
+    };
 
     return (
         <div className='mx-auto bg-light min-h-screen font-sans'>
@@ -188,11 +176,20 @@ const Accomodation = () => {
                     </div>
 
                     {/* Accommodation List */}
-                    <div className=' w-full '>
-                        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto max-h-[1000px] scrollbar-hide p-4' >
+                    <div className='w-full'>
+                        <motion.div 
+                            className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto max-h-[1000px] scrollbar-hide p-4'
+                            variants={containerVariants}
+                            initial="hidden"
+                            animate="visible"
+                        >
                             {filteredAccommodations.length > 0 ? (
                                 filteredAccommodations.map((accommodation, index) => (
-                                    <div key={index} className='bg-white rounded-lg shadow-md hover:scale-105 duration-300  '>
+                                    <motion.div
+                                        key={index}
+                                        className='bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300'
+                                        variants={cardVariants}
+                                    >
                                         <img
                                             src={accommodation.image}
                                             alt={accommodation.name}
@@ -208,7 +205,7 @@ const Accomodation = () => {
                                             </div>
                                             <h2 className='text-lg font-semibold mb-2'>{accommodation.name}</h2>
                                             <p className='text-sm text-gray-600 mb-2'>{accommodation.description}</p>
-                                            <div className='text-xs text-gray-500 mb-2'>{accommodation.destination}</div>
+                                            <div className='text-xs text-gray-500 mb-2 flex items-center'><GiPositionMarker/>{accommodation.destination}</div>
                                             <div className='flex items-center mb-4'>
                                                 <span className='text-yellow-500'>{'★'.repeat(accommodation.rating)}{'☆'.repeat(5 - accommodation.rating)}</span>
                                             </div>
@@ -216,12 +213,12 @@ const Accomodation = () => {
                                                 VIEW DETAILS
                                             </Button>
                                         </div>
-                                    </div>
+                                    </motion.div>
                                 ))
                             ) : (
                                 <p className='col-span-full text-center text-gray-500'>No accommodations match your selected filters.</p>
                             )}
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
             </div>

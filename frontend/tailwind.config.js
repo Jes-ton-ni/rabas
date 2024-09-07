@@ -7,9 +7,7 @@ module.exports = {
     './components/**/*.{js,jsx}',
     './app/**/*.{js,jsx}',
     './src/**/*.{js,jsx}',
-     "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}"
-
-  
+    "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}"
   ],
   prefix: "",
   theme: {
@@ -63,7 +61,7 @@ module.exports = {
         },
       },
       fontFamily: {
-      custom1: ['Spinnaker','sans-serif'],
+        custom1: ['Spinnaker','sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -79,13 +77,17 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        fadeIn: 'fadeIn 0.3s ease-out',
       },
     },
   },
-  darkmode: "class",
-  plugins: [require("tailwindcss-animate"), nextui()], 
+  plugins: [require("tailwindcss-animate"), nextui()],
 }

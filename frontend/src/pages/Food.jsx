@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import Nav from '../components/nav';
 import Hero from '../components/herofood';
 import Search from '@/components/Search';
@@ -6,6 +7,7 @@ import Footer from '@/components/Footer';
 import Antonio from '../assets/antonio.jpg';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
+import { GiPositionMarker } from "react-icons/gi";
 
 const Food = () => {
     const [selectedType, setSelectedType] = useState('All');
@@ -26,36 +28,6 @@ const Food = () => {
             features: ['Wi-Fi', 'Outdoor Seating'],
             destination: 'Sorsogon City',
             rating: 4
-        },
-        {
-            name: 'Sample Bar 1',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            image: Antonio,
-            tags: ['Bar'],
-            cuisine: 'International',
-            features: ['Live Music', 'Happy Hour'],
-            destination: 'Gubat',
-            rating: 5
-        },
-        {
-            name: 'Sample Bar 1',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            image: Antonio,
-            tags: ['Bar'],
-            cuisine: 'International',
-            features: ['Live Music', 'Happy Hour'],
-            destination: 'Gubat',
-            rating: 5
-        },
-        {
-            name: 'Sample Bar 1',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            image: Antonio,
-            tags: ['Bar'],
-            cuisine: 'International',
-            features: ['Live Music', 'Happy Hour'],
-            destination: 'Gubat',
-            rating: 5
         },
         {
             name: 'Sample Bar 1',
@@ -110,15 +82,38 @@ const Food = () => {
         return matchDestination && matchType && matchCuisine && matchFeatures && matchRating;
     });
 
+    // Animation variants for the container
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    // Animation variants for each food card
+    const cardVariants = {
+        hidden: { opacity: 0, y: 50 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                type: 'spring',
+                stiffness: 100,
+                damping: 12
+            }
+        }
+    };
+
     return (
         <div className='mx-auto bg-light min-h-screen font-sans'>
             <Nav />
             <Hero />
             <Search />
 
-            {/** content */}
-
-            <div className='mx-auto  max-w-7xl px-4 sm:px-6 lg:px-8 py-12'>
+            <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12'>
                 <h1 className='font-semibold text-3xl text-color1 mb-8'>Food in Sorsogon</h1>
                  
                 <div className='flex flex-col lg:flex-row gap-8'>
@@ -143,11 +138,11 @@ const Food = () => {
                                 </Select>
                             </div>
 
-                            {/* Type Dropdown */}
+                            {/* Food Type Dropdown */}
                             <div className='mb-6'>
-                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Type</h3>
+                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Food Type</h3>
                                 <Select
-                                    placeholder="Select Type"
+                                    placeholder="Select Food Type"
                                     selectedKeys={[selectedType]}
                                     onSelectionChange={(value) => setSelectedType(value.currentKey)}
                                 >
@@ -175,7 +170,7 @@ const Food = () => {
                                 </Select>
                             </div>
 
-                            {/* Features Checkboxes */}
+                            {/* Features Filter */}
                             <div className='mb-6'>
                                 <h3 className='text-sm font-medium text-gray-700 mb-2'>Features</h3>
                                 <div className='space-y-2'>
@@ -226,11 +221,20 @@ const Food = () => {
                     </div>
 
                     {/* Food List */}
-                    <div className=' w-full '>
-                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto max-h-[1000px] scrollbar-hide p-4' >
+                    <div className='w-full'>
+                        <motion.div 
+                            className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto max-h-[1000px] scrollbar-hide p-4'
+                            variants={containerVariants}
+                            initial="hidden"
+                            animate="visible"
+                        >
                             {filteredFood.length > 0 ? (
                                 filteredFood.map((food, index) => (
-                                    <div key={index} className='bg-white rounded-lg shadow-md hover:scale-105 duration-300 '>
+                                    <motion.div
+                                        key={index}
+                                        className='bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300'
+                                        variants={cardVariants}
+                                    >
                                         <img
                                             src={food.image}
                                             alt={food.name}
@@ -246,7 +250,9 @@ const Food = () => {
                                             </div>
                                             <h2 className='text-lg font-semibold mb-2'>{food.name}</h2>
                                             <p className='text-sm text-gray-600 mb-2'>{food.description}</p>
-                                            <div className='text-xs text-gray-500 mb-2'>{food.destination}</div>
+                                            <div className='text-xs text-gray-500 mb-2 flex items-center'>
+                                                <GiPositionMarker className="mr-1" />{food.destination}
+                                            </div>
                                             <div className='mb-2'>
                                                 <span className='text-sm font-semibold'>Cuisine: </span>
                                                 <span className='text-sm'>{food.cuisine}</span>
@@ -258,12 +264,12 @@ const Food = () => {
                                                 VIEW DETAILS
                                             </Button>
                                         </div>
-                                    </div>
+                                    </motion.div>
                                 ))
                             ) : (
                                 <p className='col-span-full text-center text-gray-500'>No food establishments match your selected filters.</p>
                             )}
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
             </div>
@@ -280,7 +286,7 @@ const Food = () => {
                 }}
             >
                 <ModalContent>
-                {(onClose) => (
+                    {(onClose) => (
                         <>
                             <ModalHeader className="flex flex-col gap-1">Food Details</ModalHeader>
                             <ModalBody>
@@ -299,7 +305,6 @@ const Food = () => {
                 </ModalContent>
             </Modal>
         </div>
-
     );
 };
 

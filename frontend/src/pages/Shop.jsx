@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import Nav from '../components/nav';
 import Hero from '../components/heroshop';
 import Search from '@/components/Search';
@@ -6,7 +7,7 @@ import Footer from '@/components/Footer';
 import ShopImage from '../assets/shop.webp';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
-
+import { GiPositionMarker } from "react-icons/gi";
 const Shop = () => {
     const [selectedType, setSelectedType] = useState('All');
     const [selectedDestination, setSelectedDestination] = useState('All');
@@ -80,8 +81,33 @@ const Shop = () => {
         return matchDestination && matchType && matchCategory && matchFeatures && matchRating;
     });
 
+    // Animation variants for the container
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    // Animation variants for each shop card
+    const cardVariants = {
+        hidden: { opacity: 0, y: 50 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                type: 'spring',
+                stiffness: 100,
+                damping: 12
+            }
+        }
+    };
+
     return (
-        <div className='mx-auto bg-light min-h-screen font-sans'>
+        <div className='mx-auto bg-light min-h-screen font-sans '>
             <Nav />
             <Hero />
             <Search />
@@ -194,11 +220,20 @@ const Shop = () => {
                     </div>
 
                     {/* Shop List */}
-                    <div className=' w-full '>
-                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto max-h-[1000px] scrollbar-hide p-4' >
+                    <div className='w-full'>
+                        <motion.div 
+                            className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto max-h-[1000px] scrollbar-hide p-4'
+                            variants={containerVariants}
+                            initial="hidden"
+                            animate="visible"
+                        >
                             {filteredShops.length > 0 ? (
                                 filteredShops.map((shop, index) => (
-                                    <div key={index} className='bg-white rounded-lg shadow-md hover:scale-105 duration-300 '>
+                                    <motion.div
+                                        key={index}
+                                        className='bg-white rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300'
+                                        variants={cardVariants}
+                                    >
                                         <img
                                             src={shop.image}
                                             alt={shop.name}
@@ -214,7 +249,7 @@ const Shop = () => {
                                             </div>
                                             <h2 className='text-lg font-semibold mb-2'>{shop.name}</h2>
                                             <p className='text-sm text-gray-600 mb-2'>{shop.description}</p>
-                                            <div className='text-xs text-gray-500 mb-2'>{shop.destination}</div>
+                                            <div className='text-xs text-gray-500 mb-2 flex items-center'><GiPositionMarker/>{shop.destination}</div>
                                             <div className='mb-2'>
                                                 <span className='text-sm font-semibold'>Category: </span>
                                                 <span className='text-sm'>{shop.category}</span>
@@ -226,12 +261,12 @@ const Shop = () => {
                                                 VIEW DETAILS
                                             </Button>
                                         </div>
-                                    </div>
+                                    </motion.div>
                                 ))
                             ) : (
                                 <p className='col-span-full text-center text-gray-500'>No shops match your selected filters.</p>
                             )}
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
             </div>
