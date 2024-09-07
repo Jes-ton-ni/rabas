@@ -5,6 +5,7 @@ import Destinations from './pages/Destinations';
 import Activity from './pages/Activities';
 import Accomodation from './pages/Accomodation';
 import Food from './pages/Food';
+import Shop from './pages/Shop';
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
           <Route path='/activities' element = {<Activity/>}/>
           <Route path='/accomodation' element= {<Accomodation/>}/>
           <Route path='/food' element={<Food/>}/>
+          <Route path='/shop' element={<Shop/>}/>
         </Routes>
       </Router>
     </div>

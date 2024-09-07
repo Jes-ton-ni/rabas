@@ -79,7 +79,7 @@ const Nav = () => {
                         <a  href='/activities'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Activities</li></a>
                         <a  href='/accomodation'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Accommodations</li></a>
                         <a  href='/food'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Foods</li></a>       
-                        <a  href='/shops'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Shops</li></a>           
+                        <a  href='/shop'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Shops</li></a>           
                       </ul>
                     </div>
                   </NavigationMenuLink>

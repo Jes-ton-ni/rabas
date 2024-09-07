@@ -1,91 +1,61 @@
 import React, { useState } from 'react';
 import Nav from '../components/nav';
-import Hero from '../components/heroaccomodation';
+import Hero from '../components/heroshop';
 import Search from '@/components/Search';
 import Footer from '@/components/Footer';
-import Antonio from '../assets/antonio.jpg';
+import ShopImage from '../assets/shop.webp';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
 
-const Accomodation = () => {
-    const [selectedAccommodation, setSelectedAccommodation] = useState('All');
+const Shop = () => {
+    const [selectedType, setSelectedType] = useState('All');
     const [selectedDestination, setSelectedDestination] = useState('All');
+    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [selectedFeatures, setSelectedFeatures] = useState([]);
     const [selectedRatings, setSelectedRatings] = useState([]);
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-    // Accommodation Details
-    const accommodationDetails = [
+    // Shop Details
+    const shopDetails = [
         {
-            name: 'Hotel',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            image: Antonio,
-            tags: ['Hotel'],
-            rating: 5,
-            destination: 'Sorsogon City'
+            name: 'Sample Souvenir Shop 1',
+            description: 'A charming shop offering unique local souvenirs and handicrafts.',
+            image: ShopImage,
+            tags: ['Souvenir Shop'],
+            category: 'Handicrafts',
+            features: ['Local Products', 'Gift Wrapping'],
+            destination: 'Sorsogon City',
+            rating: 4
         },
         {
-            name: 'Innside',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            image: Antonio,
-            tags: ['Inn'],
-            rating: 5,
-            destination: 'Gubat'
+            name: 'Sample Clothing Boutique 1',
+            description: 'Trendy clothing store featuring both local and international fashion brands.',
+            image: ShopImage,
+            tags: ['Clothing Store'],
+            category: 'Fashion',
+            features: ['Fitting Rooms', 'Seasonal Sales'],
+            destination: 'Gubat',
+            rating: 5
         },
-        {
-            name: 'Lodging House',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            image: Antonio,
-            tags: ['Lodging'],
-            rating: 5,
-            destination: 'Barcelona'
-        },
-        {
-            name: 'Lodging House',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            image: Antonio,
-            tags: ['Lodging'],
-            rating: 5,
-            destination: 'Barcelona'
-        },
-        {
-            name: 'Lodging House',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            image: Antonio,
-            tags: ['Lodging'],
-            rating: 5,
-            destination: 'Barcelona'
-        },
-        {
-            name: 'Lodging House',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            image: Antonio,
-            tags: ['Lodging'],
-            rating: 5,
-            destination: 'Barcelona'
-        },
-        {
-            name: 'Lodging House',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            image: Antonio,
-            tags: ['Lodging'],
-            rating: 5,
-            destination: 'Barcelona'
-        },
-        {
-            name: 'Lodging House',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            image: Antonio,
-            tags: ['Lodging'],
-            rating: 5,
-            destination: 'Barcelona'
-        },
+        // Add more shops as needed
     ];
 
     const destinations = [
         'All', 'Bulusan', 'Bulan', 'Barcelona', 'Casiguran', 'Castilla', 'Donsol', 'Gubat', 'Irosin', 'Juban', 'Magallanes', 'Matnog', 'Pilar', 'Prieto Diaz', 'Sta. Magdalena', 'Sorsogon City'
     ];
 
-    const accommodations = ['All', 'Hotel', 'Inn', 'Lodging'];
+    const types = ['All', 'Souvenir Shop', 'Clothing Store', 'Grocery Store', 'Electronics Store', 'Bookstore'];
+    const categories = ['All', 'Handicrafts', 'Fashion', 'Food', 'Electronics', 'Books', 'Home Decor'];
+    const features = ['Local Products', 'Gift Wrapping', 'Fitting Rooms', 'Seasonal Sales', 'Online Shopping', 'Custom Orders'];
+
+    // Handle feature selection
+    const handleFeatureClick = (feature) => {
+        setSelectedFeatures((prevSelected) =>
+            prevSelected.includes(feature)
+                ? prevSelected.filter((f) => f !== feature)
+                : [...prevSelected, feature]
+        );
+    };
 
     // Handle rating selection
     const handleRatingClick = (rating) => {
@@ -100,12 +70,14 @@ const Accomodation = () => {
         }
     };
 
-    // Filter the accommodations based on the selected filters
-    const filteredAccommodations = accommodationDetails.filter((accommodation) => {
-        const matchDestination = selectedDestination === 'All' || accommodation.destination === selectedDestination;
-        const matchType = selectedAccommodation === 'All' || accommodation.tags.includes(selectedAccommodation);
-        const matchRating = selectedRatings.length === 0 || selectedRatings.includes(accommodation.rating);
-        return matchDestination && matchType && matchRating;
+    // Filter the shops based on the selected filters
+    const filteredShops = shopDetails.filter((shop) => {
+        const matchDestination = selectedDestination === 'All' || shop.destination === selectedDestination;
+        const matchType = selectedType === 'All' || shop.tags.includes(selectedType);
+        const matchCategory = selectedCategory === 'All' || shop.category === selectedCategory;
+        const matchFeatures = selectedFeatures.length === 0 || selectedFeatures.every(f => shop.features.includes(f));
+        const matchRating = selectedRatings.length === 0 || selectedRatings.includes(shop.rating);
+        return matchDestination && matchType && matchCategory && matchFeatures && matchRating;
     });
 
     return (
@@ -115,7 +87,7 @@ const Accomodation = () => {
             <Search />
 
             <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12'>
-                <h1 className='font-semibold text-3xl text-color1 mb-8'>Accommodations in Sorsogon</h1>
+                <h1 className='font-semibold text-3xl text-color1 mb-8'>Shops in Sorsogon</h1>
                  
                 <div className='flex flex-col lg:flex-row gap-8'>
                     {/* Filters Section */}
@@ -139,20 +111,54 @@ const Accomodation = () => {
                                 </Select>
                             </div>
 
-                            {/* Accommodation Type Dropdown */}
+                            {/* Type Dropdown */}
                             <div className='mb-6'>
-                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Accommodation Type</h3>
+                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Type</h3>
                                 <Select
-                                    placeholder="Select Accommodation"
-                                    selectedKeys={[selectedAccommodation]}
-                                    onSelectionChange={(value) => setSelectedAccommodation(value.currentKey)}
+                                    placeholder="Select Type"
+                                    selectedKeys={[selectedType]}
+                                    onSelectionChange={(value) => setSelectedType(value.currentKey)}
                                 >
-                                    {accommodations.map((accommodation) => (
-                                        <SelectItem key={accommodation} value={accommodation}>
-                                            {accommodation}
+                                    {types.map((type) => (
+                                        <SelectItem key={type} value={type}>
+                                            {type}
                                         </SelectItem>
                                     ))}
                                 </Select>
+                            </div>
+
+                            {/* Category Dropdown */}
+                            <div className='mb-6'>
+                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Category</h3>
+                                <Select
+                                    placeholder="Select Category"
+                                    selectedKeys={[selectedCategory]}
+                                    onSelectionChange={(value) => setSelectedCategory(value.currentKey)}
+                                >
+                                    {categories.map((category) => (
+                                        <SelectItem key={category} value={category}>
+                                            {category}
+                                        </SelectItem>
+                                    ))}
+                                </Select>
+                            </div>
+
+                            {/* Features Checkboxes */}
+                            <div className='mb-6'>
+                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Features</h3>
+                                <div className='space-y-2'>
+                                    {features.map((feature) => (
+                                        <label key={feature} className='flex items-center'>
+                                            <input
+                                                type='checkbox'
+                                                onChange={() => handleFeatureClick(feature)}
+                                                checked={selectedFeatures.includes(feature)}
+                                                className='form-checkbox text-color2'
+                                            />
+                                            <span className='ml-2 text-sm'>{feature}</span>
+                                        </label>
+                                    ))}
+                                </div>
                             </div>
 
                             {/* Ratings Filter */}
@@ -187,30 +193,34 @@ const Accomodation = () => {
                         </div>
                     </div>
 
-                    {/* Accommodation List */}
+                    {/* Shop List */}
                     <div className=' w-full '>
-                        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto max-h-[1000px] scrollbar-hide p-4' >
-                            {filteredAccommodations.length > 0 ? (
-                                filteredAccommodations.map((accommodation, index) => (
-                                    <div key={index} className='bg-white rounded-lg shadow-md hover:scale-105 duration-300  '>
+                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto max-h-[1000px] scrollbar-hide p-4' >
+                            {filteredShops.length > 0 ? (
+                                filteredShops.map((shop, index) => (
+                                    <div key={index} className='bg-white rounded-lg shadow-md hover:scale-105 duration-300 '>
                                         <img
-                                            src={accommodation.image}
-                                            alt={accommodation.name}
+                                            src={shop.image}
+                                            alt={shop.name}
                                             className='w-full h-48 object-cover rounded-t-lg'
                                         />
                                         <div className='p-4'>
                                             <div className='flex flex-wrap gap-2 mb-2'>
-                                                {accommodation.tags.map((tag, index) => (
+                                                {shop.tags.map((tag, index) => (
                                                     <span key={index} className='bg-color2 text-color3 text-xs px-2 py-1 rounded-full'>
                                                         {tag}
                                                     </span>
                                                 ))}
                                             </div>
-                                            <h2 className='text-lg font-semibold mb-2'>{accommodation.name}</h2>
-                                            <p className='text-sm text-gray-600 mb-2'>{accommodation.description}</p>
-                                            <div className='text-xs text-gray-500 mb-2'>{accommodation.destination}</div>
+                                            <h2 className='text-lg font-semibold mb-2'>{shop.name}</h2>
+                                            <p className='text-sm text-gray-600 mb-2'>{shop.description}</p>
+                                            <div className='text-xs text-gray-500 mb-2'>{shop.destination}</div>
+                                            <div className='mb-2'>
+                                                <span className='text-sm font-semibold'>Category: </span>
+                                                <span className='text-sm'>{shop.category}</span>
+                                            </div>
                                             <div className='flex items-center mb-4'>
-                                                <span className='text-yellow-500'>{'★'.repeat(accommodation.rating)}{'☆'.repeat(5 - accommodation.rating)}</span>
+                                                <span className='text-yellow-500'>{'★'.repeat(shop.rating)}{'☆'.repeat(5 - shop.rating)}</span>
                                             </div>
                                             <Button onPress={onOpen} className='w-full bg-color1 text-color3 hover:bg-color2'>
                                                 VIEW DETAILS
@@ -219,7 +229,7 @@ const Accomodation = () => {
                                     </div>
                                 ))
                             ) : (
-                                <p className='col-span-full text-center text-gray-500'>No accommodations match your selected filters.</p>
+                                <p className='col-span-full text-center text-gray-500'>No shops match your selected filters.</p>
                             )}
                         </div>
                     </div>
@@ -240,9 +250,9 @@ const Accomodation = () => {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1">Accommodation Details</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1">Shop Details</ModalHeader>
                             <ModalBody>
-                                {/* Add accommodation details here */}
+                                {/* Add shop details here */}
                             </ModalBody>
                             <ModalFooter>
                                 <Button color="danger" variant="light" onPress={onClose}>
@@ -260,4 +270,4 @@ const Accomodation = () => {
     )
 }
 
-export default Accomodation;
+export default Shop;

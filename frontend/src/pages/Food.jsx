@@ -37,6 +37,36 @@ const Food = () => {
             destination: 'Gubat',
             rating: 5
         },
+        {
+            name: 'Sample Bar 1',
+            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+            image: Antonio,
+            tags: ['Bar'],
+            cuisine: 'International',
+            features: ['Live Music', 'Happy Hour'],
+            destination: 'Gubat',
+            rating: 5
+        },
+        {
+            name: 'Sample Bar 1',
+            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+            image: Antonio,
+            tags: ['Bar'],
+            cuisine: 'International',
+            features: ['Live Music', 'Happy Hour'],
+            destination: 'Gubat',
+            rating: 5
+        },
+        {
+            name: 'Sample Bar 1',
+            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+            image: Antonio,
+            tags: ['Bar'],
+            cuisine: 'International',
+            features: ['Live Music', 'Happy Hour'],
+            destination: 'Gubat',
+            rating: 5
+        },
         // Add more food establishments as needed
     ];
 
@@ -82,210 +112,195 @@ const Food = () => {
 
     return (
         <div className='mx-auto bg-light min-h-screen font-sans'>
-            <div><Nav /></div>
-            <div><Hero /></div>
-            <div><Search /></div>
+            <Nav />
+            <Hero />
+            <Search />
 
-            <div className='m-4 mx-auto w-full container bg-light p-4 sm:p-6 md:p-8 lg:p-10 rounded-lg'>
-                <div className='flex p-4 ml-2 mb-3'>
-                    <h1 className='font-semibold text-2xl text-color1'>Food in Sorsogon</h1>
-                </div>
+            {/** content */}
+
+            <div className='mx-auto  max-w-7xl px-4 sm:px-6 lg:px-8 py-12'>
+                <h1 className='font-semibold text-3xl text-color1 mb-8'>Food in Sorsogon</h1>
                  
                 <div className='flex flex-col lg:flex-row gap-8'>
-                    <div className='w-full lg:w-[300px]'>
-                        {/* Destination Dropdown */}
-                        <div className='p-4'>
-                            <h1 className='text-dark text-xl mb-2'>Destinations</h1>
-                            <Select
-                                className='max-w-[190px]'
-                                placeholder="Select Destination"
-                                selectedKeys={[selectedDestination]}
-                                onSelectionChange={(value) => setSelectedDestination(value.currentKey)}
-                            >
-                                {destinations.map((destination) => (
-                                    <SelectItem key={destination} value={destination}>
-                                        {destination}
-                                    </SelectItem>
-                                ))}
-                            </Select>
-                        </div>
-
-                        {/* Type Dropdown */}
-                        <div className='p-4'>
-                            <h1 className='text-dark text-xl mb-2'>Type</h1>
-                            <Select
-                                className='max-w-[190px]'
-                                placeholder="Select Type"
-                                selectedKeys={[selectedType]}
-                                onSelectionChange={(value) => setSelectedType(value.currentKey)}
-                            >
-                                {types.map((type) => (
-                                    <SelectItem key={type} value={type}>
-                                        {type}
-                                    </SelectItem>
-                                ))}
-                            </Select>
-                        </div>
-
-                        {/* Cuisine Dropdown */}
-                        <div className='p-4'>
-                            <h1 className='text-dark text-xl mb-2'>Cuisine</h1>
-                            <Select
-                                className='max-w-[190px]'
-                                placeholder="Select Cuisine"
-                                selectedKeys={[selectedCuisine]}
-                                onSelectionChange={(value) => setSelectedCuisine(value.currentKey)}
-                            >
-                                {cuisines.map((cuisine) => (
-                                    <SelectItem key={cuisine} value={cuisine}>
-                                        {cuisine}
-                                    </SelectItem>
-                                ))}
-                            </Select>
-                        </div>
-
-                        {/* Features Checkboxes */}
-                        <div className='p-4'>
-                            <h1 className='text-dark text-xl mb-2'>Features</h1>
-                            <div className='flex flex-col gap-2'>
-                                {features.map((feature) => (
-                                    <label key={feature} className='flex items-center gap-2'>
-                                        <input
-                                            type='checkbox'
-                                            onChange={() => handleFeatureClick(feature)}
-                                            checked={selectedFeatures.includes(feature)}
-                                            className='form-checkbox text-color2'
-                                        />
-                                        <span>{feature}</span>
-                                    </label>
-                                ))}
+                    {/* Filters Section */}
+                    <div className='w-full lg:w-1/4'>
+                        <div className='bg-white p-6 rounded-lg shadow-md'>
+                            <h2 className='text-xl font-semibold mb-4'>Filters</h2>
+                            
+                            {/* Destination Dropdown */}
+                            <div className='mb-6'>
+                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Destination</h3>
+                                <Select
+                                    placeholder="Select Destination"
+                                    selectedKeys={[selectedDestination]}
+                                    onSelectionChange={(value) => setSelectedDestination(value.currentKey)}
+                                >
+                                    {destinations.map((destination) => (
+                                        <SelectItem key={destination} value={destination}>
+                                            {destination}
+                                        </SelectItem>
+                                    ))}
+                                </Select>
                             </div>
-                        </div>
 
-                        {/* Ratings Filter */}
-                        <div className='p-4'>
-                            <h1 className='text-dark text-xl mb-2'>Ratings</h1>
-                            <div className='flex flex-col gap-2'>
-                                <label className='flex items-center gap-2'>
-                                    <input
-                                        type='checkbox'
-                                        onChange={() => handleRatingClick('All')}
-                                        checked={selectedRatings.length === 0}
-                                        className='form-checkbox text-color2'
-                                    />
-                                    <span className='flex items-center'>
-                                        ★★★★★ <span className='ml-2'>All Ratings</span>
-                                    </span>
-                                </label>
-                                {[5, 4, 3, 2, 1].map((star) => (
-                                    <label key={star} className='flex items-center gap-2'>
+                            {/* Type Dropdown */}
+                            <div className='mb-6'>
+                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Type</h3>
+                                <Select
+                                    placeholder="Select Type"
+                                    selectedKeys={[selectedType]}
+                                    onSelectionChange={(value) => setSelectedType(value.currentKey)}
+                                >
+                                    {types.map((type) => (
+                                        <SelectItem key={type} value={type}>
+                                            {type}
+                                        </SelectItem>
+                                    ))}
+                                </Select>
+                            </div>
+
+                            {/* Cuisine Dropdown */}
+                            <div className='mb-6'>
+                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Cuisine</h3>
+                                <Select
+                                    placeholder="Select Cuisine"
+                                    selectedKeys={[selectedCuisine]}
+                                    onSelectionChange={(value) => setSelectedCuisine(value.currentKey)}
+                                >
+                                    {cuisines.map((cuisine) => (
+                                        <SelectItem key={cuisine} value={cuisine}>
+                                            {cuisine}
+                                        </SelectItem>
+                                    ))}
+                                </Select>
+                            </div>
+
+                            {/* Features Checkboxes */}
+                            <div className='mb-6'>
+                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Features</h3>
+                                <div className='space-y-2'>
+                                    {features.map((feature) => (
+                                        <label key={feature} className='flex items-center'>
+                                            <input
+                                                type='checkbox'
+                                                onChange={() => handleFeatureClick(feature)}
+                                                checked={selectedFeatures.includes(feature)}
+                                                className='form-checkbox text-color2'
+                                            />
+                                            <span className='ml-2 text-sm'>{feature}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Ratings Filter */}
+                            <div>
+                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Ratings</h3>
+                                <div className='space-y-2'>
+                                    <label className='flex items-center'>
                                         <input
                                             type='checkbox'
-                                            onChange={() => handleRatingClick(star)}
-                                            checked={selectedRatings.includes(star)}
+                                            onChange={() => handleRatingClick('All')}
+                                            checked={selectedRatings.length === 0}
                                             className='form-checkbox text-color2'
                                         />
-                                        <span className='flex items-center'>
-                                            {'★'.repeat(star)}{'☆'.repeat(5 - star)}
-                                            <span className='ml-2'>{star} Star{star > 1 ? 's' : ''}</span>
-                                        </span>
+                                        <span className='ml-2 text-sm'>All Ratings</span>
                                     </label>
-                                ))}
+                                    {[5, 4, 3, 2, 1].map((star) => (
+                                        <label key={star} className='flex items-center'>
+                                            <input
+                                                type='checkbox'
+                                                onChange={() => handleRatingClick(star)}
+                                                checked={selectedRatings.includes(star)}
+                                                className='form-checkbox text-color2'
+                                            />
+                                            <span className='ml-2 text-sm flex items-center'>
+                                                {'★'.repeat(star)}{'☆'.repeat(5 - star)}
+                                                <span className='ml-1'>{star} Star{star > 1 ? 's' : ''}</span>
+                                            </span>
+                                        </label>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Lists */}
-                    <div className=' flex-grow h-screen rounded-lg max-w-full lg:max-w-[1000px] space-x-6 p-4'>
-                        <div className='flex justify-center flex-wrap overflow-y-auto max-h-full scrollbar-hide'>
+                    {/* Food List */}
+                    <div className=' w-full '>
+                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto max-h-[1000px] scrollbar-hide p-4' >
                             {filteredFood.length > 0 ? (
                                 filteredFood.map((food, index) => (
-                                    <div key={index} className='bg-white  m-2 hover:scale-105 duration-400 gap-4 p-3 rounded-lg shadow-slate-400 border-2 shadow-md mb-4'>
+                                    <div key={index} className='bg-white rounded-lg shadow-md hover:scale-105 duration-300 '>
                                         <img
                                             src={food.image}
                                             alt={food.name}
-                                            className='w-full h-40 object-cover rounded-lg mb-4'
+                                            className='w-full h-48 object-cover rounded-t-lg'
                                         />
-                                        <div className='flex gap-2 mb-2'>
-                                            {food.tags.map((tag, index) => (
-                                                <button
-                                                    key={index}
-                                                    className='bg-color2 flex items-center justify-center gap-2 text-color3 text-xs px-2 py-1 rounded-md'>
-                                                    {tag}
-                                                </button>
-                                            ))}
+                                        <div className='p-4'>
+                                            <div className='flex flex-wrap gap-2 mb-2'>
+                                                {food.tags.map((tag, index) => (
+                                                    <span key={index} className='bg-color2 text-color3 text-xs px-2 py-1 rounded-full'>
+                                                        {tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                            <h2 className='text-lg font-semibold mb-2'>{food.name}</h2>
+                                            <p className='text-sm text-gray-600 mb-2'>{food.description}</p>
+                                            <div className='text-xs text-gray-500 mb-2'>{food.destination}</div>
+                                            <div className='mb-2'>
+                                                <span className='text-sm font-semibold'>Cuisine: </span>
+                                                <span className='text-sm'>{food.cuisine}</span>
+                                            </div>
+                                            <div className='flex items-center mb-4'>
+                                                <span className='text-yellow-500'>{'★'.repeat(food.rating)}{'☆'.repeat(5 - food.rating)}</span>
+                                            </div>
+                                            <Button onPress={onOpen} className='w-full bg-color1 text-color3 hover:bg-color2'>
+                                                VIEW DETAILS
+                                            </Button>
                                         </div>
-                                        <h2 className='text-lg font-semibold mb-2'>{food.name}</h2>
-                                        <p className='text-sm'>{food.description}</p>
-                                        <div className='flex items-center gap-2 mt-2 text-xs text-gray-500'>
-                                            <span>{food.destination}</span>
-                                        </div>
-                                        <div className='mt-2'>
-                                            <span className='text-sm font-semibold'>Cuisine: </span>
-                                            <span className='text-sm'>{food.cuisine}</span>
-                                        </div>
-                                        <div className='flex items-center mt-2'>
-                                            <span className='text-yellow-500'>{'★'.repeat(food.rating)}{'☆'.repeat(5 - food.rating)}</span>
-                                        </div>
-                                        <Button onPress={onOpen} className='mt-4 text-color2 font-semibold'>
-                                            VIEW DETAILS &gt;
-                                        </Button>
-
-                                        {/* Modal */}
-                                        <Modal
-                                            backdrop="opaque"
-                                            isOpen={isOpen}
-                                            onOpenChange={onOpenChange}
-                                            classNames={{
-                                                backdrop: "bg-light/20"
-                                            }}
-                                        >
-                                            <ModalContent>
-                                                {(onClose) => (
-                                                    <>
-                                                        <ModalHeader className=''>
-                                                            <div>{food.name}</div>
-                                                        </ModalHeader>
-                                                        <ModalBody>
-                                                            <p>{food.description}</p>
-                                                            <p className='text-gray-700 mt-2'>
-                                                                Cuisine: {food.cuisine}
-                                                            </p>
-                                                            <p className='text-gray-700 mt-2'>
-                                                                Features: {food.features.join(', ')}
-                                                            </p>
-                                                            <p className='text-gray-700 mt-2'>
-                                                                Location: {food.destination}
-                                                            </p>
-                                                            <div className='flex items-center mt-2'>
-                                                                <span className='text-yellow-500'>{'★'.repeat(food.rating)}{'☆'.repeat(5 - food.rating)}</span>
-                                                            </div>
-                                                        </ModalBody>
-                                                        <ModalFooter>
-                                                            <Button color="danger" variant="light" onPress={onClose}>
-                                                                Close
-                                                            </Button>
-                                                            <Button className='text-color3 bg-color1 hover:bg-color2 duration-500' onPress={onClose}>
-                                                                Explore
-                                                            </Button>
-                                                        </ModalFooter>
-                                                    </>
-                                                )}
-                                            </ModalContent>
-                                        </Modal>
                                     </div>
                                 ))
                             ) : (
-                                <p>No food establishments match your selected filters.</p>
+                                <p className='col-span-full text-center text-gray-500'>No food establishments match your selected filters.</p>
                             )}
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div><Footer /></div>
+            <Footer />
+
+            {/* Modal */}
+            <Modal
+                backdrop="opaque"
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+                classNames={{
+                    backdrop: "bg-gray-900/50 backdrop-opacity-40"
+                }}
+            >
+                <ModalContent>
+                {(onClose) => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1">Food Details</ModalHeader>
+                            <ModalBody>
+                                {/* Add food details here */}
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button color="danger" variant="light" onPress={onClose}>
+                                    Close
+                                </Button>
+                                <Button color="primary" onPress={onClose}>
+                                    Explore
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
         </div>
-    )
-}
+
+    );
+};
 
 export default Food;
