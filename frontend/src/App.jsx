@@ -6,7 +6,11 @@ import Activity from './pages/Activities';
 import Accomodation from './pages/Accomodation';
 import Food from './pages/Food';
 import Shop from './pages/Shop';
-import Bussiness from '../src/businesspage/businesspage'
+import Business from '../src/businesspage/businesspage'
+import Dashboard from './admin/businessdashboard'
+import Profile from './admin/businessprofile'
+import Product from './admin/businessproducts'
+import Deals from './admin/businessdeals'
 
 function App() {
 
@@ -20,7 +24,11 @@ function App() {
           <Route path='/accomodation' element= {<Accomodation/>}/>
           <Route path='/food' element={<Food/>}/>
           <Route path='/shop' element={<Shop/>}/>
-          <Route path='/business' element={<Bussiness/>}/>
+          <Route path='/business' element={<Business/>}/>
+          <Route path='/dashboard' element={<Dashboard/>}/>
+          <Route path='/profile' element={<Profile/>}/>
+          <Route path='/products' element={<Product/>}/>
+          <Route path='/deals' element={<Deals/>}/>
         </Routes>
       </Router>
     </div>

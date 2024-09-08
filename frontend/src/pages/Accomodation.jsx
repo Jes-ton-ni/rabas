@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import Nav from '../components/nav';
+import Nav from '../components/navuser';
 import Hero from '../components/heroaccomodation';
 import Search from '@/components/Search';
 import Footer from '@/components/Footer';

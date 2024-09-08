@@ -1,5 +1,5 @@
 import React from 'react'
-import Nav from '../components/nav'
+import Nav from '../components/navuser'
 import Footer from '../components/Footer'
 import Hero from '../components/herodestination'
 import { Link } from 'react-router-dom'; 
@@ -25,7 +25,7 @@ import Search from '../components/Search';
 
 const Destinations = () => {
   return (
-    <div className='mx-auto  bg-light font-sans'>
+    <div className='mx-auto min-h-screen bg-light font-sans'>
       <div>
       <Nav/>
       </div>

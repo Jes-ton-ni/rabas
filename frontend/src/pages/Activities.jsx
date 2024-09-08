@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaSwimmer, FaCampground, FaHiking, FaWater, FaUmbrellaBeach } from 'react-icons/fa';
 import { MdOutlineSurfing } from "react-icons/md";
-import Nav from '../components/nav';
+import Nav from '../components/navuser';
 import Hero from '../components/heroactivity';
 import Search from '../components/Search';
 import Footer from '@/components/Footer';
