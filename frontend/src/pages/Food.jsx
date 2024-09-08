@@ -8,6 +8,7 @@ import Antonio from '../assets/antonio.jpg';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
 import { GiPositionMarker } from "react-icons/gi";
+import { useNavigate } from 'react-router-dom';
 
 const Food = () => {
     const [selectedType, setSelectedType] = useState('All');
@@ -16,6 +17,7 @@ const Food = () => {
     const [selectedFeatures, setSelectedFeatures] = useState([]);
     const [selectedRatings, setSelectedRatings] = useState([]);
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const navigate = useNavigate();
 
     // Food Details
     const foodDetails = [
@@ -296,9 +298,15 @@ const Food = () => {
                                 <Button color="danger" variant="light" onPress={onClose}>
                                     Close
                                 </Button>
-                                <Button color="primary" onPress={onClose}>
-                                    Explore
-                                </Button>
+                                <Button 
+                                color="primary" 
+                                onPress={() => {
+                                    onClose();
+                                    navigate('/business');
+                                }}
+                            >
+                                Explore
+                            </Button>
                             </ModalFooter>
                         </>
                     )}

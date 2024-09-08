@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import Logo from '../assets/rabas.png';
+import Logo2 from '../assets/Rabasorso.png'
+import LoginSignup from '@/auth/loginSignup';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -12,18 +14,14 @@ import { FaHome, FaBars, FaTimes } from 'react-icons/fa';
 import { GiPositionMarker } from "react-icons/gi";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { FaPersonWalking } from "react-icons/fa6";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
 
 const Nav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-    setIsSubMenuOpen(false); 
-  };
-
-  const toggleSubMenu = () => {
-    setIsSubMenuOpen(!isSubMenuOpen);
   };
 
   return (
@@ -203,11 +201,38 @@ const Nav = () => {
             <h1>About</h1>
           </div>
           
-          <div className="text-color1 cursor-pointer ml-6">
-            <FaRegCircleUser className="text-3xl" />
+          <div className="text-color1 cursor-pointer  ml-6" onClick={onOpen}>
+            <FaRegCircleUser className="text-3xl hover:bg-color2/70 hover:text-light duration-300 rounded-full" />
           </div>
         </div>
       </div>
+  {/* User Modal */}
+  <Modal
+        backdrop="opaque"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        classNames={{
+          backdrop: "bg-gray-900/50 backdrop-opacity-40",
+          body: "p-3 ",
+          closeButton: "hover:bg-gray-100 dark:hover:bg-gray-700",
+        }}
+        size="lg"
+      >
+        <ModalContent>
+          {() => (
+            <>
+              <ModalHeader className="flex flex-col items-center gap-4 ">
+                <img className='h-[11rem] mt-4' src={Logo} alt="Logo" />
+                <div className="text-xl font-semibold text-center text-color1">
+                </div>
+              </ModalHeader>
+              <ModalBody>
+                <LoginSignup />
+              </ModalBody>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

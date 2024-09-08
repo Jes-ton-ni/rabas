@@ -10,12 +10,13 @@ import pic1 from '../assets/donsol.jpg';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
 import { GiPositionMarker } from "react-icons/gi";
-
+import { useNavigate } from 'react-router-dom';
 const Activities = () => {
   const [selectedActivities, setSelectedActivities] = useState([]);
   const [selectedRatings, setSelectedRatings] = useState([]);
   const [selectedDestination, setSelectedDestination] = useState('All');
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const navigate = useNavigate();
 
   // Handle activity type selection
   const handleClick = (activity) => {
@@ -285,9 +286,15 @@ const Activities = () => {
                 <Button color="danger" variant="light" onPress={onClose}>
                   Close
                 </Button>
-                <Button color="primary" onPress={onClose}>
-                  Explore
-                </Button>
+                <Button 
+                                color="primary" 
+                                onPress={() => {
+                                    onClose();
+                                    navigate('/business');
+                                }}
+                            >
+                                Explore
+                            </Button>
               </ModalFooter>
             </>
           )}

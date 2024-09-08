@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Nav from '../components/nav';
 import Hero from '../components/heroaccomodation';
@@ -14,6 +15,7 @@ const Accomodation = () => {
     const [selectedDestination, setSelectedDestination] = useState('All');
     const [selectedRatings, setSelectedRatings] = useState([]);
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const navigate = useNavigate();
 
     // Accommodation Details
     const accommodationDetails = [
@@ -245,9 +247,15 @@ const Accomodation = () => {
                                 <Button color="danger" variant="light" onPress={onClose}>
                                     Close
                                 </Button>
-                                <Button color="primary" onPress={onClose}>
-                                    Explore
-                                </Button>
+                                <Button 
+                                color="primary" 
+                                onPress={() => {
+                                    onClose();
+                                    navigate('/business');
+                                }}
+                            >
+                                Explore
+                            </Button>
                             </ModalFooter>
                         </>
                     )}

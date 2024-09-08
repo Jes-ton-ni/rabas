@@ -6,6 +6,7 @@ import Activity from './pages/Activities';
 import Accomodation from './pages/Accomodation';
 import Food from './pages/Food';
 import Shop from './pages/Shop';
+import Bussiness from '../src/businesspage/businesspage'
 
 function App() {
 
@@ -19,6 +20,7 @@ function App() {
           <Route path='/accomodation' element= {<Accomodation/>}/>
           <Route path='/food' element={<Food/>}/>
           <Route path='/shop' element={<Shop/>}/>
+          <Route path='/business' element={<Bussiness/>}/>
         </Routes>
       </Router>
     </div>
