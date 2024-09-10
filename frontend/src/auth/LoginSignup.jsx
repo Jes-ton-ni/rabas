@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Tabs, Tab, Card, CardBody, Input, Button } from "@nextui-org/react";
+import { Tabs, Tab, Card, CardBody, Input, Button, Link } from "@nextui-org/react";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const LoginSignup = () => {
+  const [selected, setSelected] = useState("login");
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -24,12 +25,18 @@ const LoginSignup = () => {
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto">
-      <Tabs className='flex justify-center ' aria-label="Login or Signup">
-        <Tab key="login" title="Login">
-          <Card>
-            <CardBody >
-              <form onSubmit={handleLogin} className="space-y-4">
+    <div className="flex flex-col w-full">
+      <Card className="max-w-full w-full h-full">
+        <CardBody className="overflow-hidden">
+          <Tabs
+            fullWidth
+            size="md"
+            aria-label="Login or Signup"
+            selectedKey={selected}
+            onSelectionChange={setSelected}
+          >
+            <Tab key="login" title="Login">
+              <form onSubmit={handleLogin} className="flex flex-col gap-4">
                 <Input
                   label="Email"
                   type="email"
@@ -53,17 +60,19 @@ const LoginSignup = () => {
                     </button>
                   }
                 />
+                <p className="text-center text-small">
+                  Need to create an account?{" "}
+                  <Link className='cursor-pointer hover:text-color2' size="sm" onPress={() => setSelected("signup")}>
+                    Sign up
+                  </Link>
+                </p>
                 <Button type="submit" color="primary" className='hover:bg-color2' fullWidth>
                   Login
                 </Button>
               </form>
-            </CardBody>
-          </Card>
-        </Tab>
-        <Tab key="signup" title="Sign Up">
-          <Card>
-            <CardBody>
-              <form onSubmit={handleSignup} className="space-y-4">
+            </Tab>
+            <Tab key="signup" title="Sign Up">
+              <form onSubmit={handleSignup} className="flex flex-col gap-4">
                 <div className="flex space-x-4">
                   <Input
                     label="First Name"
@@ -135,14 +144,20 @@ const LoginSignup = () => {
                     </button>
                   }
                 />
+                <p className="text-center text-small ">
+                  Already have an account?{" "}
+                  <Link className='cursor-pointer hover:text-color2' size="sm" onPress={() => setSelected("login")}>
+                    Login
+                  </Link>
+                </p>
                 <Button type="submit" color="primary" className='hover:bg-color2' fullWidth>
                   Sign Up
                 </Button>
               </form>
-            </CardBody>
-          </Card>
-        </Tab>
-      </Tabs>
+            </Tab>
+          </Tabs>
+        </CardBody>
+      </Card>
     </div>
   );
 };

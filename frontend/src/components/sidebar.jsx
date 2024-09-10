@@ -24,7 +24,7 @@ const Sidebar = () => {
   }, [location]);
 
   return (
-    <div className='min-h-screen max-w-[300px] bg-color1  '>
+    <div className='min-h-screen max-w-[300px] bg-color1 font-sans '>
       <div className='flex flex-col justify-center mt-3'>
         <h1 className='font-bold text-4xl text-center text-white'>Business Management</h1>
         <div className='w-full flex justify-center mt-3'>

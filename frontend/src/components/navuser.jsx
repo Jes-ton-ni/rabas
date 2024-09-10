@@ -12,6 +12,7 @@ import {
 import { FaHome, FaBars, FaTimes } from 'react-icons/fa';
 import { GiPositionMarker } from "react-icons/gi";
 import { FaPersonWalking } from "react-icons/fa6";
+import Logo2 from '../assets/Rabasorso.png'
 
 const NavUser = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,13 +22,16 @@ const NavUser = () => {
   };
 
   return (
-    <div className="bg-light fixed top-0 left-0 h-[7rem] w-full px-4 shadow-lg z-50">
-      <div className="flex justify-between items-center h-full container mx-auto">
+    <div className="bg-light fixed  top-0 z-50  h-[7rem] w-full px-4 shadow-lg ">
+      <div className="flex justify-evenly gap-x-4 items-center h-full container mx-auto">
         
         {/** Logo */}
-        <div className="z-50 lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2 hover:scale-105 duration-500">
-          <a href='/'><img className="lg:h-[9rem] h-[5rem] lg:mt-28" src={Logo} alt="Logo" /></a>
-        </div>
+        <a className='z-50 flex  items-center justify-center  hover:scale-105 duration-500' href='/'>
+       
+         <img className="lg:h-[6rem] h-[5rem] text-center" src={Logo} alt="Logo" />
+          <img className="lg:h-[12rem] h-[9rem] text-center" src={Logo2} alt="Logo" />
+       
+        </a>
 
         {/** Desktop Navigation */}
         <div className="hidden lg:flex space-x-8 items-center text-color1">
@@ -206,11 +210,14 @@ const NavUser = () => {
           </div>
           
           <Dropdown placement="bottom-end ">
-            <DropdownTrigger>
-              <div className="cursor-pointer ml-6 ">
-              <Avatar  className='text-lg bg-slate-900 text-light' name="A" />
-              </div>
-            </DropdownTrigger>
+          <DropdownTrigger>
+          <div className="cursor-pointer ml-6">
+            <Avatar 
+              className='text-lg bg-color1 text-light hover:bg-color2/80 transition-colors duration-300' 
+              name="A" 
+            />
+          </div>
+        </DropdownTrigger>
             <DropdownMenu aria-label="User menu actions">
               <DropdownItem key="profile">Profile</DropdownItem>
               <DropdownItem key="logout" >Logout</DropdownItem>

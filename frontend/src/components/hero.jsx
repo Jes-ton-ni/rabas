@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
+import Slider from 'react-slick';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import hall from '../assets/hall.jpeg';
 import bulusan from '../assets/bulusan.jpg';
 import subic from '../assets/Subic.jpeg';
 import dancalan from '../assets/dancalan.png';
 
+// Import Slick CSS files
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const Hero = () => {
   const images = [hall, bulusan, subic, dancalan];
@@ -12,92 +16,92 @@ const Hero = () => {
   const greetings = [
     {
       title: 'Plan Your Perfect Journey',
-      description: 'With RabaSorsogon, your trip to Sorsogon will be more enjoyable, memorable, and truly unforgettable. Experience the best of local culture, stunning landscapes, and services, making every moment a cherished memory.'
+      description: 'With RabaSorsogon, your trip to Sorsogon will be more enjoyable, memorable, and truly unforgettable.'
     },
     {
       title: 'Embrace Serenity and Adventure',
+      description: 'Discover the perfect balance of relaxation and excitement in Sorsogon\'s diverse landscapes.'
     },
     {
       title: 'Unwind and Rejuvenate',
+      description: 'Let the natural beauty of Sorsogon refresh your mind, body, and soul.'
     },
     {
       title: 'Discover Tranquil Escapes',
+      description: 'Explore hidden gems and peaceful retreats throughout the stunning province of Sorsogon.'
     }
   ];
-  
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [fadeAnimation, setFadeAnimation] = useState(true);
 
-  const handleNext = () => {
-    setFadeAnimation(false);
-    setTimeout(() => {
-      setCurrentSlide((prevSlide) => (prevSlide + 1) % images.length);
-      setFadeAnimation(true);
-    }, 500); // Duration should match the CSS transition duration
-  };
+  const CustomPrevArrow = (props) => (
+    <button
+      {...props}
+      className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black hover:bg-color3 hover:text-dark duration-300 bg-opacity-50 text-white p-2 rounded-full focus:outline-none"
+    >
+      <FiChevronLeft size={24} />
+    </button>
+  );
 
-  const handlePrevious = () => {
-    setFadeAnimation(false);
-    setTimeout(() => {
-      setCurrentSlide((prevSlide) =>
-        prevSlide === 0 ? images.length - 1 : prevSlide - 1
-      );
-      setFadeAnimation(true);
-    }, 500); 
+  const CustomNextArrow = (props) => (
+    <button
+      {...props}
+      className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black hover:bg-color3 hover:text-dark duration-300 bg-opacity-50 text-white p-2 rounded-full focus:outline-none"
+    >
+      <FiChevronRight size={24} />
+    </button>
+  );
+
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    prevArrow: <CustomPrevArrow />,
+    nextArrow: <CustomNextArrow />,
+    fade: false,
+    cssEase: "linear",
+    autoplay: true,
+    autoplaySpeed: 5000,
+    appendDots: dots => (
+      <div style={{ position: 'absolute', bottom: '10px', width: '100%' }}>
+        <ul style={{ margin: "0px" }}> {dots} </ul>
+      </div>
+    ),
+    customPaging: i => (
+      <div className="w-3 h-3 mx-1 bg-white rounded-full opacity-50 hover:opacity-100 transition-opacity duration-300"></div>
+    ),
   };
 
   return (
-    <div className="mx-auto  mt-28 flex items-center justify-center h-[600px] relative font-sans">
-      {/* Background Image Container */}
-      <div className="absolute inset-0 z-0 bg-dark">
+    <div className="mx-auto mt-28 h-[600px] relative font-sans overflow-hidden">
+      <Slider {...settings}>
         {images.map((image, index) => (
-          <div
-            key={index}
-            className={`absolute transition-opacity duration-1000 ease-in-out ${
-              index === currentSlide ? 'opacity-100' : 'opacity-0'
-            } w-full h-full`}
-          >
+          <div key={index} className="relative h-[600px]">
             <img
               src={image}
               alt={`Slide ${index + 1}`}
-              className="w-full h-full object-cover opacity-50"
+              className="w-full h-full object-cover"
             />
+            <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+              <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-bold mb-4 animate-fadeIn">
+                {greetings[index].title}
+              </h1>
+              <p className="text-white text-lg md:text-xl max-w-2xl mb-8 animate-fadeIn animation-delay-300">
+                {greetings[index].description}
+              </p>
+            </div>
           </div>
         ))}
-      </div>
-
-      {/* Centered Text */}
-      <div className="absolute md:w-[50rem] md:h-[600px] flex flex-col items-center justify-center text-center  p-4">
-        <h1
-          className={`text-white text-4xl md:text-5xl lg:text-5xl font-bold transition-opacity duration-500 ${
-            fadeAnimation ? 'opacity-100' : 'opacity-0'
-          }`}
+      </Slider>
+      <div className="absolute bottom-[10rem] left-0 right-0 flex justify-center">
+        <a
+          href='/destination'
+          className="mt-4 flex items-center bg-light text-black font-semibold py-3 px-6 rounded-full transform transition-all duration-300 hover:translate-x-2 hover:bg-color1 hover:text-light animate-slideUp animation-delay-600"
         >
-          {greetings[currentSlide].title}
-        </h1>
-       
-      
-        <a href='/destination'
-          className="mt-9 flex items-center bg-light text-black font-semibold py-2 px-4 rounded-full transform transition-transform duration-500 hover:translate-x-2 hover:bg-color1 hover:text-light"
-        >
-          Explore  <FiChevronRight className="" size={20} />
+          Explore <FiChevronRight className="ml-2" size={20} />
         </a>
       </div>
-
-        
-      {/* Navigation Buttons */}
-      <button
-        onClick={handlePrevious}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black hover:bg-color3 hover:text-dark duration-300 bg-opacity-50 text-white p-2 rounded-full"
-      >
-        <FiChevronLeft size={24} />
-      </button>
-      <button
-        onClick={handleNext}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black hover:bg-color3 hover:text-dark duration-300  bg-opacity-50 text-white p-2 rounded-full"
-      >
-        <FiChevronRight size={24} />
-      </button>
     </div>
   );
 };
