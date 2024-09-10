@@ -1,12 +1,11 @@
 import React, { useState } from 'react'
 import { Tabs, Tab, Card, CardBody, Image, Textarea, Button, Avatar, Link } from "@nextui-org/react";
-import { MdAttachEmail, MdLocationOn, MdAccessTime } from "react-icons/md";
-import { FaFacebook, FaInstagram, FaTwitter, FaLinkedin, FaMapMarkerAlt, FaPlane, FaBus, FaStore } from "react-icons/fa";
-import { BsTelephoneOutbound } from "react-icons/bs";
-import { TbWorld } from "react-icons/tb";
 import { useBusinessContext } from './BusinessContext'
 import { businessIcons } from './businessIcons';
 import parse from 'html-react-parser';
+import 'react-quill/dist/quill.snow.css';
+
+
 
 const StarRating = ({ rating, onRatingChange, size = "md" }) => {
   const [hoverRating, setHoverRating] = useState(0);

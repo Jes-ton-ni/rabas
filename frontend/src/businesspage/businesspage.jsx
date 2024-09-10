@@ -10,6 +10,8 @@ import { Button } from '@nextui-org/react'
 import { IoStar, IoStarHalf, IoStarOutline } from "react-icons/io5";
 import { useBusinessContext } from './BusinessComponents/BusinessContext'
 import { businessIcons } from './BusinessComponents/businessIcons'
+import 'react-quill/dist/quill.snow.css';
+
 
 const BusinessPage = () => {
   const [isLiked, setIsLiked] = useState(false);

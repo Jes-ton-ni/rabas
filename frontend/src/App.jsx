@@ -12,6 +12,7 @@ import Profile from './admin/businessprofile'
 import Product from './admin/businessproducts'
 import Deals from './admin/businessdeals'
 import { BusinessProvider } from './businesspage/BusinessComponents/BusinessContext';
+import 'react-quill/dist/quill.snow.css';
 
 function App() {
   return (
