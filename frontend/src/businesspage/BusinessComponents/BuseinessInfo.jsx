@@ -2,10 +2,8 @@ import React, { useState } from 'react'
 import { Tabs, Tab, Card, CardBody, Image, Textarea, Button, Avatar, Link } from "@nextui-org/react";
 import { useBusinessContext } from './BusinessContext'
 import { businessIcons } from './businessIcons';
-import parse from 'html-react-parser';
+import DOMPurify from 'dompurify';
 import 'react-quill/dist/quill.snow.css';
-
-
 
 const StarRating = ({ rating, onRatingChange, size = "md" }) => {
   const [hoverRating, setHoverRating] = useState(0);
@@ -37,7 +35,7 @@ const ReviewCard = ({ name, rating, comment, avatar }) => (
           <h3 className="text-lg font-semibold">{name}</h3>
           <StarRating rating={rating} onRatingChange={() => {}} />
         </div>
-        <div className="text-gray-600">{parse(comment || '')}</div>
+        <div className="text-gray-600" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(comment || '') }} />
       </div>
     </CardBody>
   </Card>
@@ -56,8 +54,8 @@ const BusinessInfo = () => {
     e.preventDefault();
     const newReview = {
       id: Date.now(),
-      name: "Current User", // You might want to get this from a user context
-      rating: rating,
+      name: "Current User",
+      rating,
       comment: review,
       avatar: "https://i.pravatar.cc/150?u=currentuser"
     };
@@ -71,6 +69,10 @@ const BusinessInfo = () => {
     return IconComponent ? <IconComponent className="inline-block mr-2" /> : null;
   };
 
+  const sanitizeHtml = (html) => ({
+    __html: DOMPurify.sanitize(html)
+  });
+
   return (
     <div className='container mx-auto mt-4 px-4'>
       <Tabs aria-label="Business Information">
@@ -80,7 +82,7 @@ const BusinessInfo = () => {
               <div className="flex flex-col lg:flex-row gap-8">
                 <div className="flex-1">
                   <h2 className="text-2xl md:text-3xl font-bold mb-4">About Our Business</h2>
-                  <div className="text-gray-600 mb-6">{parse(businessData.aboutUs || '')}</div>
+                  <div className="text-gray-600 mb-6" dangerouslySetInnerHTML={sanitizeHtml(businessData.aboutUs || '')} />
                   <div className="mb-6">
                     <h3 className="text-xl font-semibold mb-2">Contact Information</h3>
                     <ul className="space-y-2">
@@ -106,7 +108,6 @@ const BusinessInfo = () => {
                     </CardBody>
                   </Card>
                 </div>
-
                 <div className="flex-1">
                   <h2 className="text-2xl md:text-3xl font-bold mb-4">Location</h2>
                   <p className="mb-4 text-gray-600">{businessData.location}</p>
@@ -154,7 +155,6 @@ const BusinessInfo = () => {
             </CardBody>
           </Card>
         </Tab>
-        
         <Tab key="facilities" title="Facilities & Amenities">
           <Card>
             <CardBody>
@@ -166,14 +166,13 @@ const BusinessInfo = () => {
                       {renderIcon(facility.icon)}
                       <h3 className="font-semibold">{facility.name}</h3>
                     </div>
-                    <div className="text-gray-600">{parse(facility.description || '')}</div>
+                    <div className="text-gray-600" dangerouslySetInnerHTML={sanitizeHtml(facility.description || '')} />
                   </div>
                 ))}
               </div>
             </CardBody>
           </Card>
         </Tab>
-        
         <Tab key="reviews" title="Reviews">
           <Card>
             <CardBody>
@@ -189,7 +188,6 @@ const BusinessInfo = () => {
                   />
                 ))}
               </div>
-              
               <Card className="bg-gray-50">
                 <CardBody>
                   <h3 className="text-xl font-bold mb-4">Leave a Review</h3>
@@ -198,7 +196,6 @@ const BusinessInfo = () => {
                       <label className="block mb-2 font-semibold">Your Rating</label>
                       <StarRating rating={rating} onRatingChange={setRating} size="lg" />
                     </div>
-                    
                     <Textarea
                       label="Your Review"
                       placeholder="Tell us about your experience..."
@@ -208,10 +205,9 @@ const BusinessInfo = () => {
                       className="w-full"
                       required
                     />
-                    
-                    <Button 
-                      type="submit" 
-                      color="primary" 
+                    <Button
+                      type="submit"
+                      color="primary"
                       disabled={rating === 0 || !review}
                       className="w-full"
                     >
@@ -223,7 +219,6 @@ const BusinessInfo = () => {
             </CardBody>
           </Card>
         </Tab>
-        
         <Tab key="policies" title="Policies">
           <Card>
             <CardBody>

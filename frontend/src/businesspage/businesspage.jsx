@@ -11,6 +11,8 @@ import { IoStar, IoStarHalf, IoStarOutline } from "react-icons/io5";
 import { useBusinessContext } from './BusinessComponents/BusinessContext'
 import { businessIcons } from './BusinessComponents/businessIcons'
 import 'react-quill/dist/quill.snow.css';
+import Section from './BusinessComponents/BusinessSection'
+import Allproducts from '../businesspage/BusinessComponents/BusinessAllproducts'
 
 
 const BusinessPage = () => {
@@ -99,6 +101,12 @@ const BusinessPage = () => {
       <div>
         <Info/>
       </div>
+    
+      <div><Section/></div>
+   
+
+      <div><Allproducts/></div>
+      
 
       <Footer/>
     </div>

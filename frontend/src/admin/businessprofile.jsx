@@ -2,10 +2,9 @@ import React, { useState, useRef } from 'react'
 import Sidebar from '../components/sidebar'
 import { FaUpload, FaSave, FaPlus, FaTrash } from 'react-icons/fa'
 import { Tabs, Tab, Card, CardBody, Input, Button, Modal, ModalContent, ModalHeader, ModalBody } from "@nextui-org/react"
-import ReactQuill from 'react-quill'
-import 'react-quill/dist/quill.snow.css'
 import { useBusinessContext } from '../businesspage/BusinessComponents/BusinessContext'
 import { businessIcons } from '../businesspage/BusinessComponents/businessIcons'
+import TextEditor from '../components/texteditor'
 
 const BusinessProfile = () => {
   const { businessData, updateBusinessData } = useBusinessContext();
@@ -14,172 +13,169 @@ const BusinessProfile = () => {
   const [isIconModalOpen, setIsIconModalOpen] = useState(false);
   const [currentEditingField, setCurrentEditingField] = useState(null);
 
+  // Handle file upload for business logo
   const handleLogoUpload = (event) => {
-    const file = event.target.files[0]
+    const file = event.target.files[0];
     if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => updateBusinessData({ businessLogo: e.target.result })
-      reader.readAsDataURL(file)
+      const reader = new FileReader();
+      reader.onload = (e) => updateBusinessData({ businessLogo: e.target.result });
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
+  // Handle file upload for hero images
   const handleHeroImagesUpload = (event) => {
-    const files = Array.from(event.target.files)
-    const newImages = files.map(file => URL.createObjectURL(file))
-    updateBusinessData({ heroImages: [...businessData.heroImages, ...newImages] })
-  }
+    const files = Array.from(event.target.files);
+    const newImages = files.map(file => URL.createObjectURL(file));
+    updateBusinessData({ heroImages: [...businessData.heroImages, ...newImages] });
+  };
 
+  // Handle adding new contact info
   const handleAddContactInfo = () => {
     updateBusinessData({
       contactInfo: [...businessData.contactInfo, { id: Date.now(), icon: 'FaPlus', label: '', value: '' }]
-    })
-  }
+    });
+  };
 
+  // Handle changes in contact info
   const handleContactInfoChange = (id, field, value) => {
     updateBusinessData({
       contactInfo: businessData.contactInfo.map(info => 
         info.id === id ? { ...info, [field]: value } : info
       )
-    })
-  }
+    });
+  };
 
+  // Handle removing contact info
   const handleRemoveContactInfo = (id) => {
     updateBusinessData({
       contactInfo: businessData.contactInfo.filter(info => info.id !== id)
-    })
-  }
+    });
+  };
 
+  // Handle adding new facility
   const handleAddFacility = () => {
     updateBusinessData({
       facilities: [...businessData.facilities, { icon: null, name: '', description: '' }]
-    })
-  }
+    });
+  };
 
+  // Handle changes in facility info
   const handleFacilityChange = (index, field, value) => {
-    const updatedFacilities = [...businessData.facilities]
-    updatedFacilities[index][field] = value
-    updateBusinessData({ facilities: updatedFacilities })
-  }
+    const updatedFacilities = [...businessData.facilities];
+    updatedFacilities[index][field] = value;
+    updateBusinessData({ facilities: updatedFacilities });
+  };
 
+  // Handle removing facility
   const handleRemoveFacility = (index) => {
-    const updatedFacilities = [...businessData.facilities]
-    updatedFacilities.splice(index, 1)
-    updateBusinessData({ facilities: updatedFacilities })
-  }
+    const updatedFacilities = [...businessData.facilities];
+    updatedFacilities.splice(index, 1);
+    updateBusinessData({ facilities: updatedFacilities });
+  };
 
+  // Handle adding new policy
   const handleAddPolicy = () => {
     updateBusinessData({
       policies: [...businessData.policies, { title: '', items: [''] }]
-    })
-  }
+    });
+  };
 
+  // Handle changes in policy info
   const handlePolicyChange = (index, field, value) => {
-    const updatedPolicies = [...businessData.policies]
-    updatedPolicies[index][field] = value
-    updateBusinessData({ policies: updatedPolicies })
-  }
+    const updatedPolicies = [...businessData.policies];
+    updatedPolicies[index][field] = value;
+    updateBusinessData({ policies: updatedPolicies });
+  };
 
+  // Handle removing policy
   const handleRemovePolicy = (index) => {
-    const updatedPolicies = [...businessData.policies]
-    updatedPolicies.splice(index, 1)
-    updateBusinessData({ policies: updatedPolicies })
-  }
+    const updatedPolicies = [...businessData.policies];
+    updatedPolicies.splice(index, 1);
+    updateBusinessData({ policies: updatedPolicies });
+  };
 
+  // Handle adding new policy item
   const handleAddPolicyItem = (policyIndex) => {
-    const updatedPolicies = [...businessData.policies]
-    updatedPolicies[policyIndex].items.push('')
-    updateBusinessData({ policies: updatedPolicies })
-  }
+    const updatedPolicies = [...businessData.policies];
+    updatedPolicies[policyIndex].items.push('');
+    updateBusinessData({ policies: updatedPolicies });
+  };
 
+  // Handle changes in policy item
   const handlePolicyItemChange = (policyIndex, itemIndex, value) => {
-    const updatedPolicies = [...businessData.policies]
-    updatedPolicies[policyIndex].items[itemIndex] = value
-    updateBusinessData({ policies: updatedPolicies })
-  }
+    const updatedPolicies = [...businessData.policies];
+    updatedPolicies[policyIndex].items[itemIndex] = value;
+    updateBusinessData({ policies: updatedPolicies });
+  };
 
+  // Handle removing policy item
   const handleRemovePolicyItem = (policyIndex, itemIndex) => {
-    const updatedPolicies = [...businessData.policies]
-    updatedPolicies[policyIndex].items.splice(itemIndex, 1)
-    updateBusinessData({ policies: updatedPolicies })
-  }
+    const updatedPolicies = [...businessData.policies];
+    updatedPolicies[policyIndex].items.splice(itemIndex, 1);
+    updateBusinessData({ policies: updatedPolicies });
+  };
 
+  // Handle adding new nearby place
   const handleAddNearbyPlace = () => {
     updateBusinessData({
       nearbyPlaces: [...businessData.nearbyPlaces, { icon: null, name: '', distance: '' }]
-    })
-  }
+    });
+  };
 
+  // Handle changes in nearby place info
   const handleNearbyPlaceChange = (index, field, value) => {
-    const updatedPlaces = [...businessData.nearbyPlaces]
-    updatedPlaces[index][field] = value
-    updateBusinessData({ nearbyPlaces: updatedPlaces })
-  }
+    const updatedPlaces = [...businessData.nearbyPlaces];
+    updatedPlaces[index][field] = value;
+    updateBusinessData({ nearbyPlaces: updatedPlaces });
+  };
 
+  // Handle removing nearby place
   const handleRemoveNearbyPlace = (index) => {
-    const updatedPlaces = [...businessData.nearbyPlaces]
-    updatedPlaces.splice(index, 1)
-    updateBusinessData({ nearbyPlaces: updatedPlaces })
-  }
+    const updatedPlaces = [...businessData.nearbyPlaces];
+    updatedPlaces.splice(index, 1);
+    updateBusinessData({ nearbyPlaces: updatedPlaces });
+  };
 
+  // Handle changes in opening hours
   const handleOpeningHoursChange = (index, field, value) => {
-    const updatedHours = [...businessData.openingHours]
-    updatedHours[index][field] = value
-    updateBusinessData({ openingHours: updatedHours })
-  }
+    const updatedHours = [...businessData.openingHours];
+    updatedHours[index][field] = value;
+    updateBusinessData({ openingHours: updatedHours });
+  };
 
+  // Open icon modal
   const openIconModal = (field) => {
-    setCurrentEditingField(field)
-    setIsIconModalOpen(true)
-  }
+    setCurrentEditingField(field);
+    setIsIconModalOpen(true);
+  };
 
+  // Handle icon selection
   const handleIconSelect = (iconName) => {
     if (currentEditingField.startsWith('contact-')) {
-      const id = parseInt(currentEditingField.split('-')[1])
-      handleContactInfoChange(id, 'icon', iconName)
+      const id = parseInt(currentEditingField.split('-')[1]);
+      handleContactInfoChange(id, 'icon', iconName);
     } else if (currentEditingField.startsWith('facility-')) {
-      const index = parseInt(currentEditingField.split('-')[1])
-      handleFacilityChange(index, 'icon', iconName)
+      const index = parseInt(currentEditingField.split('-')[1]);
+      handleFacilityChange(index, 'icon', iconName);
     } else if (currentEditingField.startsWith('nearby-')) {
-      const index = parseInt(currentEditingField.split('-')[1])
-      handleNearbyPlaceChange(index, 'icon', iconName)
+      const index = parseInt(currentEditingField.split('-')[1]);
+      handleNearbyPlaceChange(index, 'icon', iconName);
     }
-    setIsIconModalOpen(false)
-  }
+    setIsIconModalOpen(false);
+  };
 
-  const handleAddReview = () => {
-    updateBusinessData({
-      reviews: [...(businessData.reviews || []), { id: Date.now(), name: '', rating: 0, comment: '', avatar: '' }]
-    })
-  }
-
-  const handleReviewChange = (id, field, value) => {
-    updateBusinessData({
-      reviews: businessData.reviews.map(review => 
-        review.id === id ? { ...review, [field]: value } : review
-      )
-    })
-  }
-
-  const handleRemoveReview = (id) => {
-    updateBusinessData({
-      reviews: businessData.reviews.filter(review => review.id !== id)
-    })
-  }
-
-  const handleMapEmbedUrlChange = (value) => {
-    updateBusinessData({ mapEmbedUrl: value })
-  }
-
+  // Handle save action
   const handleSave = () => {
     // Implement API call to save data
-    console.log('Saving business profile...', businessData)
-  }
+    console.log('Saving business profile...', businessData);
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
       <div className="flex-1 p-8">
-        <h1 className="text-3xl font-bold mb-8 text-gray-800">Business Profile</h1>
+        <h1 className="text-3xl font-semibold mb-8 text-gray-800">Business Profile</h1>
 
         <Tabs aria-label="Business Profile Sections">
           <Tab key="general" title="General Info">
@@ -203,7 +199,7 @@ const BusinessProfile = () => {
                     />
                     <button
                       onClick={() => fileInputRef.current.click()}
-                      className='absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition'
+                      className='absolute bottom-0 right-0 bg-color1 text-white p-2 rounded-full hover:bg-blue-600 transition'
                     >
                       <FaUpload />
                     </button>
@@ -247,7 +243,7 @@ const BusinessProfile = () => {
                 />
                 <Button
                   onClick={() => heroImagesInputRef.current.click()}
-                  className='bg-blue-500 text-white hover:bg-blue-600 transition'
+                  className='bg-color1 text-white hover:bg-color2 transition'
                 >
                   Upload Hero Images
                 </Button>
@@ -259,18 +255,9 @@ const BusinessProfile = () => {
             <Card>
               <CardBody>
                 <h2 className="text-xl font-semibold mb-4 text-gray-700">About Us</h2>
-                <ReactQuill
+                <TextEditor
                   value={businessData.aboutUs}
                   onChange={(content) => updateBusinessData({ aboutUs: content })}
-                  modules={{
-                    toolbar: [
-                      ['bold', 'italic', 'underline'],
-                      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                      [{ 'align': [] }],
-                      [{ 'color': [] }, { 'background': [] }],
-                      ['clean']
-                    ]
-                  }}
                 />
                 <h3 className="text-lg font-semibold mt-4 mb-2">Contact Information</h3>
                 {businessData.contactInfo.map((info) => (
@@ -346,7 +333,7 @@ const BusinessProfile = () => {
                       className='w-1/4'
                     />
                     <Button onClick={() => handleRemoveNearbyPlace(index)} className="bg-red-500 text-white p-2">
-                      <FaTrash size={16} />
+                    <FaTrash size={16} />
                     </Button>
                   </div>
                 ))}
@@ -363,7 +350,7 @@ const BusinessProfile = () => {
                   <div key={index} className='mb-4'>
                     <div className='flex items-center gap-2 mb-2'>
                       <Button onClick={() => openIconModal(`facility-${index}`)} className="min-w-[40px] h-[40px] p-0">
-                        {facility.icon ? React.createElement(businessIcons.find(icon => icon.name === facility.icon)?.icon, { size: 20 }) : <FaPlus size={20} />}
+                        {facility.icon ? React.createElement(businessIcons.find(icon => icon.name === facility.icon)?.icon, { size: 20 }): <FaPlus size={20} />}
                       </Button>
                       <Input
                         type="text"
@@ -376,18 +363,9 @@ const BusinessProfile = () => {
                         <FaTrash size={16} />
                       </Button>
                     </div>
-                    <ReactQuill
+                    <TextEditor
                       value={facility.description}
                       onChange={(content) => handleFacilityChange(index, 'description', content)}
-                      modules={{
-                        toolbar: [
-                          ['bold', 'italic', 'underline'],
-                          [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                          [{ 'align': [] }],
-                          [{ 'color': [] }, { 'background': [] }],
-                          ['clean']
-                        ]
-                      }}
                     />
                   </div>
                 ))}
@@ -431,78 +409,6 @@ const BusinessProfile = () => {
               </CardBody>
             </Card>
           </Tab>
-
-          <Tab key="reviews" title="Reviews">
-            <Card>
-              <CardBody>
-                <h2 className="text-xl font-semibold mb-4 text-gray-700">Customer Reviews</h2>
-                {businessData.reviews && businessData.reviews.map((review) => (
-                  <div key={review.id} className='mb-4'>
-                    <Input
-                      type="text"
-                      value={review.name}
-                      onChange={(e) => handleReviewChange(review.id, 'name', e.target.value)}
-                      placeholder="Customer Name"
-                      className='mb-2'
-                    />
-                    <Input
-                      type="number"
-                      value={review.rating}
-                      onChange={(e) => handleReviewChange(review.id, 'rating', parseInt(e.target.value))}
-                      placeholder="Rating (1-5)"
-                      min="1"
-                      max="5"
-                      className='mb-2'
-                    />
-                    <ReactQuill
-                      value={review.comment}
-                      onChange={(content) => handleReviewChange(review.id, 'comment', content)}
-                      placeholder="Review comment"
-                    />
-                    <Input
-                      type="text"
-                      value={review.avatar}
-                      onChange={(e) => handleReviewChange(review.id, 'avatar', e.target.value)}
-                      placeholder="Avatar URL"
-                      className='mt-2'
-                    />
-                    <Button onClick={() => handleRemoveReview(review.id)} className="bg-red-500 text-white mt-2">
-                      Remove Review
-                    </Button>
-                  </div>
-                ))}
-                <Button onClick={handleAddReview} className="mt-2">Add Review</Button>
-              </CardBody>
-            </Card>
-          </Tab>
-
-          <Tab key="map" title="Map">
-            <Card>
-              <CardBody>
-                <h2 className="text-xl font-semibold mb-4 text-gray-700">Map Embed</h2>
-                <Input
-                  type="text"
-                  value={businessData.mapEmbedUrl || ''}
-                  onChange={(e) => handleMapEmbedUrlChange(e.target.value)}
-                  placeholder="Enter Google Maps Embed URL"
-                  className='mb-4'
-                />
-                {businessData.mapEmbedUrl && (
-                  <div className="relative h-64 md:h-80 rounded-xl overflow-hidden">
-                    <iframe
-                      src={businessData.mapEmbedUrl}
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      allowFullScreen=""
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                    ></iframe>
-                  </div>
-                )}
-              </CardBody>
-            </Card>
-          </Tab>
         </Tabs>
 
         <Button
@@ -537,4 +443,3 @@ const BusinessProfile = () => {
 }
 
 export default BusinessProfile
-                
