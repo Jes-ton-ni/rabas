@@ -51,7 +51,7 @@ const Destinations = () => {
 <div className='bg-color3 grid grid-cols-1 sm:grid-cols-2  md:grid-cols-4 lg:grid-cols-5 gap-4'>
   <div className="relative h-[200px] w-full border-2">
     <img
-      className="h-full w-full object-cover rounded-sm shadow-md shadow-black"
+      className="h-full w-full object-cover rounded-sm shadow-md"
       src={Bulusan}
       alt="Bulusan"
     />
@@ -61,12 +61,13 @@ const Destinations = () => {
     >
       Bulusan, Sorsogon
     </Link>
+    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Bulusan</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
-      className="h-full w-full object-cover rounded-sm shadow-md shadow-black"
+      className="h-full w-full object-cover rounded-sm shadow-md"
       src={Bulan}
-      alt="Bulusan"
+      alt="Bulan"
     />
     <Link
       to="/destination-page" // Replace with your destination route
@@ -74,12 +75,13 @@ const Destinations = () => {
     >
       Bulan, Sorsogon
     </Link>
+    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Bulan</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
-      className="h-full w-full object-cover rounded-sm shadow-md shadow-black"
+      className="h-full w-full object-cover rounded-sm shadow-md"
       src={Barcelona}
-      alt="Bulusan"
+      alt="Barcelona"
     />
     <Link
       to="/destination-page" // Replace with your destination route
@@ -87,12 +89,13 @@ const Destinations = () => {
     >
       Barcelona, Sorsogon
     </Link>
+    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Barcelona</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
-      className="h-full w-full object-cover rounded-sm shadow-md shadow-black"
+      className="h-full w-full object-cover rounded-sm shadow-md"
       src={Casiguran}
-      alt="Bulusan"
+      alt="Casiguran"
     />
     <Link
       to="/destination-page" // Replace with your destination route
@@ -100,12 +103,13 @@ const Destinations = () => {
     >
       Casiguran, Sorsogon
     </Link>
+    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Casiguran</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
-      className="h-full w-full object-cover rounded-sm shadow-md shadow-black"
+      className="h-full w-full object-cover rounded-sm shadow-md"
       src={Castilla}
-      alt="Bulusan"
+      alt="Castilla"
     />
     <Link
       to="/destination-page" // Replace with your destination route
@@ -113,12 +117,13 @@ const Destinations = () => {
     >
       Castilla, Sorsogon
     </Link>
+    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Castilla</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
-      className="h-full w-full object-cover rounded-sm shadow-md shadow-black"
+      className="h-full w-full object-cover rounded-sm shadow-md"
       src={Donsol}
-      alt="Bulusan"
+      alt="Donsol"
     />
     <Link
       to="/destination-page" // Replace with your destination route
@@ -126,12 +131,13 @@ const Destinations = () => {
     >
       Donsol, Sorsogon
     </Link>
+    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Donsol</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
-      className="h-full w-full object-cover rounded-sm shadow-md shadow-black"
+      className="h-full w-full object-cover rounded-sm shadow-md"
       src={Gubat}
-      alt="Bulusan"
+      alt="Gubat"
     />
     <Link
       to="/destination-page" // Replace with your destination route
@@ -139,12 +145,13 @@ const Destinations = () => {
     >
       Gubat, Sorsogon
     </Link>
+    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Gubat</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
-      className="h-full w-full object-cover rounded-sm shadow-md shadow-black"
+      className="h-full w-full object-cover rounded-sm shadow-md"
       src={Irosin}
-      alt="Bulusan"
+      alt="Irosin"
     />
     <Link
       to="/destination-page" // Replace with your destination route
@@ -152,12 +159,13 @@ const Destinations = () => {
     >
       Irosin, Sorsogon
     </Link>
+    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Irosin</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
-      className="h-full w-full object-cover rounded-sm shadow-md shadow-black"
+      className="h-full w-full object-cover rounded-sm shadow-md"
       src={Juban}
-      alt="Bulusan"
+      alt="Juban"
     />
     <Link
       to="/destination-page" // Replace with your destination route
@@ -165,12 +173,13 @@ const Destinations = () => {
     >
       Juban, Sorsogon
     </Link>
+    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Juban</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
-      className="h-full w-full object-cover rounded-sm shadow-md shadow-black"
+      className="h-full w-full object-cover rounded-sm shadow-md"
       src={Magallanes}
-      alt="Bulusan"
+      alt="Magallanes"
     />
     <Link
       to="/destination-page" // Replace with your destination route
@@ -178,12 +187,13 @@ const Destinations = () => {
     >
       Magallanes, Sorsogon
     </Link>
+    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Magallanes</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
-      className="h-full w-full object-cover rounded-sm shadow-md shadow-black"
+      className="h-full w-full object-cover rounded-sm shadow-md"
       src={Matnog}
-      alt="Bulusan"
+      alt="Matnog"
     />
     <Link
       to="/destination-page" // Replace with your destination route
@@ -191,12 +201,13 @@ const Destinations = () => {
     >
       Matnog, Sorsogon
     </Link>
+    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Matnog</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
-      className="h-full w-full object-cover rounded-sm shadow-md shadow-black"
+      className="h-full w-full object-cover rounded-sm shadow-md"
       src={Pilar}
-      alt="Bulusan"
+      alt="Pilar"
     />
     <Link
       to="/destination-page" // Replace with your destination route
@@ -204,12 +215,13 @@ const Destinations = () => {
     >
       Pilar, Sorsogon
     </Link>
+    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Pilar</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
-      className="h-full w-full object-cover rounded-sm shadow-md shadow-black"
+      className="h-full w-full object-cover rounded-sm shadow-md"
       src={Prieto}
-      alt="Bulusan"
+      alt="Prieto"
     />
     <Link
       to="/destination-page" // Replace with your destination route
@@ -217,12 +229,13 @@ const Destinations = () => {
     >
       Prieto Diaz, Sorsogon
     </Link>
+    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Prieto Diaz</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
-      className="h-full w-full object-cover rounded-sm shadow-md shadow-black"
+      className="h-full w-full object-cover rounded-sm shadow-md"
       src={Santa}
-      alt="Bulusan"
+      alt="Santa"
     />
     <Link
       to="/destination-page" // Replace with your destination route
@@ -230,19 +243,21 @@ const Destinations = () => {
     >
       Sta. Magdalena, Sorsogon
     </Link>
+    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Sta. Magdalena</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
-      className="h-full w-full object-cover rounded-sm shadow-md shadow-black"
+      className="h-full w-full object-cover rounded-sm shadow-md"
       src={Sorso}
-      alt="Bulusan"
+      alt="Sorsogon City"
     />
     <Link
       to="/destination-page" // Replace with your destination route
       className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md font-bold"
     >
-     Sorsogon City
+      Sorsogon City
     </Link>
+    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Sorsogon City</div>
   </div>  
 </div>
   </div>

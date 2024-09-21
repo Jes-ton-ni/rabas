@@ -11,6 +11,7 @@ import Dashboard from './admin/businessdashboard'
 import Profile from './admin/businessprofile'
 import Product from './admin/businessproducts'
 import Deals from './admin/businessdeals'
+import UserProfile from './auth/userprofile';
 import { BusinessProvider } from './businesspage/BusinessComponents/BusinessContext';
 import 'react-quill/dist/quill.snow.css';
 
@@ -30,6 +31,7 @@ function App() {
           <Route path='/profile' element={<Profile />} />
           <Route path='/products' element={<Product />} />
           <Route path='/deals' element={<Deals />} />
+          <Route path='/userprofile' element={<UserProfile />} />
         </Routes>
       </BusinessProvider>
     </Router>

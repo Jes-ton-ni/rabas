@@ -136,20 +136,6 @@ const BusinessInfo = () => {
                   <Button color="primary" className="w-full mb-6 hover:bg-color2/90">
                     Get Directions
                   </Button>
-                  <div className="mb-6">
-                    <h3 className="text-xl font-semibold mb-3">What's nearby</h3>
-                    <div className="space-y-4">
-                      {businessData.nearbyPlaces && businessData.nearbyPlaces.map((place, index) => (
-                        <div key={index} className="bg-gray-50 p-4 rounded-lg flex items-center">
-                          {renderIcon(place.icon)}
-                          <div>
-                            <h4 className="font-medium mb-1 text-gray-700">{place.name}</h4>
-                            <span className="text-sm text-gray-500">{place.distance}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
                 </div>
               </div>
             </CardBody>

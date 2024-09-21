@@ -1,4 +1,3 @@
-import React from 'react';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -45,7 +44,10 @@ const BusinessSection = () => {
     ]
   };
 
-
+  const handleInquire = (deal) => {
+    // Define what happens when the button is clicked
+    console.log(`Inquiring about: ${deal.name}`);
+  };
 
   return (
     <div className='mx-auto mt-4 container p-4 rounded-xl mb-4 bg-'>

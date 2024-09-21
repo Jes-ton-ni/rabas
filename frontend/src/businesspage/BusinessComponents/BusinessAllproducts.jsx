@@ -123,14 +123,19 @@ const BusinessAllProducts = () => {
             <h1 className="text-2xl font-bold mb-4">Products</h1>
             <div className="flex justify-between items-center mb-4">
                 <div className="flex space-x-2">
-                    <Button onClick={() => setFilter('All')} startContent={<FaFilter />}>ALL</Button>
-                    <Button onClick={() => setFilter('Activity')} startContent={<FaHiking />}>Activity</Button>
-                    <Button onClick={() => setFilter('Accommodation')} startContent={<FaBed />}>Accommodation</Button>
-                    <Button onClick={() => setFilter('Food')} startContent={<FaUtensils />}>Food</Button>
-                    <Button onClick={() => setFilter('Shop')} startContent={<FaShoppingBag />}>Shop</Button>
+                    {['All', 'Activity', 'Accommodation', 'Food', 'Shop'].map((category) => (
+                        <Button
+                            key={category}
+                            onClick={() => setFilter(category)}
+                            startContent={category === 'All' ? <FaFilter /> : category === 'Activity' ? <FaHiking /> : category === 'Accommodation' ? <FaBed /> : category === 'Food' ? <FaUtensils /> : <FaShoppingBag />}
+                            className={`${filter === category ? 'bg-color2 text-white' : 'bg-gray-200 text-gray-800'} hover:bg-color2 duration-300 hover:text-white`} // Tailwind styles for active state
+                        >
+                            {category}
+                        </Button>
+                    ))}
                 </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 overflow-auto max-h-[900px]"> 
                 {filteredProducts.map(product => (
                     <Card key={product.id} className="w-full max-w-sm mx-auto shadow-lg rounded-lg overflow-hidden">
                         <CardBody className="p-0">
@@ -149,7 +154,7 @@ const BusinessAllProducts = () => {
                             </div>
                         </CardBody>
                         <CardFooter className="flex justify-between p-4 bg-gray-100">
-                            <Button color="primary" size="sm"  className='hover:bg-color2 duration-300'>Inquire</Button>
+                            <Button color="primary" size="sm" className='hover:bg-color2 duration-300'>Inquire</Button>
                         </CardFooter>
                     </Card>
                 ))}

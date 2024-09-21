@@ -21,7 +21,7 @@ export const BusinessProvider = ({ children }) => {
       { day: 'Saturday', open: '', close: '' },
       { day: 'Sunday', open: '', close: '' },
     ],
-    nearbyPlaces: [],
+   
   });
 
   const updateBusinessData = (newData) => {

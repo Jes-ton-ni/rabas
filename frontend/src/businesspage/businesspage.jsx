@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import  { useState } from 'react'
 import Nav from '../components/navuser'
 import HeroAndGallery from './BusinessComponents/BusinessHero'
 import Footer from '@/components/Footer'
@@ -49,7 +49,7 @@ const BusinessPage = () => {
     <div className='mx-auto min-h-screen bg-light font-sans'>
       <Nav />
       <div className='container p-3 rounded-md mt-[7.2rem] flex justify-center'> 
-        <div className=''><Search/></div>
+        <Search/>
       </div>
      
       <HeroAndGallery />

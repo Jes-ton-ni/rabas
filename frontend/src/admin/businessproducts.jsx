@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Sidebar from '../components/sidebar';
 import { Button, Tabs, Tab, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardBody, CardFooter, Input, useDisclosure } from "@nextui-org/react";
 import { FaPlus, FaBed, FaUtensils, FaHiking, FaShoppingBag, FaImage, FaClock, FaUsers, FaChevronLeft, FaChevronRight, FaEdit, FaTimes, FaTrash } from 'react-icons/fa';
 
-const CustomInput = ({ type = 'text', label, placeholder, value, onChange, multiline = false, startContent, endContent, className, ...props }) => {
+const CustomInput = ({ type = 'text', label, placeholder, value, onChange, multiline = false, className, ...props }) => {
   const InputComponent = multiline ? 'textarea' : Input;
   return (
     <div className="mb-4">
@@ -86,7 +86,7 @@ const ProductCard = ({ product, onEdit, onDelete }) => {
   );
 };
 
-const ProductForm = ({ productDetails, setProductDetails, categoryCards, handleInputChange, handleImageUpload, handleSubmit, handleAddTag, handleRemoveTag, isEditing, editingCategory }) => (
+const ProductForm = ({ productDetails, setProductDetails, categoryCards, handleInputChange, handleImageUpload, handleSubmit, handleAddTag, handleRemoveTag, isEditing }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
     {categoryCards.filter(card => !isEditing || card.title === editingCategory).map((card, index) => (
       <Card key={index} className="p-4 shadow-lg rounded-lg">

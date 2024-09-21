@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import Sidebar from '@/components/sidebar';
 import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, useDisclosure } from "@nextui-org/react";
 import { FaPlus, FaEdit, FaTimes, FaTrash, FaImage, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
@@ -64,6 +64,7 @@ const BusinessDeals = () => {
   const [deals, setDeals] = useState([]);
 
   const handleInputChange = (field, value) => {
+    console.log(`Input Change - ${field}: ${value}`);
     setDealDetails(prev => ({
       ...prev,
       [field]: value
@@ -72,6 +73,7 @@ const BusinessDeals = () => {
 
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
+    console.log('Files uploaded:', files);
     if (files.length > 5) {
       alert("You can only upload up to 5 images.");
       return;
@@ -83,63 +85,75 @@ const BusinessDeals = () => {
   };
 
   const handleSubmit = async () => {
-    const readFileAsDataURL = (file) => new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => resolve(e.target.result);
-      reader.readAsDataURL(file);
-    });
+    try {
+      const readFileAsDataURL = (file) => new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.readAsDataURL(file);
+      });
 
-    const imageDataUrls = await Promise.all((dealDetails.images || []).map(readFileAsDataURL));
+      const imageDataUrls = await Promise.all((dealDetails.images || []).map(readFileAsDataURL));
 
-    const newDeal = {
-      id: Date.now(),
-      name: dealDetails.name,
-      description: dealDetails.description || '',
-      price: parseFloat(dealDetails.price) || 0,
-      images: imageDataUrls,
-    };
+      const newDeal = {
+        id: Date.now(),
+        name: dealDetails.name,
+        description: dealDetails.description || '',
+        price: parseFloat(dealDetails.price) || 0,
+        images: imageDataUrls,
+      };
 
-    setDeals(prevDeals => [...prevDeals, newDeal]);
-    setDealDetails({});
-    onOpenChange(false);
-    alert(`Deal "${newDeal.name}" added successfully!`);
+      console.log('New Deal:', newDeal);
+      setDeals(prevDeals => [...prevDeals, newDeal]);
+      setDealDetails({});
+      onOpenChange(false);
+      alert(`Deal "${newDeal.name}" added successfully!`);
+    } catch (error) {
+      console.error('Error adding deal:', error);
+    }
   };
 
   const handleEditDeal = (deal) => {
+    console.log('Editing Deal:', deal);
     setEditingDeal(deal);
     setDealDetails(deal);
     setEditModalOpen(true);
   };
 
   const handleUpdateDeal = async () => {
-    const readFileAsDataURL = (file) => new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => resolve(e.target.result);
-      reader.readAsDataURL(file);
-    });
+    try {
+      const readFileAsDataURL = (file) => new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.readAsDataURL(file);
+      });
 
-    const updatedImages = await Promise.all((dealDetails.images || []).map(async (image) => {
-      if (image instanceof File) {
-        return await readFileAsDataURL(image);
-      }
-      return image;
-    }));
+      const updatedImages = await Promise.all((dealDetails.images || []).map(async (image) => {
+        if (image instanceof File) {
+          return await readFileAsDataURL(image);
+        }
+        return image;
+      }));
 
-    const updatedDeal = {
-      ...editingDeal,
-      name: dealDetails.name,
-      description: dealDetails.description,
-      price: parseFloat(dealDetails.price),
-      images: updatedImages,
-    };
+      const updatedDeal = {
+        ...editingDeal,
+        name: dealDetails.name,
+        description: dealDetails.description,
+        price: parseFloat(dealDetails.price),
+        images: updatedImages,
+      };
 
-    setDeals(prevDeals => prevDeals.map(d => d.id === updatedDeal.id ? updatedDeal : d));
-    setEditingDeal(null);
-    setEditModalOpen(false);
-    alert(`Deal "${updatedDeal.name}" updated successfully!`);
+      console.log('Updated Deal:', updatedDeal);
+      setDeals(prevDeals => prevDeals.map(d => d.id === updatedDeal.id ? updatedDeal : d));
+      setEditingDeal(null);
+      setEditModalOpen(false);
+      alert(`Deal "${updatedDeal.name}" updated successfully!`);
+    } catch (error) {
+      console.error('Error updating deal:', error);
+    }
   };
 
   const handleDeleteDeal = (dealId) => {
+    console.log('Deleting Deal ID:', dealId);
     setDeals(prevDeals => prevDeals.filter(deal => deal.id !== dealId));
     alert("Deal deleted successfully!");
   };

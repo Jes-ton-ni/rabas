@@ -1,4 +1,3 @@
-import React from 'react';
 import Slider from 'react-slick';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import hall from '../assets/hall.jpeg';
@@ -67,7 +66,7 @@ const Hero = () => {
         <ul style={{ margin: "0px" }}> {dots} </ul>
       </div>
     ),
-    customPaging: i => (
+    customPaging: () => (
       <div className="w-3 h-3 mx-1 bg-white rounded-full opacity-50 hover:opacity-100 transition-opacity duration-300"></div>
     ),
   };
