@@ -116,27 +116,6 @@ const BusinessProfile = () => {
     updateBusinessData({ policies: updatedPolicies });
   };
 
-  // Handle adding new nearby place
-  const handleAddNearbyPlace = () => {
-    updateBusinessData({
-      nearbyPlaces: [...businessData.nearbyPlaces, { icon: null, name: '', distance: '' }]
-    });
-  };
-
-  // Handle changes in nearby place info
-  const handleNearbyPlaceChange = (index, field, value) => {
-    const updatedPlaces = [...businessData.nearbyPlaces];
-    updatedPlaces[index][field] = value;
-    updateBusinessData({ nearbyPlaces: updatedPlaces });
-  };
-
-  // Handle removing nearby place
-  const handleRemoveNearbyPlace = (index) => {
-    const updatedPlaces = [...businessData.nearbyPlaces];
-    updatedPlaces.splice(index, 1);
-    updateBusinessData({ nearbyPlaces: updatedPlaces });
-  };
-
   // Handle changes in opening hours
   const handleOpeningHoursChange = (index, field, value) => {
     const updatedHours = [...businessData.openingHours];
@@ -158,9 +137,6 @@ const BusinessProfile = () => {
     } else if (currentEditingField.startsWith('facility-')) {
       const index = parseInt(currentEditingField.split('-')[1]);
       handleFacilityChange(index, 'icon', iconName);
-    } else if (currentEditingField.startsWith('nearby-')) {
-      const index = parseInt(currentEditingField.split('-')[1]);
-      handleNearbyPlaceChange(index, 'icon', iconName);
     }
     setIsIconModalOpen(false);
   };
@@ -216,10 +192,10 @@ const BusinessProfile = () => {
             </Card>
           </Tab>
 
-          <Tab key="hero" title="Hero Images">
+          <Tab key="hero" title="Cover Photo">
             <Card>
               <CardBody>
-                <h2 className="text-xl font-semibold mb-4 text-gray-700">Hero Images</h2>
+                <h2 className="text-xl font-semibold mb-4 text-gray-700">Cover Photo</h2>
                 <div className='grid grid-cols-3 gap-4 mb-4'>
                   {businessData.heroImages.map((image, index) => (
                     <div key={index} className="relative">
@@ -245,7 +221,7 @@ const BusinessProfile = () => {
                   onClick={() => heroImagesInputRef.current.click()}
                   className='bg-color1 text-white hover:bg-color2 transition'
                 >
-                  Upload Hero Images
+                  Upload Images
                 </Button>
               </CardBody>
             </Card>
@@ -311,33 +287,6 @@ const BusinessProfile = () => {
                     />
                   </div>
                 ))}
-
-                <h3 className="text-lg font-semibold mt-4 mb-2">Nearby Places</h3>
-                {businessData.nearbyPlaces.map((place, index) => (
-                  <div key={index} className='flex items-center gap-2 mb-2'>
-                    <Button onClick={() => openIconModal(`nearby-${index}`)} className="min-w-[40px] h-[40px] p-0">
-                      {place.icon ? React.createElement(businessIcons.find(icon => icon.name === place.icon)?.icon, { size: 20 }) : <FaPlus size={20} />}
-                    </Button>
-                    <Input
-                      type="text"
-                      value={place.name}
-                      onChange={(e) => handleNearbyPlaceChange(index, 'name', e.target.value)}
-                      placeholder="Place name"
-                      className='flex-grow'
-                    />
-                    <Input
-                      type="text"
-                      value={place.distance}
-                      onChange={(e) => handleNearbyPlaceChange(index, 'distance', e.target.value)}
-                      placeholder="Distance"
-                      className='w-1/4'
-                    />
-                    <Button onClick={() => handleRemoveNearbyPlace(index)} className="bg-red-500 text-white p-2">
-                    <FaTrash size={16} />
-                    </Button>
-                  </div>
-                ))}
-                <Button onClick={handleAddNearbyPlace} className="mt-2">Add Nearby Place</Button>
               </CardBody>
             </Card>
           </Tab>
