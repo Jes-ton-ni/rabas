@@ -175,7 +175,7 @@ const BusinessProfile = () => {
                     />
                     <button
                       onClick={() => fileInputRef.current.click()}
-                      className='absolute bottom-0 right-0 bg-color1 text-white p-2 rounded-full hover:bg-blue-600 transition'
+                      className='absolute bottom-0 right-0 bg-color1 text-white p-2 rounded-full hover:bg-color2'
                     >
                       <FaUpload />
                     </button>

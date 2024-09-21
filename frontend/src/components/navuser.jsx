@@ -188,8 +188,8 @@ const NavUser = () => {
                   </div>
                 </DropdownTrigger>
                 <DropdownMenu aria-label="User menu actions" className="bg-white shadow-lg rounded-md mt-2">
-                  <DropdownItem key="profile" className="px-4 py-2 text-gray-800 hover:bg-gray-200 rounded-md">
-                    <Link to='/userprofile'>Profile</Link>
+                  <DropdownItem key="profile">
+                    <Link to='/userprofile' className="block w-full text-left">Profile</Link>
                   </DropdownItem>
                   <DropdownItem key="logout" color="danger" className="px-4 py-2 text-red-600 hover:bg-red-100 rounded-md">
                     Logout
@@ -223,9 +223,9 @@ const NavUser = () => {
             />
           </div>
         </DropdownTrigger>
-            <DropdownMenu aria-label="User menu actions">
-             <DropdownItem key="profile"><Link to='/userprofile'>Profile</Link></DropdownItem>
-              <DropdownItem key="logout" >Logout</DropdownItem>
+            <DropdownMenu  >
+             <DropdownItem key="profile"><Link to='/userprofile' className="block w-full text-left">Profile</Link></DropdownItem>
+              <DropdownItem key="logout"  >Logout</DropdownItem>
             </DropdownMenu>
           </Dropdown>
         </div>
