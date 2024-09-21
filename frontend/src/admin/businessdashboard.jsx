@@ -1,5 +1,5 @@
-import React from 'react'
 import Sidebar from '../components/sidebar';
+import PropTypes from 'prop-types';
 
 const BusinessDashboard = () => (
   <div className="flex min-h-screen bg-gray-50 font-sans">
@@ -33,12 +33,23 @@ const DashboardCard = ({ title, value, icon }) => (
   </div>
 );
 
+DashboardCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  value: PropTypes.number.isRequired,
+  icon: PropTypes.string.isRequired,
+};
+
 const ChartSection = ({ title }) => (
   <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
     <h2 className="text-lg font-medium mb-4 text-gray-700">{title}</h2>
-    {/* Add chart component here */}
   </div>
 );
+
+
+ChartSection.propTypes = {
+  title: PropTypes.string.isRequired, 
+};
+
 
 const Section = ({ title }) => (
   <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -46,5 +57,10 @@ const Section = ({ title }) => (
     {/* Add content here */}
   </div>
 );
+
+Section.propTypes = {
+  title: PropTypes.string.isRequired, 
+};
+
 
 export default BusinessDashboard;

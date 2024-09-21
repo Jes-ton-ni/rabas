@@ -13,6 +13,7 @@ import { FaHome, FaBars, FaTimes } from 'react-icons/fa';
 import { GiPositionMarker } from "react-icons/gi";
 import { FaPersonWalking } from "react-icons/fa6";
 import Logo2 from '../assets/Rabasorso.png'
+import { Link } from 'react-router-dom'; // Assuming this is already imported or added
 
 const NavUser = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -183,12 +184,16 @@ const NavUser = () => {
               <Dropdown placement="bottom-end">
                 <DropdownTrigger>
                   <div className="cursor-pointer">
-                  <Avatar  className='text-lg bg-slate-900 text-light' name="A" />
+                    <Avatar className='text-lg bg-slate-900 text-light' name="A" />
                   </div>
                 </DropdownTrigger>
-                <DropdownMenu aria-label="User menu actions">
-                  <DropdownItem key="profile">Profile</DropdownItem>
-                  <DropdownItem key="logout" color="danger">Logout</DropdownItem>
+                <DropdownMenu aria-label="User menu actions" className="bg-white shadow-lg rounded-md mt-2">
+                  <DropdownItem key="profile" className="px-4 py-2 text-gray-800 hover:bg-gray-200 rounded-md">
+                    <Link to='/userprofile'>Profile</Link>
+                  </DropdownItem>
+                  <DropdownItem key="logout" color="danger" className="px-4 py-2 text-red-600 hover:bg-red-100 rounded-md">
+                    Logout
+                  </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
             </div>
@@ -219,7 +224,7 @@ const NavUser = () => {
           </div>
         </DropdownTrigger>
             <DropdownMenu aria-label="User menu actions">
-              <DropdownItem key="profile">Profile</DropdownItem>
+             <DropdownItem key="profile"><Link to='/userprofile'>Profile</Link></DropdownItem>
               <DropdownItem key="logout" >Logout</DropdownItem>
             </DropdownMenu>
           </Dropdown>

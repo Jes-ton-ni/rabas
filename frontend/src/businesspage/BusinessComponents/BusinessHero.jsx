@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react'
+import  { useState, useRef, useCallback } from 'react'
 import Slider from 'react-slick'
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react"
 import EnlargedImage from '../../components/EnlargedImage'
@@ -8,7 +8,7 @@ import 'slick-carousel/slick/slick-theme.css'
 
 const BusinessHero = () => {
   const [imageLoadError, setImageLoadError] = useState(false)
-  const [currentSlide, setCurrentSlide] = useState(0)
+  const [, setCurrentSlide] = useState(0)
   const {isOpen, onOpen, onOpenChange} = useDisclosure()
   const sliderRef = useRef(null)
   const [hoveredImage, setHoveredImage] = useState(null)
@@ -181,7 +181,7 @@ const BusinessHero = () => {
                 </div>
               </ModalBody>
               <ModalFooter>
-             \
+             
               </ModalFooter>
             </>
           )}

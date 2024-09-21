@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import  { useState } from 'react'
 import Nav from '../components/navuser'
 import HeroAndGallery from './BusinessComponents/BusinessHero'
 import Footer from '@/components/Footer'
