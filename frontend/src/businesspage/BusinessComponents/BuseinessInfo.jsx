@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
-import { Tabs, Tab, Card, CardBody, Image, Textarea, Button, Avatar, Link } from "@nextui-org/react";
-import { useBusinessContext } from './BusinessContext'
+import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Tabs, Tab, Card, CardBody, Textarea, Button, Avatar } from "@nextui-org/react";
 import { businessIcons } from './businessIcons';
 import DOMPurify from 'dompurify';
-import 'react-quill/dist/quill.snow.css';
+import { updateBusinessData } from '@/redux/businessSlice'; 
 
 const StarRating = ({ rating, onRatingChange, size = "md" }) => {
   const [hoverRating, setHoverRating] = useState(0);
@@ -42,7 +42,8 @@ const ReviewCard = ({ name, rating, comment, avatar }) => (
 );
 
 const BusinessInfo = () => {
-  const { businessData, updateBusinessData } = useBusinessContext();
+  const businessData = useSelector((state) => state.business);
+  const dispatch = useDispatch();
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
 
@@ -59,7 +60,7 @@ const BusinessInfo = () => {
       comment: review,
       avatar: "https://i.pravatar.cc/150?u=currentuser"
     };
-    updateBusinessData({ reviews: [newReview, ...(businessData.reviews || [])] });
+    dispatch(updateBusinessData({ reviews: [newReview, ...(businessData.reviews || [])] }));
     setRating(0);
     setReview("");
   };

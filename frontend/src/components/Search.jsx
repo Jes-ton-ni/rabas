@@ -6,11 +6,11 @@ import { MdOutlineLocalDining } from "react-icons/md";
 import { FaShop } from "react-icons/fa6";
 
 const Search = () => {
-  const [destination, setDestination] = useState('');
-  const [activity, setActivity] = useState('');
-  const [accommodation, setAccommodation] = useState('');
-  const [food, setFood] = useState('');
-  const [shop, setShop] = useState('');
+  const [destination, setDestination] = useState(null);
+  const [activity, setActivity] = useState(null);
+  const [accommodation, setAccommodation] = useState(null);
+  const [food, setFood] = useState(null);
+  const [shop, setShop] = useState(null);
 
   const handleSearch = () => {
     // Handle search logic based on the selected options
@@ -21,6 +21,15 @@ const Search = () => {
     console.log('Selected Shop:', shop);
   };
 
+  // This function will toggle between selecting and deselecting an option
+  const handleToggleSelection = (value, currentSelection, setSelection) => {
+    if (currentSelection === value) {
+      setSelection(null); // Reset to the default (unselected)
+    } else {
+      setSelection(value); // Otherwise, select the new option
+    }
+  };
+
   return (
     <div className="flex flex-col items-center w-full">
       <div className="bg-light rounded-md shadow-lg p-4 flex flex-wrap justify-center gap-4">
@@ -29,9 +38,9 @@ const Search = () => {
         <div className="flex items-center space-x-2 flex-1 min-w-[195px]">
           <FaMapMarkerAlt className="text-dark text-md" />
           <Select
-            placeholder={destination || "Select Destination"}
-            selectedKeys={[destination]}
-            onSelectionChange={(value) => setDestination(value)}
+            placeholder={!destination ? "Select Destination" : destination}
+            selectedKeys={destination ? [destination] : []}
+            onSelectionChange={(value) => handleToggleSelection(value.currentKey, destination, setDestination)}
           >
             <SelectItem key="Bulusan">Bulusan</SelectItem>
             <SelectItem key="Bulan">Bulan</SelectItem>
@@ -55,10 +64,9 @@ const Search = () => {
         <div className="flex items-center space-x-2 flex-1 min-w-[220px]">
           <FaWalking className="text-dark text-md" />
           <Select
-            placeholder={activity || "Select Activity"}
-            selectedKeys={[activity]}
-            onSelectionChange={(value) => setActivity(value)}
-            className="whitespace-nowrap overflow-hidden text-ellipsis"
+            placeholder={!activity ? "Select Activity" : activity}
+            selectedKeys={activity ? [activity] : []}
+            onSelectionChange={(value) => handleToggleSelection(value.currentKey, activity, setActivity)}
           >
             <SelectItem key="Diving">Diving</SelectItem>
             <SelectItem key="Camping">Camping</SelectItem>
@@ -73,9 +81,9 @@ const Search = () => {
         <div className="flex items-center space-x-2 flex-1 min-w-[220px]">
           <FaBed className="text-dark text-md" />
           <Select
-            placeholder={accommodation || "Select Accommodation"}
-            selectedKeys={[accommodation]}
-            onSelectionChange={(value) => setAccommodation(value)}
+            placeholder={!accommodation ? "Select Accommodation" : accommodation}
+            selectedKeys={accommodation ? [accommodation] : []}
+            onSelectionChange={(value) => handleToggleSelection(value.currentKey, accommodation, setAccommodation)}
           >
             <SelectItem key="Hotel">Hotel</SelectItem>
             <SelectItem key="Inn">Inn</SelectItem>
@@ -87,9 +95,9 @@ const Search = () => {
         <div className="flex items-center space-x-2 flex-1 min-w-[230px]">
           <MdOutlineLocalDining className="text-dark text-md" />
           <Select
-            placeholder={food || "Select Food and Drink"}
-            selectedKeys={[food]}
-            onSelectionChange={(value) => setFood(value)}
+            placeholder={!food ? "Food Place" : food}
+            selectedKeys={food ? [food] : []}
+            onSelectionChange={(value) => handleToggleSelection(value.currentKey, food, setFood)}
           >
             <SelectItem key="Restaurant">Restaurant</SelectItem>
             <SelectItem key="Bar">Bar</SelectItem>
@@ -100,10 +108,9 @@ const Search = () => {
         <div className="flex items-center space-x-2 flex-1 min-w-[200px]">
           <FaShop className="text-dark text-md" />
           <Select
-            placeholder={shop || "Select Shop"}
-            selectedKeys={[shop]}
-            onSelectionChange={(value) => setShop(value)}
-            className="whitespace-nowrap overflow-hidden text-ellipsis"
+            placeholder={!shop ? "Select Shop" : shop}
+            selectedKeys={shop ? [shop] : []}
+            onSelectionChange={(value) => handleToggleSelection(value.currentKey, shop, setShop)}
           >
             <SelectItem key="Souvenir">Souvenir Shop</SelectItem>
           </Select>

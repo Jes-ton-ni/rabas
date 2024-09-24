@@ -62,6 +62,7 @@ module.exports = {
       },
       fontFamily: {
         custom1: ['Spinnaker','sans-serif'],
+        font1: ['Pacifico', 'cursive'],
       },
       borderRadius: {
         lg: "var(--radius)",

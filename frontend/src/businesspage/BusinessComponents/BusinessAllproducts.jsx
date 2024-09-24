@@ -1,63 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Card, CardBody, CardFooter } from '@nextui-org/react';
-import { FaShoppingCart, FaBed, FaUtensils, FaHiking, FaFilter, FaShoppingBag } from 'react-icons/fa';
+import {  FaBed, FaUtensils, FaHiking, FaFilter, FaShoppingBag } from 'react-icons/fa';
 
 const sampleProducts = [
-    {
-        id: 1,
-        name: 'Sample Product 1',
-        description: 'This is a description for Sample Product 1.',
-        price: 100.00,
-        perPax: null,
-        images: ['https://via.placeholder.com/150'],
-        tags: ['Tag1', 'Tag2'],
-        category: 'Accommodation',
-        features: ['Air-Conditioned', '1 Bedroom', '1 Bathroom']
-    },
-    {
-        id: 1,
-        name: 'Sample Product 1',
-        description: 'This is a description for Sample Product 1.',
-        price: 100.00,
-        perPax: null,
-        images: ['https://via.placeholder.com/150'],
-        tags: ['Tag1', 'Tag2'],
-        category: 'Accommodation',
-        features: ['Air-Conditioned', '1 Bedroom', '1 Bathroom']
-    },
-    {
-        id: 1,
-        name: 'Sample Product 1',
-        description: 'This is a description for Sample Product 1.',
-        price: 100.00,
-        perPax: null,
-        images: ['https://via.placeholder.com/150'],
-        tags: ['Tag1', 'Tag2'],
-        category: 'Accommodation',
-        features: ['Air-Conditioned', '1 Bedroom', '1 Bathroom']
-    },
-    {
-        id: 1,
-        name: 'Sample Product 1',
-        description: 'This is a description for Sample Product 1.',
-        price: 100.00,
-        perPax: null,
-        images: ['https://via.placeholder.com/150'],
-        tags: ['Tag1', 'Tag2'],
-        category: 'Accommodation',
-        features: ['Air-Conditioned', '1 Bedroom', '1 Bathroom']
-    },
-    {
-        id: 1,
-        name: 'Sample Product 1',
-        description: 'This is a description for Sample Product 1.',
-        price: 100.00,
-        perPax: null,
-        images: ['https://via.placeholder.com/150'],
-        tags: ['Tag1', 'Tag2'],
-        category: 'Accommodation',
-        features: ['Air-Conditioned', '1 Bedroom', '1 Bathroom']
-    },
     {
         id: 1,
         name: 'Sample Product 1',
@@ -90,19 +35,7 @@ const sampleProducts = [
         tags: ['Tag5', 'Tag6'],
         category: 'Activity',
         features: ['Duration: 2 hours', 'Guide Included']
-    },
-    {
-        id: 4,
-        name: 'Sample Product 4',
-        description: 'This is a description for Sample Product 4.',
-        price: 50.00,
-        perPax: null,
-        images: ['https://via.placeholder.com/150'],
-        tags: ['Tag7', 'Tag8'],
-        category: 'Shop',
-        features: ['Handmade', 'Local Product']
-    },
-    // Add more sample products as needed
+    }
 ];
 
 const BusinessAllProducts = () => {
@@ -135,11 +68,11 @@ const BusinessAllProducts = () => {
                     ))}
                 </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 overflow-auto max-h-[900px]"> 
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 overflow-auto max-h-[900px]">
                 {filteredProducts.map(product => (
                     <Card key={product.id} className="w-full max-w-sm mx-auto shadow-lg rounded-lg overflow-hidden">
                         <CardBody className="p-0">
-                            {product.images.length > 0 && (
+                            {product.images && product.images.length > 0 && (
                                 <img src={product.images[0]} alt={product.name} className="w-full h-48 object-cover" />
                             )}
                             <div className="p-4">

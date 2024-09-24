@@ -27,7 +27,6 @@ import {
     FaTrain,
     FaBus,
     FaBicycle,
-    FaHotel,
     FaHospital,
     FaGraduationCap,
     FaDumbbell,
@@ -46,6 +45,8 @@ import {
     FaWineGlass,
     FaIceCream
   } from 'react-icons/fa';
+  import { FaCheck } from "react-icons/fa6";
+
   
   export const businessIcons = [
     { name: 'Phone', icon: FaPhone },
@@ -92,5 +93,7 @@ import {
     { name: 'Pizza', icon: FaPizzaSlice },
     { name: 'Beer', icon: FaBeer },
     { name: 'Wine', icon: FaWineGlass },
-    { name: 'Ice Cream', icon: FaIceCream }
+    { name: 'Ice Cream', icon: FaIceCream },
+    { name: 'Check', icon: FaCheck },
+    
   ];

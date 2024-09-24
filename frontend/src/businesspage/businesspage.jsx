@@ -1,23 +1,21 @@
-import  { useState } from 'react'
-import Nav from '../components/navuser'
-import HeroAndGallery from './BusinessComponents/BusinessHero'
-import Footer from '@/components/Footer'
-import Info from '../businesspage/BusinessComponents/BuseinessInfo.jsx'
-import Search from '@/components/Search'
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import Nav from '../components/navuser';
+import HeroAndGallery from './BusinessComponents/BusinessHero';
+import Footer from '@/components/Footer';
+import Info from '../businesspage/BusinessComponents/BuseinessInfo.jsx';
+import Search from '@/components/Search';
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 import { AiOutlineLike } from "react-icons/ai";
-import { Button } from '@nextui-org/react'
+import { Button } from '@nextui-org/react';
 import { IoStar, IoStarHalf, IoStarOutline } from "react-icons/io5";
-import { useBusinessContext } from './BusinessComponents/BusinessContext'
-import { businessIcons } from './BusinessComponents/businessIcons'
 import 'react-quill/dist/quill.snow.css';
-import Section from './BusinessComponents/BusinessSection'
-import Allproducts from '../businesspage/BusinessComponents/BusinessAllproducts'
-
+import Section from './BusinessComponents/BusinessSection';
+import Allproducts from '../businesspage/BusinessComponents/BusinessAllproducts';
 
 const BusinessPage = () => {
+  const businessData = useSelector((state) => state.business);
   const [isLiked, setIsLiked] = useState(false);
-  const { businessData } = useBusinessContext();
   const averageRating = businessData.averageRating || 0;
 
   const renderStars = (rating) => {
@@ -40,11 +38,6 @@ const BusinessPage = () => {
     // For example: saveToBackend(isLiked);
   };
 
-  const renderIcon = (iconName) => {
-    const IconComponent = businessIcons.find(icon => icon.name === iconName)?.icon;
-    return IconComponent ? <IconComponent className="inline-block mr-2" /> : null;
-  };
-  
   return (
     <div className='mx-auto min-h-screen bg-light font-sans'>
       <Nav />
@@ -81,21 +74,6 @@ const BusinessPage = () => {
             </div>
           </div>
         </div>
-        
-        <div className="flex flex-wrap gap-4 mt-4">
-          {businessData.socialLinks.map((link, index) => (
-            <a 
-              key={index} 
-              href={link.url} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="flex items-center text-sm text-gray-600 hover:text-color2"
-            >
-              {renderIcon(link.icon)}
-              {link.label}
-            </a>
-          ))}
-        </div>
       </div>
 
       <div>
@@ -104,13 +82,11 @@ const BusinessPage = () => {
     
       <div><Section/></div>
    
-
       <div><Allproducts/></div>
       
-
       <Footer/>
     </div>
-  )
-}
+  );
+};
 
-export default BusinessPage
+export default BusinessPage;

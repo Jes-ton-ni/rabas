@@ -1,4 +1,4 @@
-import  { useState } from 'react';
+import { useState } from 'react';
 import Sidebar from '@/components/sidebar';
 import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, useDisclosure } from "@nextui-org/react";
 import { FaPlus, FaEdit, FaTimes, FaTrash, FaImage, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
@@ -62,9 +62,9 @@ const BusinessDeals = () => {
   const [dealDetails, setDealDetails] = useState({});
   const [editingDeal, setEditingDeal] = useState(null);
   const [deals, setDeals] = useState([]);
+  const [errors, setErrors] = useState({});
 
   const handleInputChange = (field, value) => {
-    console.log(`Input Change - ${field}: ${value}`);
     setDealDetails(prev => ({
       ...prev,
       [field]: value
@@ -73,7 +73,6 @@ const BusinessDeals = () => {
 
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
-    console.log('Files uploaded:', files);
     if (files.length > 5) {
       alert("You can only upload up to 5 images.");
       return;
@@ -84,7 +83,16 @@ const BusinessDeals = () => {
     }));
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    if (!dealDetails.name) newErrors.name = "Deal name is required";
+    if (!dealDetails.price) newErrors.price = "Price is required";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async () => {
+    if (!validateForm()) return;
     try {
       const readFileAsDataURL = (file) => new Promise((resolve) => {
         const reader = new FileReader();
@@ -102,7 +110,6 @@ const BusinessDeals = () => {
         images: imageDataUrls,
       };
 
-      console.log('New Deal:', newDeal);
       setDeals(prevDeals => [...prevDeals, newDeal]);
       setDealDetails({});
       onOpenChange(false);
@@ -113,13 +120,13 @@ const BusinessDeals = () => {
   };
 
   const handleEditDeal = (deal) => {
-    console.log('Editing Deal:', deal);
     setEditingDeal(deal);
     setDealDetails(deal);
     setEditModalOpen(true);
   };
 
   const handleUpdateDeal = async () => {
+    if (!validateForm()) return;
     try {
       const readFileAsDataURL = (file) => new Promise((resolve) => {
         const reader = new FileReader();
@@ -142,7 +149,6 @@ const BusinessDeals = () => {
         images: updatedImages,
       };
 
-      console.log('Updated Deal:', updatedDeal);
       setDeals(prevDeals => prevDeals.map(d => d.id === updatedDeal.id ? updatedDeal : d));
       setEditingDeal(null);
       setEditModalOpen(false);
@@ -153,7 +159,6 @@ const BusinessDeals = () => {
   };
 
   const handleDeleteDeal = (dealId) => {
-    console.log('Deleting Deal ID:', dealId);
     setDeals(prevDeals => prevDeals.filter(deal => deal.id !== dealId));
     alert("Deal deleted successfully!");
   };
@@ -170,15 +175,35 @@ const BusinessDeals = () => {
           {deals.map(deal => <DealCard key={deal.id} deal={deal} onEdit={handleEditDeal} onDelete={handleDeleteDeal} />)}
         </div>
 
+        {/* Add Deal Modal */}
         <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="md" scrollBehavior="inside">
           <ModalContent>
             {(onClose) => (
               <>
                 <ModalHeader className="flex flex-col gap-1">Add New Deal</ModalHeader>
                 <ModalBody>
-                  <CustomInput label="Deal Name" placeholder="Enter deal name" value={dealDetails.name || ''} onChange={(e) => handleInputChange('name', e.target.value)} />
-                  <CustomInput label="Description" placeholder="Enter description" multiline value={dealDetails.description || ''} onChange={(e) => handleInputChange('description', e.target.value)} />
-                  <CustomInput label="Price (PHP)" placeholder="Enter price" type="number" value={dealDetails.price || ''} onChange={(e) => handleInputChange('price', e.target.value)} />
+                  <CustomInput
+                    label="Deal Name"
+                    placeholder="Enter deal name"
+                    value={dealDetails.name || ''}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                  />
+                  {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+                  <CustomInput
+                    label="Description"
+                    placeholder="Enter description"
+                    multiline
+                    value={dealDetails.description || ''}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
+                  />
+                  <CustomInput
+                    label="Price (PHP)"
+                    placeholder="Enter price"
+                    type="number"
+                    value={dealDetails.price || ''}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                  />
+                  {errors.price && <p className="text-red-500 text-sm">{errors.price}</p>}
                   <div className="flex items-center space-x-2">
                     <Button color="primary" startContent={<FaImage />} as="label" htmlFor="image-upload">Upload Images (Max 5)</Button>
                     <input id="image-upload" type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
@@ -194,15 +219,35 @@ const BusinessDeals = () => {
           </ModalContent>
         </Modal>
 
+        {/* Edit Deal Modal */}
         <Modal isOpen={editModalOpen} onOpenChange={setEditModalOpen} size="md" scrollBehavior="inside">
           <ModalContent>
             {(onClose) => (
               <>
                 <ModalHeader className="flex flex-col gap-1">Edit Deal</ModalHeader>
                 <ModalBody>
-                  <CustomInput label="Deal Name" placeholder="Enter deal name" value={dealDetails.name || ''} onChange={(e) => handleInputChange('name', e.target.value)} />
-                  <CustomInput label="Description" placeholder="Enter description" multiline value={dealDetails.description || ''} onChange={(e) => handleInputChange('description', e.target.value)} />
-                  <CustomInput label="Price (PHP)" placeholder="Enter price" type="number" value={dealDetails.price || ''} onChange={(e) => handleInputChange('price', e.target.value)} />
+                  <CustomInput
+                    label="Deal Name"
+                    placeholder="Enter deal name"
+                    value={dealDetails.name || ''}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                  />
+                  {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+                  <CustomInput
+                    label="Description"
+                    placeholder="Enter description"
+                    multiline
+                    value={dealDetails.description || ''}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
+                  />
+                  <CustomInput
+                    label="Price (PHP)"
+                    placeholder="Enter price"
+                    type="number"
+                    value={dealDetails.price || ''}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                  />
+                  {errors.price && <p className="text-red-500 text-sm">{errors.price}</p>}
                   <div className="flex items-center space-x-2">
                     <Button color="primary" startContent={<FaImage />} as="label" htmlFor="image-upload-edit">Upload Images (Max 5)</Button>
                     <input id="image-upload-edit" type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />

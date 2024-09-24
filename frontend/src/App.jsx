@@ -12,13 +12,13 @@ import Profile from './admin/businessprofile'
 import Product from './admin/businessproducts'
 import Deals from './admin/businessdeals'
 import UserProfile from './auth/userprofile';
-import { BusinessProvider } from './businesspage/BusinessComponents/BusinessContext';
-import 'react-quill/dist/quill.snow.css';
+import Booking from '@/admin/businessbooking'
+
 
 function App() {
   return (
     <Router>
-      <BusinessProvider>
+     
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/destination' element={<Destinations />} />
@@ -32,8 +32,9 @@ function App() {
           <Route path='/products' element={<Product />} />
           <Route path='/deals' element={<Deals />} />
           <Route path='/userprofile' element={<UserProfile />} />
+          <Route path='/booking' element={<Booking />} />
         </Routes>
-      </BusinessProvider>
+     
     </Router>
   )
 }

@@ -219,7 +219,7 @@ const Activities = () => {
           {/* Activity List */}
           <div className='w-full'>
             <motion.div 
-              className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto max-h-[1000px] scrollbar-hide p-4'
+              className='grid grid-cols-1  gap-6 overflow-y-auto max-h-[1000px] scrollbar-hide p-4'
               variants={containerVariants}
               initial="hidden"
               animate="visible"

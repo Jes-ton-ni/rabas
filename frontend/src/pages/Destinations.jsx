@@ -48,7 +48,7 @@ const Destinations = () => {
 
   
    {/** Municipalities */}
-<div className='bg-color3 grid grid-cols-1 sm:grid-cols-2  md:grid-cols-4 lg:grid-cols-5 gap-4'>
+<div className='bg-color3 text-sm grid grid-cols-1 sm:grid-cols-2 font-font1 md:grid-cols-4 lg:grid-cols-5 gap-4'>
   <div className="relative h-[200px] w-full border-2">
     <img
       className="h-full w-full object-cover rounded-sm shadow-md"
@@ -61,7 +61,7 @@ const Destinations = () => {
     >
       Bulusan, Sorsogon
     </Link>
-    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Bulusan</div>
+    <div className="absolute bottom-2 left-2  bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Bulusan</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -75,7 +75,7 @@ const Destinations = () => {
     >
       Bulan, Sorsogon
     </Link>
-    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Bulan</div>
+    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Bulan</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -89,7 +89,7 @@ const Destinations = () => {
     >
       Barcelona, Sorsogon
     </Link>
-    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Barcelona</div>
+    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Barcelona</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -103,7 +103,7 @@ const Destinations = () => {
     >
       Casiguran, Sorsogon
     </Link>
-    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Casiguran</div>
+    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Casiguran</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -117,7 +117,7 @@ const Destinations = () => {
     >
       Castilla, Sorsogon
     </Link>
-    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Castilla</div>
+    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Castilla</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -131,7 +131,7 @@ const Destinations = () => {
     >
       Donsol, Sorsogon
     </Link>
-    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Donsol</div>
+    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Donsol</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -145,7 +145,7 @@ const Destinations = () => {
     >
       Gubat, Sorsogon
     </Link>
-    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Gubat</div>
+    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Gubat</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -159,7 +159,7 @@ const Destinations = () => {
     >
       Irosin, Sorsogon
     </Link>
-    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Irosin</div>
+    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Irosin</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -173,7 +173,7 @@ const Destinations = () => {
     >
       Juban, Sorsogon
     </Link>
-    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Juban</div>
+    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Juban</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -187,7 +187,7 @@ const Destinations = () => {
     >
       Magallanes, Sorsogon
     </Link>
-    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Magallanes</div>
+    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Magallanes</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -201,7 +201,7 @@ const Destinations = () => {
     >
       Matnog, Sorsogon
     </Link>
-    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Matnog</div>
+    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Matnog</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -215,7 +215,7 @@ const Destinations = () => {
     >
       Pilar, Sorsogon
     </Link>
-    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Pilar</div>
+    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Pilar</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -229,7 +229,7 @@ const Destinations = () => {
     >
       Prieto Diaz, Sorsogon
     </Link>
-    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Prieto Diaz</div>
+    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Prieto Diaz</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -243,7 +243,7 @@ const Destinations = () => {
     >
       Sta. Magdalena, Sorsogon
     </Link>
-    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Sta. Magdalena</div>
+    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Sta. Magdalena</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -257,7 +257,7 @@ const Destinations = () => {
     >
       Sorsogon City
     </Link>
-    <div className="absolute bottom-2 right-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Sorsogon City</div>
+    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Sorsogon City</div>
   </div>  
 </div>
   </div>
