@@ -57,11 +57,11 @@ const Destinations = () => {
     />
     <Link
       to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md font-bold"
+      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
     >
-      Bulusan, Sorsogon
+    Explore
     </Link>
-    <div className="absolute bottom-2 left-2  bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Bulusan</div>
+    <div className="absolute bottom-0 left-0 right-0 bg-dark/60   text-white rounded-lg p-1  text-md text-center w-full  ">Bulusan</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -71,11 +71,11 @@ const Destinations = () => {
     />
     <Link
       to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md font-bold"
+      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
     >
-      Bulan, Sorsogon
+    Explore 
     </Link>
-    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Bulan</div>
+    <div className="absolute bottom-0 left-0 right-0  bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full  ">Bulan</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -85,11 +85,11 @@ const Destinations = () => {
     />
     <Link
       to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md font-bold"
+      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
     >
-      Barcelona, Sorsogon
+    Explore 
     </Link>
-    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Barcelona</div>
+    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full   ">Barcelona</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -99,11 +99,11 @@ const Destinations = () => {
     />
     <Link
       to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md font-bold"
+      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
     >
-      Casiguran, Sorsogon
+    Explore
     </Link>
-    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Casiguran</div>
+    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full ">Casiguran</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -113,11 +113,11 @@ const Destinations = () => {
     />
     <Link
       to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md font-bold"
+      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
     >
-      Castilla, Sorsogon
+    Explore
     </Link>
-    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Castilla</div>
+    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full ">Castilla</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -127,11 +127,11 @@ const Destinations = () => {
     />
     <Link
       to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md font-bold"
+      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
     >
-      Donsol, Sorsogon
+    Explore 
     </Link>
-    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Donsol</div>
+    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full   ">Donsol</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -141,11 +141,11 @@ const Destinations = () => {
     />
     <Link
       to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md font-bold"
+      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
     >
-      Gubat, Sorsogon
+   Explore
     </Link>
-    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Gubat</div>
+    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full   ">Gubat</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -155,11 +155,11 @@ const Destinations = () => {
     />
     <Link
       to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md font-bold"
+      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
     >
-      Irosin, Sorsogon
+ Explore
     </Link>
-    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Irosin</div>
+    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full  ">Irosin</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -169,11 +169,11 @@ const Destinations = () => {
     />
     <Link
       to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md font-bold"
+      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
     >
-      Juban, Sorsogon
+    Explore 
     </Link>
-    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Juban</div>
+    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full   ">Juban</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -183,11 +183,11 @@ const Destinations = () => {
     />
     <Link
       to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md font-bold"
+      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
     >
-      Magallanes, Sorsogon
+Explore
     </Link>
-    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Magallanes</div>
+    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full ">Magallanes</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -197,11 +197,11 @@ const Destinations = () => {
     />
     <Link
       to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md font-bold"
+      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
     >
-      Matnog, Sorsogon
+    Explore
     </Link>
-    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Matnog</div>
+    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full  ">Matnog</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -211,11 +211,11 @@ const Destinations = () => {
     />
     <Link
       to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md font-bold"
+      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
     >
-      Pilar, Sorsogon
+   Explore
     </Link>
-    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Pilar</div>
+    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full   ">Pilar</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -225,11 +225,11 @@ const Destinations = () => {
     />
     <Link
       to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md font-bold"
+      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
     >
-      Prieto Diaz, Sorsogon
+    Explore 
     </Link>
-    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Prieto Diaz</div>
+    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full  ">Prieto Diaz</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -239,11 +239,11 @@ const Destinations = () => {
     />
     <Link
       to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md font-bold"
+      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
     >
-      Sta. Magdalena, Sorsogon
+    Explore
     </Link>
-    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Sta. Magdalena</div>
+    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full   ">Sta. Magdalena</div>
   </div>
   <div className="relative h-[200px] w-full border-2">
     <img
@@ -253,11 +253,11 @@ const Destinations = () => {
     />
     <Link
       to="/destination-page" // Replace with your destination route
-      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md font-bold"
+      className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 text-white text-md "
     >
-      Sorsogon City
+   Explore
     </Link>
-    <div className="absolute bottom-2 left-2 bg-white bg-opacity-80 p-1 text-black font-semibold rounded shadow-md">Sorsogon City</div>
+    <div className="absolute bottom-0  left-0 right-0 bg-dark/60  text-white rounded-lg p-1 text-md text-center w-full  ">Sorsogon City</div>
   </div>  
 </div>
   </div>

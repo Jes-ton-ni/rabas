@@ -11,7 +11,6 @@ import "slick-carousel/slick/slick-theme.css";
 
 const Hero = () => {
   const images = [hall, bulusan, subic, dancalan];
-  
   const greetings = [
     {
       title: 'Plan Your Perfect Journey',
@@ -35,6 +34,7 @@ const Hero = () => {
     <button
       {...props}
       className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black hover:bg-color3 hover:text-dark duration-300 bg-opacity-50 text-white p-2 rounded-full focus:outline-none"
+      onClick={props.onClick}
     >
       <FiChevronLeft size={24} />
     </button>
@@ -44,6 +44,7 @@ const Hero = () => {
     <button
       {...props}
       className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black hover:bg-color3 hover:text-dark duration-300 bg-opacity-50 text-white p-2 rounded-full focus:outline-none"
+      onClick={props.onClick}
     >
       <FiChevronRight size={24} />
     </button>
@@ -61,7 +62,7 @@ const Hero = () => {
     cssEase: "linear",
     autoplay: true,
     autoplaySpeed: 5000,
-    appendDots: dots => (
+    appendDots: (dots) => (
       <div style={{ position: 'absolute', bottom: '10px', width: '100%' }}>
         <ul style={{ margin: "0px" }}> {dots} </ul>
       </div>
