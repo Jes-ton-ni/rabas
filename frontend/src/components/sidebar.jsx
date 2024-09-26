@@ -15,11 +15,11 @@ const Sidebar = () => {
   const location = useLocation();
 
   const navItems = [
-    { icon: <MdDashboard className="text-2xl" />, label: 'Dashboard', path: '/dashboard' },
-    { icon: <RiProfileFill className="text-2xl" />, label: 'Business Profile', path: '/profile' },
-    { icon: <CiBoxes className="text-2xl" />, label: 'Business Products', path: '/products' },
-    { icon: <IoPricetagsOutline className="text-2xl" />, label: 'Business Deals', path: '/deals' },
-    { icon: <FaCalendar className="text-2xl" />, label: 'Business Bookings', path: '/booking' }
+    { icon: <MdDashboard className="text-2xl" />, label: 'Dashboard', path: '/admin' },
+    { icon: <RiProfileFill className="text-2xl" />, label: 'Business Profile', path: '/profileadmin' },
+    { icon: <CiBoxes className="text-2xl" />, label: 'Business Products', path: '/productsadmin' },
+    { icon: <IoPricetagsOutline className="text-2xl" />, label: 'Business Deals', path: '/dealsadmin' },
+    { icon: <FaCalendar className="text-2xl" />, label: 'Business Bookings', path: '/bookingadmin' }
   ];
 
   useEffect(() => {
