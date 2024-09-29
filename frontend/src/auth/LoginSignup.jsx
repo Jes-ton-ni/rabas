@@ -1,23 +1,80 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tabs, Tab, Button, Input, Link } from "@nextui-org/react";
 import { FaEye, FaEyeSlash, FaGoogle, FaEnvelope, FaArrowLeft } from 'react-icons/fa';
 import Logo2 from '../assets/Rabas.png';
+import swal from 'sweetalert'; //npm install sweetalert
 
 const LoginSignup = () => {
   const [view, setView] = useState("initial"); // initial, email, signup, forgotPassword
   const [selected, setSelected] = useState("login");
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [name, setName] = useState('');
-  const [address, setAddress] = useState('');
-  const [contactNumber, setContactNumber] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+
+  const [identifier, setIdentifier] = useState(''); // Update state to hold identifier (username or email) for login
+  const [loginPassword, setLoginPassword] = useState('');
 
   const handleLogin = (e) => {
     e.preventDefault();
     // Handle login logic here
   };
+  
+  const [signupData, setSignupData] = useState({
+    username: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    address: '',
+    phone: '',
+    password: '',
+    confirmPassword: ''
+  });
+
+  const handleSignupChange = (e) => {
+    const { name, value } = e.target;
+    setSignupData(prevFields => ({
+      ...prevFields,
+      [name]: value
+    }));
+  };
+  
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleSignup = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await fetch('http://localhost:5000/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include', 
+        body: JSON.stringify(signupData)
+      });
+      const data = await response.json();
+      console.log(data);
+      if(data.success){
+        swal({
+          title: 'Signup Successful!',
+          text: ' ',
+          icon: 'success',
+          buttons: false,
+          timer: 1500,
+        }).then(() => {          
+          window.location.href = '/'; // Redirect to home page after the alert is closed
+        });
+      }
+      else{
+        swal({
+          title: 'Signup Failed!',
+          text: data.error,
+          icon: 'error',
+          buttons: false,
+          timer: 2000,
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);      
+      alert('An error occurred while signing up. Please try again later.'); // Display a generic error message to the user
+    }
+  }
 
   const handleGoogleLogin = () => {
     // Handle Google sign-in logic here
@@ -71,17 +128,17 @@ const LoginSignup = () => {
           <form onSubmit={handleLogin} className="flex flex-col gap-4 ">
           <h1 className='font-font1 text-center text-2xl mb-2'>Welcome Back, Tara Rabas kita !</h1>
             <Input
-              label="Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              label="Email/username"
+              type="text"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
               required
             />
             <Input
               label="Password"
               type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
               required
               endContent={
                 <button
@@ -123,40 +180,61 @@ const LoginSignup = () => {
         </Tab>
 
         <Tab key="signup" title="Sign Up">
-          <form onSubmit={handleLogin} className="flex flex-col gap-4">
+          <form onSubmit={handleSignup} className="flex flex-col gap-4">
             <Input
-              label="Name"
+              label="First Name"
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              name='firstName'
+              value={signupData.firstName}
+              onChange={handleSignupChange}
+              required
+            />
+            <Input
+              label="Last Name"
+              type="text"
+              name='lastName'
+              value={signupData.lastName}
+              onChange={handleSignupChange}
               required
             />
             <Input
               label="Email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name='email'
+              value={signupData.email}
+              onChange={handleSignupChange}
               required
             />
-              <Input
+            <Input
+              label="Username"
+              type="text"
+              name='username'
+              value={signupData.username}
+              onChange={handleSignupChange}
+              required
+            />
+            <Input
               label="Address"
               type="text"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
+              name='address'
+              value={signupData.address}
+              onChange={handleSignupChange}
               required
             />
             <Input
               label="Contact Number"
-              type="tel"
-              value={contactNumber}
-              onChange={(e) => setContactNumber(e.target.value)}
+              type="text"
+              name='phone'
+              value={signupData.phone}
+              onChange={handleSignupChange}
               required
             />
             <Input
               label="Password"
               type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              name='password'
+              value={signupData.password}
+              onChange={handleSignupChange}
               required
               endContent={
                 <button
@@ -175,8 +253,9 @@ const LoginSignup = () => {
             <Input
               label="Confirm Password"
               type={showPassword ? "text" : "password"}
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              name='confirmPassword'
+              value={signupData.confirmPassword}
+              onChange={handleSignupChange}
               required
               endContent={
                 <button
