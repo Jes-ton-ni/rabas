@@ -11,9 +11,67 @@ const LoginSignup = () => {
   const [identifier, setIdentifier] = useState(''); // Update state to hold identifier (username or email) for login
   const [loginPassword, setLoginPassword] = useState('');
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    // Handle login logic here
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Add state to track login status
+
+  useEffect(() => {
+    document.title = 'Login/Signup - Spa-ntaneous';
+
+    // Check login status when the component mounts
+    const checkLoginStatus = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/check-login', {
+          method: 'GET',
+          credentials: 'include', // Include credentials
+        });
+        const data = await response.json();
+        setIsLoggedIn(data.isLoggedIn);
+      } catch (error) {
+        console.error('Error checking login status:', error);
+      }
+    };
+
+    checkLoginStatus(); // Call the function
+  }, []);
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('sessionId')}` // Include session ID in the headers
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          identifier: identifier, // Send identifier instead of username
+          password: loginPassword
+        })
+      });
+      const data = await response.json();
+      if (data.success) {
+        swal({
+          title: 'Login Successful!',
+          text: ' ',
+          icon: 'success',
+          buttons: false,
+          timer: 1500,
+        }).then(() => {         
+          window.location.href = '/login'; // Redirect to home page after the alert is closed
+        });
+      } else {
+        swal({
+          title: 'Login Failed!',
+          text: 'Invalid username or password',
+          icon: 'error',
+          buttons: false,
+          timer: 2000,
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error); 
+      alert('An error occurred while logging in. Please try again later.'); // Display a generic error message to the user      
+    }
   };
   
   const [signupData, setSignupData] = useState({

@@ -471,5 +471,162 @@ app.post('/admin/logout', (req, res) => {
 });
 
 
+//Para sa pag display ng business
+// Endpoint to fetch businesses
+app.get('/businesses', (req, res) => {
+  const sql = `
+    SELECT * FROM business
+  `;
+  
+  // Execute the SQL query
+  connection.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error executing SQL query:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+    // Send the list of businesses as the response
+    return res.json({ success: true, businesses: results });
+  });
+});
+
+//Para sa pag display ng accomodations
+// Endpoint to fetch accomodations
+app.get('/accomodations', (req, res) => {
+  const sql = `
+    SELECT * FROM accomodations
+  `;
+  
+  // Execute the SQL query
+  connection.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error executing SQL query:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+    // Send the list of accomodations as the response
+    return res.json({ success: true, accomodations: results });
+  });
+});
+
+//Para sa pag display ng foods
+// Endpoint to fetch foods
+app.get('/foods', (req, res) => {
+  const sql = `
+    SELECT * FROM foods
+  `;
+  
+  // Execute the SQL query
+  connection.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error executing SQL query:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+    // Send the list of foods as the response
+    return res.json({ success: true, foods: results });
+  });
+});
+
+//para sa pag display ng mga rooms
+//Endpoint to fetch rooms
+app.get('/rooms', (req, res) => {
+  const sql = `
+    SELECT * FROM rooms
+  `;
+  // Execute the SQL query
+  connection.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error executing SQL query:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+    // Send the list of rooms as the response
+    return res.json({ success: true, rooms: results });
+  });
+});
+
+//para sa pag display ng mga activities
+//Endpoint to fetch activities
+app.get('/activities', (req, res) => {
+  const sql = `
+    SELECT * FROM activities
+  `;
+  // Execute the SQL query
+  connection.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error executing SQL query:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+    // Send the list of activities as the response
+    return res.json({ success: true, activities: results });
+  });
+});
+
+//para sa pag display ng mga amenities
+//Endpoint to fetch amenities
+app.get('/amenities', (req, res) => {
+  const sql = `
+    SELECT * FROM amenities
+  `;
+  // Execute the SQL query
+  connection.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error executing SQL query:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+    // Send the list of amenities as the response
+    return res.json({ success: true, amenities: results });
+  });
+});
+
+//para sa pag display ng mga deals
+//Endpoint to fetch deals
+app.get('/deals', (req, res) => {
+  const sql = `
+    SELECT * FROM deals
+  `;
+  // Execute the SQL query
+  connection.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error executing SQL query:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+    // Send the list of deals as the response
+    return res.json({ success: true, deals: results });
+  });
+});
+
+//para sa pag display ng mga products
+//Endpoint to fetch products
+app.get('/products', (req, res) => {
+  const sql = `
+    SELECT * FROM products
+  `;
+  // Execute the SQL query
+  connection.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error executing SQL query:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+    // Send the list of products as the response
+    return res.json({ success: true, products: results });
+  });
+});
+
+//para sa pag display ng mga location
+//Endpoint to fetch locations
+app.get('/locations', (req, res) => {
+  const sql = `
+    SELECT * FROM locations
+  `;
+  // Execute the SQL query
+  connection.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error executing SQL query:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+    // Send the list of locations as the response
+    return res.json({ success: true, locations: results });
+  });
+});
+
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));

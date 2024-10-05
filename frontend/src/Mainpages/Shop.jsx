@@ -5,20 +5,22 @@ import Hero from '../components/heroshop';
 import Search from '@/components/Search';
 import Footer from '@/components/Footer';
 import ShopImage from '../assets/shop.webp';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
-import { Select, SelectItem } from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
+import { Checkbox, CheckboxGroup, Select, SelectItem, Slider } from "@nextui-org/react";
 import { GiPositionMarker } from "react-icons/gi";
-import { useNavigate } from 'react-router-dom';
-const Shop = () => {
-    const [selectedType, setSelectedType] = useState('All');
-    const [selectedDestination, setSelectedDestination] = useState('All');
-    const [selectedCategory, setSelectedCategory] = useState('All');
-    const [selectedFeatures, setSelectedFeatures] = useState([]);
-    const [selectedRatings, setSelectedRatings] = useState([]);
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    const navigate = useNavigate();
+import { Link } from 'react-router-dom';
 
-    // Shop Details
+
+const Shop = () => {
+    const [selectedType, setSelectedType] = useState([]);
+    const [selectedDestination, setSelectedDestination] = useState('All');
+    const [selectedCategory, setSelectedCategory] = useState([]);
+    const [selectedAmenities, setSelectedAmenities] = useState([]);
+    const [selectedRatings, setSelectedRatings] = useState([]);
+    const [priceRange, setPriceRange] = useState([0, 5000]); // Price range slider
+   
+
+    // Shop Details (mock data)
     const shopDetails = [
         {
             name: 'Sample Souvenir Shop 1',
@@ -26,9 +28,10 @@ const Shop = () => {
             image: ShopImage,
             tags: ['Souvenir Shop'],
             category: 'Handicrafts',
-            features: ['Local Products', 'Gift Wrapping'],
+            Amenities: ['Local Products', 'Gift Wrapping'],
             destination: 'Sorsogon City',
-            rating: 4
+            rating: 4,
+            price: '500-1500',
         },
         {
             name: 'Sample Clothing Boutique 1',
@@ -36,28 +39,46 @@ const Shop = () => {
             image: ShopImage,
             tags: ['Clothing Store'],
             category: 'Fashion',
-            features: ['Fitting Rooms', 'Seasonal Sales'],
+            Amenities: ['Fitting Rooms', 'Seasonal Sales'],
             destination: 'Gubat',
-            rating: 5
+            rating: 5,
+            price: '1000-3000',
         },
-        // Add more shops as needed
+        {
+            name: 'Sample Bookstore',
+            description: 'A quaint bookstore with a vast selection of local and international books.',
+            image: ShopImage,
+            tags: ['Bookstore'],
+            category: 'Books',
+            Amenities: ['Reading Areas', 'Custom Orders'],
+            destination: 'Matnog',
+            rating: 3,
+            price: '200-800',
+        },
+        {
+            name: 'Sample Electronics Store',
+            description: 'A store with a variety of electronic devices and accessories.',
+            image: ShopImage,
+            tags: ['Electronics Store'],
+            category: 'Electronics',
+            Amenities: ['Online Shopping', 'Custom Orders'],
+            destination: 'Bulusan',
+            rating: 4,
+            price: '1500-5000',
+        },
     ];
 
     const destinations = [
         'All', 'Bulusan', 'Bulan', 'Barcelona', 'Casiguran', 'Castilla', 'Donsol', 'Gubat', 'Irosin', 'Juban', 'Magallanes', 'Matnog', 'Pilar', 'Prieto Diaz', 'Sta. Magdalena', 'Sorsogon City'
     ];
 
-    const types = ['All', 'Souvenir Shop', 'Clothing Store', 'Grocery Store', 'Electronics Store', 'Bookstore'];
-    const categories = ['All', 'Handicrafts', 'Fashion', 'Food', 'Electronics', 'Books', 'Home Decor'];
-    const features = ['Local Products', 'Gift Wrapping', 'Fitting Rooms', 'Seasonal Sales', 'Online Shopping', 'Custom Orders'];
+    const shopTypes = ['Souvenir Shop', 'Clothing Store', 'Grocery Store', 'Electronics Store', 'Bookstore'];
+    const categories = ['Handicrafts', 'Fashion', 'Food', 'Electronics', 'Books', 'Home Decor'];
+    const amenitiesList = ['Local Products', 'Gift Wrapping', 'Fitting Rooms', 'Seasonal Sales', 'Online Shopping', 'Custom Orders'];
 
-    // Handle feature selection
-    const handleFeatureClick = (feature) => {
-        setSelectedFeatures((prevSelected) =>
-            prevSelected.includes(feature)
-                ? prevSelected.filter((f) => f !== feature)
-                : [...prevSelected, feature]
-        );
+    // Handle Amenities selection
+    const handleAmenitiesChange = (selected) => {
+        setSelectedAmenities(selected);
     };
 
     // Handle rating selection
@@ -73,14 +94,29 @@ const Shop = () => {
         }
     };
 
-    // Filter the shops based on the selected filters
+    const handleTypeChange = (selected) => {
+        setSelectedType(selected);
+    };
+
+    const handleCategoryChange = (selected) => {
+        setSelectedCategory(selected);
+    };
+
+    const handleDestinationChange = (destination) => {
+        setSelectedDestination(destination);
+    };
+
+    // Filtering the shops based on selected filters
     const filteredShops = shopDetails.filter((shop) => {
-        const matchDestination = selectedDestination === 'All' || shop.destination === selectedDestination;
-        const matchType = selectedType === 'All' || shop.tags.includes(selectedType);
-        const matchCategory = selectedCategory === 'All' || shop.category === selectedCategory;
-        const matchFeatures = selectedFeatures.length === 0 || selectedFeatures.every(f => shop.features.includes(f));
+        const matchType = selectedType.length === 0 || selectedType.every((type) => shop.tags.includes(type));
+        const matchCategory = selectedCategory.length === 0 || selectedCategory.includes(shop.category);
+        const matchAmenities= selectedAmenities.length === 0 || selectedAmenities.every(f => shop.Amenities.includes(f));
         const matchRating = selectedRatings.length === 0 || selectedRatings.includes(shop.rating);
-        return matchDestination && matchType && matchCategory && matchFeatures && matchRating;
+        const matchDestination = selectedDestination === 'All' || shop.destination === selectedDestination;
+        const [minPrice, maxPrice] = shop.price.split('-').map(Number);
+        const matchPrice = minPrice >= priceRange[0] && maxPrice <= priceRange[1];
+
+        return matchType && matchCategory && matchAmenities&& matchRating && matchDestination && matchPrice;
     });
 
     // Animation variants for the container
@@ -109,7 +145,7 @@ const Shop = () => {
     };
 
     return (
-        <div className='mx-auto bg-light min-h-screen font-sans '>
+        <div className='mx-auto bg-light min-h-screen font-sans'>
             <Nav />
             <Hero />
             <Search />
@@ -129,7 +165,7 @@ const Shop = () => {
                                 <Select
                                     placeholder="Select Destination"
                                     selectedKeys={[selectedDestination]}
-                                    onSelectionChange={(value) => setSelectedDestination(value.currentKey)}
+                                    onSelectionChange={(value) => handleDestinationChange(value.currentKey)}
                                 >
                                     {destinations.map((destination) => (
                                         <SelectItem key={destination} value={destination}>
@@ -139,53 +175,66 @@ const Shop = () => {
                                 </Select>
                             </div>
 
-                            {/* Type Dropdown */}
-                            <div className='mb-6'>
-                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Type</h3>
-                                <Select
-                                    placeholder="Select Type"
-                                    selectedKeys={[selectedType]}
-                                    onSelectionChange={(value) => setSelectedType(value.currentKey)}
+                            {/* Shop Type Filter */}
+                            <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
+                                <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Shop Type</h3>
+                                <CheckboxGroup
+                                    value={selectedType}
+                                    onChange={handleTypeChange}
                                 >
-                                    {types.map((type) => (
-                                        <SelectItem key={type} value={type}>
+                                    {shopTypes.map((type) => (
+                                        <Checkbox key={type} value={type}>
                                             {type}
-                                        </SelectItem>
+                                        </Checkbox>
                                     ))}
-                                </Select>
+                                </CheckboxGroup>
                             </div>
 
-                            {/* Category Dropdown */}
-                            <div className='mb-6'>
-                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Category</h3>
-                                <Select
-                                    placeholder="Select Category"
-                                    selectedKeys={[selectedCategory]}
-                                    onSelectionChange={(value) => setSelectedCategory(value.currentKey)}
+                            {/* Category Filter */}
+                            <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
+                                <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Category</h3>
+                                <CheckboxGroup
+                                    value={selectedCategory}
+                                    onChange={handleCategoryChange}
                                 >
                                     {categories.map((category) => (
-                                        <SelectItem key={category} value={category}>
+                                        <Checkbox key={category} value={category}>
                                             {category}
-                                        </SelectItem>
+                                        </Checkbox>
                                     ))}
-                                </Select>
+                                </CheckboxGroup>
                             </div>
 
-                            {/* Features Checkboxes */}
-                            <div className='mb-6'>
-                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Features</h3>
-                                <div className='space-y-2'>
-                                    {features.map((feature) => (
-                                        <label key={feature} className='flex items-center'>
-                                            <input
-                                                type='checkbox'
-                                                onChange={() => handleFeatureClick(feature)}
-                                                checked={selectedFeatures.includes(feature)}
-                                                className='form-checkbox text-color2'
-                                            />
-                                            <span className='ml-2 text-sm'>{feature}</span>
-                                        </label>
+                            {/* AmenitiesFilter */}
+                            <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
+                                <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Amenities</h3>
+                                <CheckboxGroup
+                                    value={selectedAmenities}
+                                    onChange={handleAmenitiesChange}
+                                >
+                                    {amenitiesList.map((amenities) => (
+                                        <Checkbox key={amenities} value={amenities}>
+                                            {amenities}
+                                        </Checkbox>
                                     ))}
+                                </CheckboxGroup>
+                            </div>
+
+                            {/* Price Range Filter */}
+                            <div className='mb-6'>
+                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Price Range (PHP)</h3>
+                                <Slider
+                                    step={100}
+                                    minValue={0}
+                                    maxValue={5000}
+                                    value={priceRange}
+                                    onChange={setPriceRange}
+                                    formatOptions={{ style: 'currency', currency: 'PHP' }}
+                                    className="max-w-md flex"
+                                />
+                                <div className='flex justify-between text-xs'>
+                                    <span>₱{priceRange[0]}</span>
+                                    <span>₱{priceRange[1]}+</span>
                                 </div>
                             </div>
 
@@ -224,7 +273,7 @@ const Shop = () => {
                     {/* Shop List */}
                     <div className='w-full'>
                         <motion.div 
-                            className='grid grid-cols-1  gap-6 overflow-y-auto max-h-[1000px] scrollbar-hide p-4'
+                            className='grid grid-cols-1 gap-6 overflow-y-auto max-h-[1000px] scrollbar-hide p-4'
                             variants={containerVariants}
                             initial="hidden"
                             animate="visible"
@@ -242,6 +291,7 @@ const Shop = () => {
                                             className='w-full h-48 object-cover rounded-t-lg'
                                         />
                                         <div className='p-4'>
+                                        <div className='flex justify-between items-center mb-2'>
                                             <div className='flex flex-wrap gap-2 mb-2'>
                                                 {shop.tags.map((tag, index) => (
                                                     <span key={index} className='bg-color2 text-color3 text-xs px-2 py-1 rounded-full'>
@@ -249,19 +299,21 @@ const Shop = () => {
                                                     </span>
                                                 ))}
                                             </div>
-                                            <h2 className='text-lg font-semibold mb-2'>{shop.name}</h2>
-                                            <p className='text-sm text-gray-600 mb-2'>{shop.description}</p>
-                                            <div className='text-xs text-gray-500 mb-2 flex items-center'><GiPositionMarker/>{shop.destination}</div>
-                                            <div className='mb-2'>
-                                                <span className='text-sm font-semibold'>Category: </span>
-                                                <span className='text-sm'>{shop.category}</span>
-                                            </div>
                                             <div className='flex items-center mb-4'>
-                                                <span className='text-yellow-500'>{'★'.repeat(shop.rating)}{'☆'.repeat(5 - shop.rating)}</span>
+                                              <span className='text-[12px]'>{shop.rating}</span>  <span className='text-yellow-500'>{'★'.repeat(shop.rating)}{'☆'.repeat(5 - shop.rating)}</span>
                                             </div>
-                                            <Button onPress={onOpen} className='w-full bg-color1 text-color3 hover:bg-color2'>
-                                                VIEW DETAILS
+                                            </div>
+                                            <h2 className='text-lg font-semibold mb-2'>{shop.name}</h2>
+                                            <div className='text-xs text-gray-500 mb-2 flex items-center'><GiPositionMarker/>{shop.destination}</div>
+                                            <div className=' flex mb-2  max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom  flex-col '>
+                                            <p className='text-sm text-gray-600 mb-2'>{shop.description}</p>
+                                            </div>
+                                             <p className='text-md font-semibold mb-2'>₱{shop.price}</p>
+                                            <Link to='/business' target='_blank'>
+                                            <Button  className='w-full bg-color1 text-color3 hover:bg-color2'>
+                                               Explore More
                                             </Button>
+                                            </Link>
                                         </div>
                                     </motion.div>
                                 ))
@@ -275,42 +327,9 @@ const Shop = () => {
 
             <Footer />
 
-            {/* Modal */}
-            <Modal
-                backdrop="opaque"
-                isOpen={isOpen}
-                onOpenChange={onOpenChange}
-                classNames={{
-                    backdrop: "bg-gray-900/50 backdrop-opacity-40"
-                }}
-            >
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader className="flex flex-col gap-1">Shop Details</ModalHeader>
-                            <ModalBody>
-                                {/* Add shop details here */}
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button color="danger" variant="light" onPress={onClose}>
-                                    Close
-                                </Button>
-                                <Button 
-                                color="primary" 
-                                onPress={() => {
-                                    onClose();
-                                    navigate('/business');
-                                }}
-                            >
-                                Explore
-                            </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
+          
         </div>
-    )
-}
+    );
+};
 
 export default Shop;

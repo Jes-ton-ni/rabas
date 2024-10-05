@@ -1,56 +1,73 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Nav from '../components/navuser';
 import Hero from '../components/heroaccomodation';
 import Search from '@/components/Search';
 import Footer from '@/components/Footer';
 import Antonio from '../assets/antonio.jpg';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
-import { Select, SelectItem } from "@nextui-org/react";
+import {  Button, Slider } from "@nextui-org/react";
+import { Checkbox, CheckboxGroup, Select, SelectItem } from "@nextui-org/react";
 import { GiPositionMarker } from "react-icons/gi";
 
 const Accomodation = () => {
-    const [selectedAccommodation, setSelectedAccommodation] = useState('All');
-    const [selectedDestination, setSelectedDestination] = useState('All');
+    const [selectedAccommodation, setSelectedAccommodation] = useState([]);
+    const [selectedAmenities, setSelectedAmenities] = useState([]);
     const [selectedRatings, setSelectedRatings] = useState([]);
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    const navigate = useNavigate();
+    const [selectedDestination, setSelectedDestination] = useState('All');
+    const [budgetRange, setBudgetRange] = useState([0, 10000]); // Budget range slider
 
-    // Accommodation Details
+    // Accommodation details (mock data)
     const accommodationDetails = [
         {
-            name: 'Hotel',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+            name: 'Luxury Hotel',
+            description: 'A luxurious stay with world-class facilities and services',
             image: Antonio,
             tags: ['Hotel'],
+            amenities: ['Wi-Fi', 'Breakfast', 'Parking'],
             rating: 5,
-            destination: 'Sorsogon City'
+            destination: 'Sorsogon City',
+            price: '4000-10000',
         },
         {
-            name: 'Innside',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+            name: 'Cozy Inn',
+            description: 'A comfortable and budget-friendly inn, perfect for short stays.',
             image: Antonio,
             tags: ['Inn'],
-            rating: 5,
-            destination: 'Gubat'
+            amenities: ['Parking', 'Wi-Fi'],
+            rating: 4,
+            destination: 'Gubat',
+            price: '1500-3000',
         },
         {
-            name: 'Lodging House',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+            name: 'Beachfront Lodge',
+            description: 'A lodge with a perfect view of the beach and peaceful surroundings.',
             image: Antonio,
-            tags: ['Lodging'],
-            rating: 5,
-            destination: 'Barcelona'
+            tags: ['Lodge'],
+            amenities: ['Breakfast', 'Wi-Fi'],
+            rating: 3,
+            destination: 'Barcelona',
+            price: '2000-5000',
         },
-        // ... more accommodation details ...
+        {
+            name: 'Mountain Resort',
+            description: 'A serene resort in the mountains, ideal for a relaxing getaway.',
+            image: Antonio,
+            tags: ['Resort'],
+            amenities: ['Parking', 'Wi-Fi', 'Pool'],
+            rating: 5,
+            destination: 'Bulusan',
+            price: '3000-7000',
+        },
+        // Add more accommodations as needed
     ];
 
     const destinations = [
         'All', 'Bulusan', 'Bulan', 'Barcelona', 'Casiguran', 'Castilla', 'Donsol', 'Gubat', 'Irosin', 'Juban', 'Magallanes', 'Matnog', 'Pilar', 'Prieto Diaz', 'Sta. Magdalena', 'Sorsogon City'
     ];
 
-    const accommodations = ['All', 'Hotel', 'Inn', 'Lodging'];
+    const accommodationTypes = ['Hotel', 'Inn', 'Lodge', 'Resort'];
+    const amenitiesList = ['Wi-Fi', 'Breakfast', 'Parking', 'Pool'];
 
     // Handle rating selection
     const handleRatingClick = (rating) => {
@@ -65,15 +82,44 @@ const Accomodation = () => {
         }
     };
 
-    // Filter the accommodations based on the selected filters
+    const handleAccommodationTypeChange = (selected) => {
+        setSelectedAccommodation(selected);
+    };
+
+    const handleAmenitiesChange = (selected) => {
+        setSelectedAmenities(selected);
+    };
+
+    const handleDestinationChange = (destination) => {
+        setSelectedDestination(destination);
+    };
+
+    const handleBudgetChange = (value) => {
+        setBudgetRange(value);
+    };
+
+    // Filtering the accommodations based on selected filters
     const filteredAccommodations = accommodationDetails.filter((accommodation) => {
-        const matchDestination = selectedDestination === 'All' || accommodation.destination === selectedDestination;
-        const matchType = selectedAccommodation === 'All' || accommodation.tags.includes(selectedAccommodation);
-        const matchRating = selectedRatings.length === 0 || selectedRatings.includes(accommodation.rating);
-        return matchDestination && matchType && matchRating;
+        const matchesType =
+            selectedAccommodation.length === 0 || selectedAccommodation.every((type) => accommodation.tags.includes(type));
+
+        const matchesAmenities =
+            selectedAmenities.length === 0 || selectedAmenities.every((amenity) => accommodation.amenities.includes(amenity));
+
+        const matchesRating =
+            selectedRatings.length === 0 || selectedRatings.includes(accommodation.rating);
+
+        const matchesDestination =
+            selectedDestination === 'All' || accommodation.destination === selectedDestination;
+
+        const [minPrice, maxPrice] = accommodation.price.split('-').map(Number);
+        const matchesBudget =
+            minPrice >= budgetRange[0] && maxPrice <= budgetRange[1];
+
+        return matchesType && matchesAmenities && matchesRating && matchesDestination && matchesBudget;
     });
 
-    // Animation variants for the container
+    // Animation variants (same as Activities.jsx)
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -84,7 +130,6 @@ const Accomodation = () => {
         }
     };
 
-    // Animation variants for each accommodation card
     const cardVariants = {
         hidden: { opacity: 0, y: 50 },
         visible: {
@@ -119,7 +164,7 @@ const Accomodation = () => {
                                 <Select
                                     placeholder="Select Destination"
                                     selectedKeys={[selectedDestination]}
-                                    onSelectionChange={(value) => setSelectedDestination(value.currentKey)}
+                                    onSelectionChange={(value) => handleDestinationChange(value.currentKey)}
                                 >
                                     {destinations.map((destination) => (
                                         <SelectItem key={destination} value={destination}>
@@ -129,20 +174,52 @@ const Accomodation = () => {
                                 </Select>
                             </div>
 
-                            {/* Accommodation Type Dropdown */}
-                            <div className='mb-6'>
-                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Accommodation Type</h3>
-                                <Select
-                                    placeholder="Select Accommodation"
-                                    selectedKeys={[selectedAccommodation]}
-                                    onSelectionChange={(value) => setSelectedAccommodation(value.currentKey)}
+                            {/* Accommodation Type Filter */}
+                            <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
+                                <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Property Type</h3>
+                                <CheckboxGroup
+                                    value={selectedAccommodation}
+                                    onChange={handleAccommodationTypeChange}
                                 >
-                                    {accommodations.map((accommodation) => (
-                                        <SelectItem key={accommodation} value={accommodation}>
-                                            {accommodation}
-                                        </SelectItem>
+                                    {accommodationTypes.map((type) => (
+                                        <Checkbox key={type} value={type}>
+                                            {type}
+                                        </Checkbox>
                                     ))}
-                                </Select>
+                                </CheckboxGroup>
+                            </div>
+
+                            {/* Amenities Filter */}
+                            <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
+                                <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Amenities</h3>
+                                <CheckboxGroup
+                                    value={selectedAmenities}
+                                    onChange={handleAmenitiesChange}
+                                >
+                                    {amenitiesList.map((amenity) => (
+                                        <Checkbox key={amenity} value={amenity}>
+                                            {amenity}
+                                        </Checkbox>
+                                    ))}
+                                </CheckboxGroup>
+                            </div>
+
+                            {/* Budget Filter */}
+                            <div className='mb-6'>
+                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Budget (PHP)</h3>
+                                <Slider
+                                    step={100}
+                                    minValue={0}
+                                    maxValue={10000}
+                                    value={budgetRange}
+                                    onChange={handleBudgetChange}
+                                    formatOptions={{ style: 'currency', currency: 'PHP' }}
+                                    className="max-w-md flex"
+                                />
+                                <div className='flex justify-between text-xs'>
+                                    <span>₱{budgetRange[0]}</span>
+                                    <span>₱{budgetRange[1]}+</span>
+                                </div>
                             </div>
 
                             {/* Ratings Filter */}
@@ -198,22 +275,29 @@ const Accomodation = () => {
                                             className='w-full h-48 object-cover rounded-t-lg'
                                         />
                                         <div className='p-4'>
-                                            <div className='flex flex-wrap gap-2 mb-2'>
+                                            <div className='flex justify-between items-center mb-4'>
+                                            <div className='flex flex-wrap gap-2 '>
                                                 {accommodation.tags.map((tag, index) => (
                                                     <span key={index} className='bg-color2 text-color3 text-xs px-2 py-1 rounded-full'>
                                                         {tag}
                                                     </span>
                                                 ))}
                                             </div>
-                                            <h2 className='text-lg font-semibold mb-2'>{accommodation.name}</h2>
-                                            <p className='text-sm text-gray-600 mb-2'>{accommodation.description}</p>
-                                            <div className='text-xs text-gray-500 mb-2 flex items-center'><GiPositionMarker/>{accommodation.destination}</div>
-                                            <div className='flex items-center mb-4'>
-                                                <span className='text-yellow-500'>{'★'.repeat(accommodation.rating)}{'☆'.repeat(5 - accommodation.rating)}</span>
+                                            <div className='flex items-center gap-1 '>
+                                               <span className='text-[12px]'>{accommodation.rating}</span> <span className='text-yellow-500'>{'★'.repeat(accommodation.rating)}{'☆'.repeat(5 - accommodation.rating)}</span>
                                             </div>
-                                            <Button onPress={onOpen} className='w-full bg-color1 text-color3 hover:bg-color2'>
-                                                VIEW DETAILS
+                                            </div>
+                                            <h2 className='text-lg font-semibold mb-2'>{accommodation.name}</h2>
+                                            <div className='text-xs text-gray-500 mb-2 flex items-center'><GiPositionMarker/>{accommodation.destination}</div>
+                                            <div className=' flex mb-2  max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom  flex-col '>
+                                            <p className='text-sm text-gray-600 '>{accommodation.description}</p>
+                                            </div>
+                                            <p className='mb-2 text-md font-semibold '>₱{accommodation.price}</p>
+                                            <Link to='/business' target='_blank'>
+                                            <Button  className='w-full bg-color1 text-color3 hover:bg-color2'>
+                                                Explore More
                                             </Button>
+                                            </Link>
                                         </div>
                                     </motion.div>
                                 ))
@@ -227,42 +311,9 @@ const Accomodation = () => {
 
             <Footer />
 
-            {/* Modal */}
-            <Modal
-                backdrop="opaque"
-                isOpen={isOpen}
-                onOpenChange={onOpenChange}
-                classNames={{
-                    backdrop: "bg-gray-900/50 backdrop-opacity-40"
-                }}
-            >
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader className="flex flex-col gap-1">Accommodation Details</ModalHeader>
-                            <ModalBody>
-                                {/* Add accommodation details here */}
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button color="danger" variant="light" onPress={onClose}>
-                                    Close
-                                </Button>
-                                <Button 
-                                color="primary" 
-                                onPress={() => {
-                                    onClose();
-                                    navigate('/business');
-                                }}
-                            >
-                                Explore
-                            </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
+           
         </div>
-    )
-}
+    );
+};
 
 export default Accomodation;

@@ -1,3 +1,5 @@
+// BusinessProfile.jsx
+
 import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Sidebar from '../components/sidebar';
@@ -21,8 +23,6 @@ import {
   removeContactInfo,
   updateContactIcon
 } from '../redux/businessSlice';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 
 const BusinessProfile = () => {
   const dispatch = useDispatch();
@@ -71,13 +71,11 @@ const BusinessProfile = () => {
 
   // Handle changes in facility info
   const handleFacilityChange = (index, field, value) => {
-    console.log('Updating facility', { index, field, value });
     dispatch(updateFacility({ index, field, value }));
   };
 
   // Handle removing facility
   const handleRemoveFacility = (index) => {
-    console.log('Removing facility', index);
     dispatch(removeFacility({ index }));
   };
 
@@ -88,41 +86,44 @@ const BusinessProfile = () => {
 
   // Handle changes in policy info
   const handlePolicyChange = (index, field, value) => {
-    console.log('Updating policy', { index, field, value });
     dispatch(updatePolicy({ index, field, value }));
   };
 
   // Handle removing policy
   const handleRemovePolicy = (index) => {
-    console.log('Removing policy', index);
     dispatch(removePolicy({ index }));
   };
 
   // Handle adding new policy item
   const handleAddPolicyItem = (policyIndex) => {
-    console.log('Adding policy item to policy', policyIndex);
     dispatch(addPolicyItem({ policyIndex }));
   };
 
   // Handle changes in policy item
   const handlePolicyItemChange = (policyIndex, itemIndex, value) => {
-    console.log('Updating policy item', { policyIndex, itemIndex, value });
     dispatch(updatePolicyItem({ policyIndex, itemIndex, value }));
   };
 
   // Handle removing policy item
   const handleRemovePolicyItem = (policyIndex, itemIndex) => {
-    console.log('Removing policy item', { policyIndex, itemIndex });
     dispatch(removePolicyItem({ policyIndex, itemIndex }));
   };
 
   // Handle changes in opening hours
   const handleOpeningHoursChange = (index, field, value) => {
+    // Create a copy of the openingHours array
     const updatedHours = [...businessData.openingHours];
-    updatedHours[index][field] = value;
+    
+    // Update the specific field of the copied object
+    updatedHours[index] = {
+      ...updatedHours[index],
+      [field]: value,
+    };
+    
+    // Dispatch the updated array to the store
     dispatch(updateBusinessData({ openingHours: updatedHours }));
   };
-
+  
   // Open icon modal
   const openIconModal = (field) => {
     setCurrentEditingField(field);
@@ -148,22 +149,22 @@ const BusinessProfile = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen mx-auto  bg-gray-100 font-sans">
+    <div className="flex flex-col lg:flex-row min-h-screen mx-auto bg-gray-100 font-sans">
       <Sidebar />
       
-      <div className="flex-1 p-4 lg:p-8 ">
-      <div className='flex justify-between items-center mb-3'>
-        <h1 className="text-2xl lg:text-3xl font-semibold   text-gray-800">Business Profile</h1>
-        <Button
-          onClick={handleSave}
-          className=' bg-green-500 text-white hover:bg-green-600 transition flex items-center'
-        >
-          <FaSave className='mr-2' />
-          Save Profile
-        </Button>
+      <div className="flex-1 p-4 lg:p-8 max-h-screen overflow-y-auto ">
+        <div className='flex justify-between items-center mb-3'>
+          <h1 className="text-2xl lg:text-3xl font-semibold text-gray-800">Business Profile</h1>
+          <Button
+            onClick={handleSave}
+            className='bg-green-500 text-white hover:bg-green-600 transition flex items-center'
+          >
+            <FaSave className='mr-2' />
+            Save Profile
+          </Button>
         </div>
        
-        <Tabs  aria-label="Business Profile Sections" className="w-full">
+        <Tabs aria-label="Business Profile Sections" className="w-full">
           <Tab key="general" title="General Info">
             <Card>
               <CardBody>
@@ -241,12 +242,13 @@ const BusinessProfile = () => {
             <Card>
               <CardBody className='overflow-x-auto'>
                 <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">About Us</h2>
-                <ReactQuill
+                <textarea
                   value={businessData.aboutUs}
-                  onChange={(value) => dispatch(updateBusinessData({ aboutUs: value }))}
+                  onChange={(e) => dispatch(updateBusinessData({ aboutUs: e.target.value }))}
                   placeholder="Enter information about your business"
                   className="w-full p-2 border border-gray-300 rounded-lg mb-4"
                 />
+
                 <h3 className="text-md lg:text-lg font-semibold mt-4 mb-2">Contact Information</h3>
                 {businessData.contactInfo.map((info) => (
                   <div key={info.id} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
@@ -307,13 +309,11 @@ const BusinessProfile = () => {
             <Card>
               <CardBody className='h-[300px] overflow-x-auto scrollbar-hide'>
                 <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">Facilities & Amenities</h2>
-                 <div className=' flex justify-start flex-wrap gap-3 '>
-                {businessData.facilities.map((facility, index) => (
-                
-             
-                    <div className='flex  lg:flex-row items-center gap-2 mb-2'>
+                <div className='flex justify-start flex-wrap gap-3'>
+                  {businessData.facilities.map((facility, index) => (
+                    <div key={index} className='flex lg:flex-row items-center gap-2 mb-2'>
                       <Button onClick={() => openIconModal(`facility-${index}`)} className="min-w-[40px] h-[40px] p-0">
-                        {facility.icon ? React.createElement(businessIcons.find(icon => icon.name === facility.icon)?.icon, { size: 20 }): <FaPlus size={20} />}
+                        {facility.icon ? React.createElement(businessIcons.find(icon => icon.name === facility.icon)?.icon, { size: 20 }) : <FaPlus size={20} />}
                       </Button>
                       <Input 
                         type="text"
@@ -326,8 +326,7 @@ const BusinessProfile = () => {
                         <FaTrash size={16} />
                       </Button>
                     </div>                
-                ))}
-               
+                  ))}
                 </div>
               </CardBody>
             </Card>
@@ -371,7 +370,6 @@ const BusinessProfile = () => {
           </Tab>
         </Tabs>
 
-   
       </div>
     
 

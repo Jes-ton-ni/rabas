@@ -1,37 +1,35 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaSwimmer, FaCampground, FaHiking, FaWater, FaUmbrellaBeach } from 'react-icons/fa';
-import { MdOutlineSurfing } from "react-icons/md";
 import Nav from '../components/navuser';
 import Hero from '../components/heroactivity';
 import Search from '../components/Search';
 import Footer from '@/components/Footer';
 import pic1 from '../assets/donsol.jpg';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
-import { Select, SelectItem } from "@nextui-org/react";
+import {Button, useDisclosure } from "@nextui-org/react";
+import { Checkbox, CheckboxGroup, Select, SelectItem, Slider } from "@nextui-org/react";
 import { GiPositionMarker } from "react-icons/gi";
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';  
+
 const Activities = () => {
+  // State Variables
   const [selectedActivities, setSelectedActivities] = useState([]);
+  const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [selectedRatings, setSelectedRatings] = useState([]);
   const [selectedDestination, setSelectedDestination] = useState('All');
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const navigate = useNavigate();
+  const [selectedCategories, setSelectedCategories] = useState([]); // New state for categories
+  const [budgetRange, setBudgetRange] = useState([0, 10000]);
+  const [selectedActivity, setSelectedActivity] = useState(null); // New state for selected activity
 
-  // Handle activity type selection
-  const handleClick = (activity) => {
-    if (activity === 'All') {
-      setSelectedActivities([]);
-    } else {
-      setSelectedActivities((prevSelected) =>
-        prevSelected.includes(activity)
-          ? prevSelected.filter((a) => a !== activity)
-          : [...prevSelected, activity]
-      );
-    }
+
+  // Handlers
+  const handleActivityChange = (selected) => {
+    setSelectedActivities(selected);
   };
 
-  // Handle rating selection
+  const handleAmenitiesChange = (selected) => {
+    setSelectedAmenities(selected);
+  };
+
   const handleRatingClick = (rating) => {
     if (rating === 'All') {
       setSelectedRatings([]);
@@ -44,19 +42,12 @@ const Activities = () => {
     }
   };
 
-  // Handle destination selection
   const handleDestinationChange = (destination) => {
     setSelectedDestination(destination);
   };
 
-  // Activity Icons Mapping
-  const icons = {
-    Diving: <FaSwimmer />,
-    Camping: <FaCampground />,
-    Hiking: <FaHiking />,
-    'Island Hopping': <FaWater />,
-    Swimming: <FaUmbrellaBeach />,
-    Surfing: <MdOutlineSurfing />,
+  const handleBudgetChange = (value) => {
+    setBudgetRange(value);
   };
 
   // Activity Details
@@ -66,42 +57,91 @@ const Activities = () => {
       description: 'Relax and enjoy the scenic beach view.',
       image: pic1,
       tags: ['Swimming', 'Surfing'],
+      amenities: ['Parking', 'Restrooms'],
       rating: 5,
       destination: 'Donsol',
+      budget: '500-2000',
+      category: 'Relaxation',
     },
     {
       name: 'Mountain Adventure',
       description: 'Hike through the mountains and enjoy nature.',
       image: pic1,
       tags: ['Hiking', 'Camping'],
+      amenities: ['Guides', 'Parking'],
       rating: 4,
       destination: 'Bulusan',
+      budget: '250-3000',
+      category: 'Adventure',
     },
-    // ... more activity details ...
+    {
+      name: 'Cultural Tour',
+      description: 'Discover the local history and culture.',
+      image: pic1,
+      tags: ['Tour', 'History'],
+      amenities: ['Guides'],
+      rating: 4,
+      destination: 'Sorsogon City',
+      budget: '30-1500',
+      category: 'Tour',
+    },
+    {
+      name: 'Snorkeling Expedition',
+      description: 'Explore underwater life.',
+      image: pic1,
+      tags: ['Swimming', 'Snorkeling'],
+      amenities: ['Guides', 'Restrooms'],
+      rating: 5,
+      destination: 'Matnog',
+      budget: '500-3500',
+      category: 'Adventure',
+    },
+    {
+      name: 'Camping Retreat',
+      description: 'Spend the night under the stars.',
+      image: pic1,
+      tags: ['Camping'],
+      amenities: ['Parking', 'Restrooms'],
+      rating: 4,
+      destination: 'Bulan',
+      budget: '40-800',
+      category: 'Adventure',
+    },
+    // Add more mock activities here...
   ];
 
-  // Filtering 
+  // Filtering Logic
   const filteredActivities = activityDetails.filter((activity) => {
-    const matchesActivityType = 
-      selectedActivities.length === 0 || 
-      selectedActivities.some((type) => activity.tags.includes(type));
+    const matchesActivityType =
+      selectedActivities.length === 0 || selectedActivities.every((type) => activity.tags.includes(type));
 
-    const matchesRating = 
-      selectedRatings.length === 0 || 
-      selectedRatings.includes(activity.rating);
+    const matchesAmenities =
+      selectedAmenities.length === 0 || selectedAmenities.every((amenity) => activity.amenities.includes(amenity));
 
-    const matchesDestination = 
-      selectedDestination === 'All' || 
-      activity.destination === selectedDestination;
+    const matchesRating =
+      selectedRatings.length === 0 || selectedRatings.includes(activity.rating);
 
-    return matchesActivityType && matchesRating && matchesDestination;
+    const matchesDestination =
+      selectedDestination === 'All' || activity.destination === selectedDestination;
+
+    const matchesCategory =
+      selectedCategories.length === 0 || selectedCategories.includes(activity.category);
+
+    const [minBudget, maxBudget] = activity.budget.split('-').map(Number);
+    const matchesBudget =
+      minBudget >= budgetRange[0] && maxBudget <= budgetRange[1];
+
+    return matchesActivityType && matchesAmenities && matchesRating && matchesDestination && matchesCategory && matchesBudget;
   });
 
+  // Dropdown Options
   const destinations = [
     'All', 'Bulusan', 'Bulan', 'Barcelona', 'Casiguran', 'Castilla', 'Donsol', 'Gubat', 'Irosin', 'Juban', 'Magallanes', 'Matnog', 'Pilar', 'Prieto Diaz', 'Sta. Magdalena', 'Sorsogon City',
   ];
 
-  // Animation variants for the container
+  const categories = ['Adventure', 'Tour', 'Relaxation', 'Water Sports', 'Cultural', 'Nature']; // Category options
+
+  // Animation Variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -112,7 +152,6 @@ const Activities = () => {
     }
   };
 
-  // Animation variants for each activity card
   const cardVariants = {
     hidden: { opacity: 0, y: 50 },
     visible: {
@@ -146,7 +185,7 @@ const Activities = () => {
                 <h3 className='text-sm font-medium text-gray-700 mb-2'>Destination</h3>
                 <Select
                   placeholder="Select Destination"
-                  selectedKeys={[selectedDestination]}
+                  selectedKeys={selectedDestination !== 'All' ? [selectedDestination] : []}
                   onSelectionChange={(value) => handleDestinationChange(value.currentKey)}
                 >
                   {destinations.map((destination) => (
@@ -157,30 +196,66 @@ const Activities = () => {
                 </Select>
               </div>
 
-              {/* Activity Types */}
-              <div className='mb-6'>
-                <h3 className='text-sm font-medium text-gray-700 mb-2'>Activity Types</h3>
-                <div className='flex flex-wrap gap-2'>
-                  <button
-                    onClick={() => handleClick('All')}
-                    className={`flex items-center gap-2 text-color3 px-2 py-1 text-sm rounded-xl transition-all duration-300 ${
-                      selectedActivities.length === 0 ? 'bg-color2/70' : 'bg-color1'
-                    }`}
-                  >
-                    All
-                  </button>
-                  {Object.keys(icons).map((activity) => (
-                    <button
-                      key={activity}
-                      onClick={() => handleClick(activity)}
-                      className={`flex items-center gap-2 text-color3 px-2 py-1 text-sm rounded-xl transition-all duration-300 ${
-                        selectedActivities.includes(activity) ? 'bg-color2/70' : 'bg-color1'
-                      }`}
-                    >
-                      {icons[activity]}
-                      {activity}
-                    </button>
+              {/* Category Checkbox Group */}
+              <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
+                <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Category</h3>
+                <CheckboxGroup
+                  value={selectedCategories}
+                  onChange={setSelectedCategories}
+                >
+                  {categories.map((category) => (
+                    <Checkbox key={category} value={category}>
+                      {category}
+                    </Checkbox>
                   ))}
+                </CheckboxGroup>
+              </div>
+
+              {/* Activity Types Filter */}
+              <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
+                <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Activities</h3>
+                <CheckboxGroup
+                  value={selectedActivities}
+                  onChange={handleActivityChange}
+                >
+                  {['Diving', 'Camping', 'Hiking', 'Island Hopping', 'Swimming', 'Surfing'].map((activity) => (
+                    <Checkbox key={activity} value={activity}>
+                      {activity}
+                    </Checkbox>
+                  ))}
+                </CheckboxGroup>
+              </div>
+
+              {/* Amenities Filter */}
+              <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
+                <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Amenities</h3>
+                <CheckboxGroup
+                  value={selectedAmenities}
+                  onChange={handleAmenitiesChange}
+                >
+                  {['Parking', 'Restrooms', 'Guides'].map((amenity) => (
+                    <Checkbox key={amenity} value={amenity}>
+                      {amenity}
+                    </Checkbox>
+                  ))}
+                </CheckboxGroup>
+              </div>
+
+              {/* Budget Filter */}
+              <div className='mb-6'>
+                <h3 className='text-sm font-medium text-gray-700 mb-2'>Budget (PHP)</h3>
+                <Slider
+                  step={100}
+                  minValue={0}
+                  maxValue={10000}
+                  value={budgetRange}
+                  onChange={setBudgetRange}
+                  formatOptions={{ style: 'currency', currency: 'PHP' }}
+                  className="max-w-md flex "
+                />
+                <div className='flex justify-between text-xs'>
+                  <span>₱{budgetRange[0]}</span>
+                  <span>₱{budgetRange[1]}+</span>
                 </div>
               </div>
 
@@ -219,7 +294,7 @@ const Activities = () => {
           {/* Activity List */}
           <div className='w-full'>
             <motion.div 
-              className='grid grid-cols-1  gap-6 overflow-y-auto max-h-[1000px] scrollbar-hide p-4'
+              className='grid grid-cols-1 gap-6 overflow-y-auto max-h-[1000px] scrollbar-hide p-4'
               variants={containerVariants}
               initial="hidden"
               animate="visible"
@@ -237,22 +312,37 @@ const Activities = () => {
                       className='w-full h-48 object-cover rounded-t-lg'
                     />
                     <div className='p-4'>
-                      <div className='flex flex-wrap gap-2 mb-2'>
-                        {activity.tags.map((tag, index) => (
-                          <span key={index} className='bg-color2 text-color3 text-xs px-2 py-1 rounded-full'>
-                            {tag}
-                          </span>
-                        ))}
+                      <div className='flex items-center justify-between gap-2'>
+                         {/* Category Badge */}
+                      <div className='mb-2'>
+                        <span className='inline-block bg-color2 text-white text-xs px-2 py-1 rounded-full'>
+                          {activity.category}
+                        </span>
                       </div>
-                      <h2 className='text-lg font-semibold mb-2'>{activity.name}</h2>
+                        <div className='flex items-center gap-2'>
+                          <div className='flex items-center gap-1 '>
+                            <span className='text-black text-[12px] '>{activity.rating}</span> 
+                            <span className='text-yellow-500'>
+                              {'★'.repeat(activity.rating)}{'☆'.repeat(5 - activity.rating)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <h3 className='font-semibold text-lg text-color1'>{activity.name}</h3>
+                      <div className='text-xs text-gray-500 mb-2 flex items-center'>
+                        <GiPositionMarker/> {activity.destination}
+                      </div>
+                      <div className=' flex mb-2  max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom  flex-col '>      
                       <p className='text-sm text-gray-600 mb-2'>{activity.description}</p>
-                      <div className='text-xs text-gray-500 mb-2 flex items-center'><GiPositionMarker/>{activity.destination}</div>
-                      <div className='flex items-center mb-4'>
-                        <span className='text-yellow-500'>{'★'.repeat(activity.rating)}{'☆'.repeat(5 - activity.rating)}</span>
                       </div>
-                      <Button onPress={onOpen} className='w-full bg-color1 text-color3 hover:bg-color2'>
-                        VIEW DETAILS
+                      <p className='font-semibold text-md mb-2'>₱{activity.budget}</p>
+                     <Link to="/business" target='_blank'>
+                      <Button 
+                        className='w-full bg-color1 text-color3 hover:bg-color2'
+                      >
+                        Explore More
                       </Button>
+                      </Link>
                     </div>
                   </motion.div>
                 ))
@@ -266,40 +356,6 @@ const Activities = () => {
 
       <Footer />
 
-      {/* Modal */}
-      <Modal
-        backdrop="opaque"
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        classNames={{
-          backdrop: "bg-gray-900/50 backdrop-opacity-40"
-        }}
-      >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">Activity Details</ModalHeader>
-              <ModalBody>
-                {/* Add activity details here */}
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Close
-                </Button>
-                <Button 
-                                color="primary" 
-                                onPress={() => {
-                                    onClose();
-                                    navigate('/business');
-                                }}
-                            >
-                                Explore
-                            </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
     </div>
   );
 };

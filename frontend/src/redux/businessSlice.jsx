@@ -1,3 +1,5 @@
+// businessSlice.js
+
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
@@ -25,7 +27,7 @@ const businessSlice = createSlice({
   reducers: {
     // General business data update
     updateBusinessData: (state, action) => {
-      return { ...state, ...action.payload };
+      Object.assign(state, action.payload);
     },
 
     // Facilities-related reducers

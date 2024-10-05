@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 const BusinessDashboard = () => (
   <div className="flex min-h-screen bg-gray-50 font-sans">
     <Sidebar />
-    <div className="flex-1 p-8">
+    <div className="flex-1 p-8 max-h-screen overflow-y-auto">
       <h1 className="text-3xl font-semibold mb-8 text-gray-800">My Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <DashboardCard title="My Events" value={1} icon="📅" />
