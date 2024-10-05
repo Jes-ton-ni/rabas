@@ -11,8 +11,7 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  optimizeDeps: {
-    include: ['react-quill']
+  optimizeDeps: { 
   },
   css: {
     preprocessorOptions: {

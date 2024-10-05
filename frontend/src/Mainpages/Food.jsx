@@ -5,60 +5,80 @@ import Hero from '../components/herofood';
 import Search from '@/components/Search';
 import Footer from '@/components/Footer';
 import Antonio from '../assets/antonio.jpg';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
-import { Select, SelectItem } from "@nextui-org/react";
+import { Button} from "@nextui-org/react";
+import { Checkbox, CheckboxGroup, Select, SelectItem, Slider } from "@nextui-org/react";
 import { GiPositionMarker } from "react-icons/gi";
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const Food = () => {
-    const [selectedType, setSelectedType] = useState('All');
-    const [selectedDestination, setSelectedDestination] = useState('All');
-    const [selectedCuisine, setSelectedCuisine] = useState('All');
-    const [selectedFeatures, setSelectedFeatures] = useState([]);
+    const [selectedType, setSelectedType] = useState([]);
+    const [selectedCuisine, setSelectedCuisine] = useState([]);
+    const [selectedAmenities, setSelectedAmenities] = useState([]);
     const [selectedRatings, setSelectedRatings] = useState([]);
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
-    const navigate = useNavigate();
+    const [selectedDestination, setSelectedDestination] = useState('All');
+    const [priceRange, setPriceRange] = useState([0, 5000]); // Price range slider
+  
 
-    // Food Details
+
+    // Mock Food Details
     const foodDetails = [
         {
             name: 'Sample Restaurant 1',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+            description: 'A popular Filipino restaurant offering traditional dishes.',
             image: Antonio,
             tags: ['Restaurant'],
             cuisine: 'Filipino',
-            features: ['Wi-Fi', 'Outdoor Seating'],
+            amenities: ['Wi-Fi', 'Outdoor Seating'],
             destination: 'Sorsogon City',
-            rating: 4
+            rating: 4,
+            price: '1000-2000',
         },
         {
             name: 'Sample Bar 1',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+            description: 'A lively bar with international food and live music.',
             image: Antonio,
             tags: ['Bar'],
             cuisine: 'International',
-            features: ['Live Music', 'Happy Hour'],
+            amenities: ['Live Music', 'Happy Hour'],
             destination: 'Gubat',
-            rating: 5
+            rating: 5,
+            price: '500-1000',
         },
-        // Add more food establishments as needed
+        {
+            name: 'Sample Restaurant 2',
+            description: 'An authentic Italian restaurant with a cozy atmosphere.',
+            image: Antonio,
+            tags: ['Restaurant'],
+            cuisine: 'Italian',
+            amenities: ['Family-Friendly', 'Vegan Options'],
+            destination: 'Bulusan',
+            rating: 5,
+            price: '1500-3000',
+        },
+        {
+            name: 'Sample Cafe 1',
+            description: 'A cozy cafe with Japanese-inspired decor.',
+            image: Antonio,
+            tags: ['Cafe'],
+            cuisine: 'Japanese',
+            amenities: ['Wi-Fi', 'Family-Friendly'],
+            destination: 'Matnog',
+            rating: 3,
+            price: '800-1200',
+        },
     ];
 
     const destinations = [
         'All', 'Bulusan', 'Bulan', 'Barcelona', 'Casiguran', 'Castilla', 'Donsol', 'Gubat', 'Irosin', 'Juban', 'Magallanes', 'Matnog', 'Pilar', 'Prieto Diaz', 'Sta. Magdalena', 'Sorsogon City'
     ];
 
-    const types = ['All', 'Restaurant', 'Bar'];
-    const cuisines = ['All', 'Filipino', 'International', 'Chinese', 'Japanese', 'Italian'];
-    const features = ['Wi-Fi', 'Outdoor Seating', 'Live Music', 'Happy Hour', 'Family-Friendly', 'Vegan Options'];
+    const foodTypes = ['Restaurant', 'Bar', 'Cafe'];
+    const cuisines = ['Filipino', 'International', 'Chinese', 'Japanese', 'Italian'];
+    const    amenitiesList = ['Wi-Fi', 'Outdoor Seating', 'Live Music', 'Happy Hour', 'Family-Friendly', 'Vegan Options'];
 
-    // Handle feature selection
-    const handleFeatureClick = (feature) => {
-        setSelectedFeatures((prevSelected) =>
-            prevSelected.includes(feature)
-                ? prevSelected.filter((f) => f !== feature)
-                : [...prevSelected, feature]
-        );
+    // Handle amenities selection
+    const handleAmenitiesChange = (selected) => {
+        setSelectedAmenities(selected);
     };
 
     // Handle rating selection
@@ -74,14 +94,29 @@ const Food = () => {
         }
     };
 
-    // Filter the food establishments based on the selected filters
+    const handleTypeChange = (selected) => {
+        setSelectedType(selected);
+    };
+
+    const handleCuisineChange = (selected) => {
+        setSelectedCuisine(selected);
+    };
+
+    const handleDestinationChange = (destination) => {
+        setSelectedDestination(destination);
+    };
+
+    // Filtering the food establishments based on selected filters
     const filteredFood = foodDetails.filter((food) => {
-        const matchDestination = selectedDestination === 'All' || food.destination === selectedDestination;
-        const matchType = selectedType === 'All' || food.tags.includes(selectedType);
-        const matchCuisine = selectedCuisine === 'All' || food.cuisine === selectedCuisine;
-        const matchFeatures = selectedFeatures.length === 0 || selectedFeatures.every(f => food.features.includes(f));
+        const matchType = selectedType.length === 0 || selectedType.every((type) => food.tags.includes(type));
+        const matchCuisine = selectedCuisine.length === 0 || selectedCuisine.includes(food.cuisine);
+        const matchFeatures = selectedAmenities.length === 0 || selectedAmenities.every(f => food.amenities.includes(f));
         const matchRating = selectedRatings.length === 0 || selectedRatings.includes(food.rating);
-        return matchDestination && matchType && matchCuisine && matchFeatures && matchRating;
+        const matchDestination = selectedDestination === 'All' || food.destination === selectedDestination;
+        const [minPrice, maxPrice] = food.price.split('-').map(Number);
+        const matchPrice = minPrice >= priceRange[0] && maxPrice <= priceRange[1];
+
+        return matchType && matchCuisine && matchFeatures && matchRating && matchDestination && matchPrice;
     });
 
     // Animation variants for the container
@@ -130,7 +165,7 @@ const Food = () => {
                                 <Select
                                     placeholder="Select Destination"
                                     selectedKeys={[selectedDestination]}
-                                    onSelectionChange={(value) => setSelectedDestination(value.currentKey)}
+                                    onSelectionChange={(value) => handleDestinationChange(value.currentKey)}
                                 >
                                     {destinations.map((destination) => (
                                         <SelectItem key={destination} value={destination}>
@@ -140,53 +175,66 @@ const Food = () => {
                                 </Select>
                             </div>
 
-                            {/* Food Type Dropdown */}
-                            <div className='mb-6'>
-                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Food Type</h3>
-                                <Select
-                                    placeholder="Select Food Type"
-                                    selectedKeys={[selectedType]}
-                                    onSelectionChange={(value) => setSelectedType(value.currentKey)}
+                            {/* Food Type Filter */}
+                            <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
+                                <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Restaurant Type</h3>
+                                <CheckboxGroup
+                                    value={selectedType}
+                                    onChange={handleTypeChange}
                                 >
-                                    {types.map((type) => (
-                                        <SelectItem key={type} value={type}>
+                                    {foodTypes.map((type) => (
+                                        <Checkbox key={type} value={type}>
                                             {type}
-                                        </SelectItem>
+                                        </Checkbox>
                                     ))}
-                                </Select>
+                                </CheckboxGroup>
                             </div>
 
-                            {/* Cuisine Dropdown */}
-                            <div className='mb-6'>
-                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Cuisine</h3>
-                                <Select
-                                    placeholder="Select Cuisine"
-                                    selectedKeys={[selectedCuisine]}
-                                    onSelectionChange={(value) => setSelectedCuisine(value.currentKey)}
+                            {/* Cuisine Filter */}
+                            <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
+                                <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Cuisine</h3>
+                                <CheckboxGroup
+                                    value={selectedCuisine}
+                                    onChange={handleCuisineChange}
                                 >
                                     {cuisines.map((cuisine) => (
-                                        <SelectItem key={cuisine} value={cuisine}>
+                                        <Checkbox key={cuisine} value={cuisine}>
                                             {cuisine}
-                                        </SelectItem>
+                                        </Checkbox>
                                     ))}
-                                </Select>
+                                </CheckboxGroup>
                             </div>
 
                             {/* Features Filter */}
-                            <div className='mb-6'>
-                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Features</h3>
-                                <div className='space-y-2'>
-                                    {features.map((feature) => (
-                                        <label key={feature} className='flex items-center'>
-                                            <input
-                                                type='checkbox'
-                                                onChange={() => handleFeatureClick(feature)}
-                                                checked={selectedFeatures.includes(feature)}
-                                                className='form-checkbox text-color2'
-                                            />
-                                            <span className='ml-2 text-sm'>{feature}</span>
-                                        </label>
+                            <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
+                                <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Amenities</h3>
+                                <CheckboxGroup
+                                    value={selectedAmenities}
+                                    onChange={handleAmenitiesChange}
+                                >
+                                        {amenitiesList.map((amenities) => (
+                                        <Checkbox key={amenities} value={amenities}>
+                                            {amenities}
+                                        </Checkbox>
                                     ))}
+                                </CheckboxGroup>
+                            </div>
+
+                            {/* Price Range Filter */}
+                            <div className='mb-6'>
+                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Price Range (PHP)</h3>
+                                <Slider
+                                    step={100}
+                                    minValue={0}
+                                    maxValue={5000}
+                                    value={priceRange}
+                                    onChange={setPriceRange}
+                                    formatOptions={{ style: 'currency', currency: 'PHP' }}
+                                    className="max-w-md flex"
+                                />
+                                <div className='flex justify-between text-xs'>
+                                    <span>₱{priceRange[0]}</span>
+                                    <span>₱{priceRange[1]}+</span>
                                 </div>
                             </div>
 
@@ -225,7 +273,7 @@ const Food = () => {
                     {/* Food List */}
                     <div className='w-full'>
                         <motion.div 
-                            className='grid grid-cols-1  gap-6 overflow-y-auto max-h-[1000px] scrollbar-hide p-4'
+                            className='grid grid-cols-1 gap-6 overflow-y-auto max-h-[1000px] scrollbar-hide p-4'
                             variants={containerVariants}
                             initial="hidden"
                             animate="visible"
@@ -243,28 +291,33 @@ const Food = () => {
                                             className='w-full h-48 object-cover rounded-t-lg'
                                         />
                                         <div className='p-4'>
-                                            <div className='flex flex-wrap gap-2 mb-2'>
+                                            <div className='flex justify-between items-center mb-2'>
+                                            <div className='flex flex-wrap gap-2 '>
                                                 {food.tags.map((tag, index) => (
                                                     <span key={index} className='bg-color2 text-color3 text-xs px-2 py-1 rounded-full'>
                                                         {tag}
                                                     </span>
                                                 ))}
                                             </div>
+                                            <div className='flex items-center gap-1'>
+                                               <span className='text-[12px]'>{food.rating}</span> <span className='text-yellow-500'>{'★'.repeat(food.rating)}{'☆'.repeat(5 - food.rating)}</span>
+                                            </div>
+                                            </div>
                                             <h2 className='text-lg font-semibold mb-2'>{food.name}</h2>
-                                            <p className='text-sm text-gray-600 mb-2'>{food.description}</p>
                                             <div className='text-xs text-gray-500 mb-2 flex items-center'>
                                                 <GiPositionMarker className="mr-1" />{food.destination}
                                             </div>
-                                            <div className='mb-2'>
-                                                <span className='text-sm font-semibold'>Cuisine: </span>
-                                                <span className='text-sm'>{food.cuisine}</span>
-                                            </div>
-                                            <div className='flex items-center mb-4'>
-                                                <span className='text-yellow-500'>{'★'.repeat(food.rating)}{'☆'.repeat(5 - food.rating)}</span>
-                                            </div>
-                                            <Button onPress={onOpen} className='w-full bg-color1 text-color3 hover:bg-color2'>
-                                                VIEW DETAILS
+                                            <div className=' flex mb-2  max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom  flex-col '>
+                                            <p className='text-sm text-gray-600 mb-2'>{food.description}</p>
+                                            </div>                  
+                                             <p className='text-md mb-2 font-semibold'>₱{food.price}</p>
+                                           
+                                          
+                                            <Link to='/business' target='_blank'>
+                                            <Button  className='w-full bg-color1 text-color3 hover:bg-color2'>
+                                                Explore More
                                             </Button>
+                                            </Link>
                                         </div>
                                     </motion.div>
                                 ))
@@ -278,40 +331,7 @@ const Food = () => {
 
             <Footer />
 
-            {/* Modal */}
-            <Modal
-                backdrop="opaque"
-                isOpen={isOpen}
-                onOpenChange={onOpenChange}
-                classNames={{
-                    backdrop: "bg-gray-900/50 backdrop-opacity-40"
-                }}
-            >
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader className="flex flex-col gap-1">Food Details</ModalHeader>
-                            <ModalBody>
-                                {/* Add food details here */}
-                            </ModalBody>
-                            <ModalFooter>
-                                <Button color="danger" variant="light" onPress={onClose}>
-                                    Close
-                                </Button>
-                                <Button 
-                                color="primary" 
-                                onPress={() => {
-                                    onClose();
-                                    navigate('/business');
-                                }}
-                            >
-                                Explore
-                            </Button>
-                            </ModalFooter>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal>
+          
         </div>
     );
 };

@@ -30,7 +30,7 @@ const Sidebar = () => {
   }, [location]);
 
   return (
-    <div>
+    <div className=''>
       {/* Mobile Toggle Button */}
       <div className="flex justify-between items-center bg-color1 p-4 lg:hidden">
         <h1 className="font-bold text-xl text-white">Business Management</h1>
@@ -41,7 +41,7 @@ const Sidebar = () => {
 
       {/* Sidebar for desktop and mobile */}
       <div
-        className={`fixed lg:flex flex-col justify-between h-full bg-color1 p-6 w-[250px] transform transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed lg:flex flex-col top-0 left-0 justify-between h-full bg-color1 p-6 w-[250px] transform transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:static z-50`}
       >
@@ -78,9 +78,8 @@ const Sidebar = () => {
             </ul>
           </nav>
         </div>
-
-        {/* Buttons */}
-        <div className="flex flex-col gap-2 mt-9 items-center">
+             {/* Buttons */}
+             <div className="flex flex-col gap-2 mt-9 items-center ">
           <Button className="bg-color3 text-black font-medium w-full flex items-center justify-center gap-2">
             <TbWorld /> Go to Business Page
           </Button>
@@ -88,6 +87,7 @@ const Sidebar = () => {
             <CgLogOut /> Logout
           </Button>
         </div>
+      
       </div>
 
       {/* Overlay for mobile when sidebar is open */}

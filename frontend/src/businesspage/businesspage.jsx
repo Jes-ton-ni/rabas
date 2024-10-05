@@ -9,7 +9,6 @@ import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 import { AiOutlineLike } from "react-icons/ai";
 import { Button } from '@nextui-org/react';
 import { IoStar, IoStarHalf, IoStarOutline } from "react-icons/io5";
-import 'react-quill/dist/quill.snow.css';
 import Section from './BusinessComponents/BusinessSection';
 import Allproducts from '../businesspage/BusinessComponents/BusinessAllproducts';
 
@@ -48,8 +47,8 @@ const BusinessPage = () => {
       <HeroAndGallery />
       <div className='container mx-auto px-4'>
         <div className='flex flex-wrap items-center gap-4 py-4'>
-          <img className='h-16 sm:h-24' src={businessData.businessLogo} alt="Business Logo" />
-          <h1 className='text-xl sm:text-2xl font-medium mr-16'>{businessData.businessName}</h1>
+          <img className='h-16 sm:h-24 rounded-full object-cover' src='https://i.pravatar.cc/150?u=currentuser' alt="Business Logo" />
+          <h1 className='text-xl sm:text-2xl font-medium mr-16'>{businessData.businessName} Business Name</h1>
            
           <div className='flex flex-wrap items-center gap-3'>
             <Button className='h-9 px-3 bg-slate-300 hover:text-white hover:bg-color2/90'>
