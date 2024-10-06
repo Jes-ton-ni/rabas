@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Tabs, Tab, Button, Input, Link } from "@nextui-org/react";
 import { FaEye, FaEyeSlash, FaGoogle, FaEnvelope, FaArrowLeft } from 'react-icons/fa';
 import Logo2 from '../assets/Rabas.png';
-import swal from 'sweetalert'; //npm install sweetalert
+import Swal from 'sweetalert2'; // Change import to sweetalert2
 
 const LoginSignup = () => {
   const [view, setView] = useState("initial"); // initial, email, signup, forgotPassword
@@ -50,21 +50,21 @@ const LoginSignup = () => {
       });
       const data = await response.json();
       if (data.success) {
-        swal({
+        Swal.fire({
           title: 'Login Successful!',
           text: ' ',
           icon: 'success',
-          buttons: false,
+          showConfirmButton: false,
           timer: 1500,
         }).then(() => {         
           window.location.href = '/login'; // Redirect to home page after the alert is closed
         });
       } else {
-        swal({
+        Swal.fire({
           title: 'Login Failed!',
           text: 'Invalid username or password',
           icon: 'error',
-          buttons: false,
+          showConfirmButton: false,
           timer: 2000,
         });
       }
@@ -109,22 +109,22 @@ const LoginSignup = () => {
       const data = await response.json();
       console.log(data);
       if(data.success){
-        swal({
+        Swal.fire({
           title: 'Signup Successful!',
           text: ' ',
           icon: 'success',
-          buttons: false,
+          showConfirmButton: false,
           timer: 1500,
         }).then(() => {          
           window.location.href = '/'; // Redirect to home page after the alert is closed
         });
       }
       else{
-        swal({
+        Swal.fire({
           title: 'Signup Failed!',
           text: data.error,
           icon: 'error',
-          buttons: false,
+          showConfirmButton: false,
           timer: 2000,
         });
       }
