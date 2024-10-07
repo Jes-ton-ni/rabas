@@ -1,319 +1,509 @@
 import React, { useState } from 'react';
-import { Input, Button, Spacer } from '@nextui-org/react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/modal";
-import { addNewDeal, editDeal, deleteDeal } from '@/redux/activitydealSlice';
-import { updateActivity } from '@/redux/activitiesSlice';
+import { useSelector, useDispatch } from 'react-redux';
+import Swal from 'sweetalert2';
+import { Select, SelectSection, SelectItem } from "@nextui-org/select";
+import { Input } from "@nextui-org/input";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
+import { addDeal, deleteDeal, updateDeal } from '@/redux/activityDealsSlice';
 
 const ActivityDeals = () => {
   const dispatch = useDispatch();
+  const activities = useSelector((state) => state.activities.activities);
+  const activeDeals = useSelector((state) => state.activityDeals.activeDeals);
+  const expiredDeals = useSelector((state) => state.activityDeals.expiredDeals);
 
-  const { activities } = useSelector((state) => state.activities);
-  const { activeDeals, expiredDeals } = useSelector((state) => state.activitydeals);
+  const [selectedActivity, setSelectedActivity] = useState('');
+  const [originalPrice, setOriginalPrice] = useState(0);
+  const [discount, setDiscount] = useState('');
+  const [expirationDate, setExpirationDate] = useState('');
+  const [editingDeal, setEditingDeal] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [newDeal, setNewDeal] = useState({
     name: '',
     description: '',
     price: '',
-    priceUnit: '',
-    expiration: '',
-    image: '',
-    activityId: '',
+    pricingUnit: '',
+    expirationDate: '',
+    hasBookingOption: false, // New booking option field
+    image: null,
   });
 
-  const [imagePreview, setImagePreview] = useState(null); // For image preview
-  const [editingDeal, setEditingDeal] = useState(null); // Store the deal being edited
-  const [editingActivity, setEditingActivity] = useState(null); // Store the activity being edited
+  const [newActiveDeals, setNewActiveDeals] = useState([]);
+  const [newExpiredDeals, setNewExpiredDeals] = useState([]);
+  const { isOpen: isNewDealOpen, onOpen: onNewDealOpen, onClose: onNewDealClose } = useDisclosure();
 
-  const [showDealModal, setShowDealModal] = useState(false);
-  const [showActivityModal, setShowActivityModal] = useState(false);
-
-  // Handle form input changes for new deal
-  const handleNewDealChange = (e) => {
-    setNewDeal({ ...newDeal, [e.target.name]: e.target.value });
+  // SweetAlert2 for missing fields
+  const showAlert = (message) => {
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      confirmButtonColor:'#0BDA51',
+      text: message,
+    });
   };
 
-  // Handle image upload for new deal
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-        setNewDeal({ ...newDeal, image: reader.result });
-      };
-      reader.readAsDataURL(file);
+  const handleActivityChange = (event) => {
+    const value = event.target.value;
+    setSelectedActivity(value);
+    const activity = activities.find(activity => activity.id === value);
+    if (activity) {
+      setOriginalPrice(Number(activity.pricing));
     }
   };
 
-  // Remove image from new deal
-  const handleRemoveImage = () => {
-    setImagePreview(null);
-    setNewDeal({ ...newDeal, image: '' });
+  const handleAddDeal = () => {
+    if (!selectedActivity || !discount || !expirationDate) {
+      showAlert("Please fill all fields");
+      return;
+    }
+
+    const discountValue = parseFloat(discount);
+    if (isNaN(discountValue) || discountValue <= 0 || discountValue >= 100) {
+      showAlert("Please enter a valid discount percentage (0-100)");
+      return;
+    }
+
+    const expiration = new Date(expirationDate);
+    if (isNaN(expiration.getTime())) {
+      showAlert("Please enter a valid expiration date");
+      return;
+    }
+
+    if (editingDeal) {
+      // Update deal with the booking option field
+      dispatch(updateDeal({
+        dealId: editingDeal.id,
+        discount: discountValue,
+        expirationDate,
+        isExpired: editingDeal.isExpired,
+        hasBookingOption: editingDeal.hasBookingOption,
+      }));
+      setEditingDeal(null);
+      Swal.fire({
+        title: 'Success!',
+        text: 'Deal updated successfully!',
+        icon: 'success',
+        confirmButtonColor: '#0BDA51',
+      });
+      
+    } else {
+      // Add new deal with the booking option
+      dispatch(addDeal(selectedActivity, discountValue, expirationDate, newDeal.hasBookingOption));
+      Swal.fire({
+        title: 'Success!',
+        text: 'Deal added successfully!',
+        icon: 'success',
+        confirmButtonColor: '#0BDA51',
+      });
+    }
+
+    setDiscount('');
+    setExpirationDate('');
   };
 
-  // Add new deal
+  const handleEditDeal = (deal, isExpired) => {
+    setEditingDeal({ ...deal, isExpired });
+    setDiscount(deal.discount.toString());
+    setExpirationDate(deal.expirationDate.toISOString().split('T')[0]);
+    onOpen();
+  };
+
+  const handleDeleteDeal = (dealId, isExpired) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor:'#0BDA51',
+      cancelButtonColor: '#D33736',
+
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(deleteDeal({ dealId, isExpired }));
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'The deal has been deleted.',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51',
+        });
+        
+      }
+    });
+  };
+
+  const discountedPrice = originalPrice && discount ? (originalPrice - (originalPrice * (parseFloat(discount) / 100))).toFixed(2) : originalPrice;
+
+  const handleNewDealChange = (e) => {
+    const { name, value } = e.target;
+    setNewDeal(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCheckboxChange = (e) => {
+    const { checked } = e.target;
+    setNewDeal(prev => ({ ...prev, hasBookingOption: checked }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setNewDeal(prev => ({ ...prev, image: file }));
+  };
+
   const handleAddNewDeal = () => {
-    dispatch(addNewDeal(newDeal));
-    setNewDeal({ name: '', description: '', price: '', priceUnit: 'PHP', expiration: '', image: '', activityId: '' });
-    setImagePreview(null);
+    // Required fields validation
+    if (!newDeal.name || !newDeal.description || !newDeal.price || !newDeal.pricingUnit || !newDeal.expirationDate || !newDeal.image) {
+      showAlert("Please fill all fields in the New Deal form!");
+      return;
+    }
+
+    const today = new Date();
+    const expiration = new Date(newDeal.expirationDate);
+    if (expiration > today) {
+      setNewActiveDeals([...newActiveDeals, newDeal]);
+    } else {
+      setNewExpiredDeals([...newExpiredDeals, newDeal]);
+    }
+
+    // Reset new deal form after adding
+    setNewDeal({
+      name: '',
+      description: '',
+      price: '',
+      pricingUnit: '',
+      expirationDate: '',
+      hasBookingOption: false, // Reset booking option
+      image: null,
+    });
+    Swal.fire({
+      title: 'Success!',
+      text: 'New deal added!',
+      icon: 'success',
+      confirmButtonColor: '#0BDA51',
+    });
+    
   };
 
-  // Add deal for a specific activity
-  const handleAddDealToActivity = (activityId) => {
-    setNewDeal({ ...newDeal, activityId });
+  const handleEditNewDeal = (deal, isExpired) => {
+    setNewDeal(deal);
+    onNewDealOpen();
   };
 
-  // Open modal to edit a deal
-  const handleOpenEditDeal = (deal) => {
-    setEditingDeal(deal);
-    setShowDealModal(true);
+  const handleDeleteNewDeal = (dealId, isExpired) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor:'#0BDA51',
+      cancelButtonColor: '#D33736',
+
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if (isExpired) {
+          setNewExpiredDeals(newExpiredDeals.filter(deal => deal.name !== dealId));
+        } else {
+          setNewActiveDeals(newActiveDeals.filter(deal => deal.name !== dealId));
+        }
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'The deal has been deleted.',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51',
+        });
+      }
+    });
   };
-
-  // Open modal to edit an activity
-  const handleOpenEditActivity = (activity) => {
-    setEditingActivity(activity);
-    setShowActivityModal(true);
-  };
-
-  // Handle deal edit submit
-  const handleEditDealSubmit = () => {
-    dispatch(editDeal({ id: editingDeal.id, updatedDeal: editingDeal }));
-    setShowDealModal(false);
-    setEditingDeal(null);
-  };
-
-  // Handle activity edit submit
-  const handleEditActivitySubmit = () => {
-    dispatch(updateActivity({ id: editingActivity.id, updatedData: editingActivity }));
-    setShowActivityModal(false);
-    setEditingActivity(null);
-  };
-
-  // Render existing activities
-  const renderExistingActivities = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {activities.map((activity) => (
-        <div key={activity.id} className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-xl font-semibold">{activity.activityName}</h3>
-          <p className="text-gray-700">Price: ₱{activity.pricing} {activity.pricingUnit}</p>
-          <div className="flex space-x-2 my-2 overflow-auto">
-            {activity.images.map((image, index) => (
-              <img key={index} src={image} alt={activity.activityName} className="w-16 h-16 rounded-md" />
-            ))}
-          </div>
-          <Input
-            fullWidth
-            label="Discount (%)"
-            placeholder="e.g., 10"
-            onChange={(e) => setEditingActivity({ ...activity, discount: e.target.value })}
-          />
-          <Input
-            fullWidth
-            label="Expiration Date"
-            type="date"
-            onChange={(e) => setEditingActivity({ ...activity, expiration: e.target.value })}
-          />
-          <Button flat auto onPress={() => handleAddDealToActivity(activity.id)} className="mt-4">
-            Add Deal to this Activity
-          </Button>
-        </div>
-      ))}
-    </div>
-  );
-
-  // Render form for creating new deals
-  const renderNewDealForm = () => (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h3 className="text-xl font-semibold mb-4">Create New Deal</h3>
-      <Input
-        fullWidth
-        label="Activity Name"
-        name="name"
-        value={newDeal.name}
-        onChange={handleNewDealChange}
-      />
-      <Input
-        fullWidth
-        label="Description"
-        name="description"
-        value={newDeal.description}
-        onChange={handleNewDealChange}
-      />
-      <Input
-        fullWidth
-        label="Price"
-        name="price"
-        type="number"
-        value={newDeal.price}
-        onChange={handleNewDealChange}
-        placeholder="₱"
-      />
-      <Input
-        fullWidth
-        label="Price Unit"
-        name="priceUnit"
-        value={newDeal.priceUnit}
-        onChange={handleNewDealChange}
-        placeholder="e.g., per pax"
-      />
-      <Input
-        fullWidth
-        label="Expiration Date"
-        type="date"
-        name="expiration"
-        value={newDeal.expiration}
-        onChange={handleNewDealChange}
-      />
-      <input type="file" accept="image/*" onChange={handleImageUpload} />
-      {imagePreview && (
-        <div>
-          <img src={imagePreview} alt="Preview" className="w-full h-40 object-cover mt-2 rounded-md" />
-          <Button flat auto color="error" onPress={handleRemoveImage}>
-            Remove Image
-          </Button>
-        </div>
-      )}
-      <Button flat auto onPress={handleAddNewDeal} className="mt-4">
-        Add New Deal
-      </Button>
-    </div>
-  );
-
-  // Render active deals
-  const renderActiveDeals = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8 overflow-y-auto max-h-[500px] ">
-      {activeDeals.map((deal) => (
-        <div key={deal.id} className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-xl font-semibold">{deal.name}</h3>
-          <p>{deal.description}</p>
-          <p>Price: ₱{deal.price} {deal.priceUnit}</p>
-          <p>Expiration: {deal.expiration}</p>
-          <img src={deal.image} alt={deal.name} className="w-full h-40 object-cover mt-2 rounded-md" />
-          <div className="flex space-x-2 mt-4">
-            <Button color="warning" flat auto onPress={() => handleOpenEditDeal(deal)}>
-              Edit
-            </Button>
-            <Button color="error" flat auto onPress={() => dispatch(deleteDeal(deal.id))}>
-              Delete
-            </Button>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
-  // Render expired deals
-  const renderExpiredDeals = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-      {expiredDeals.map((deal) => (
-        <div key={deal.id} className="bg-gray-300 p-6 rounded-lg shadow-md">
-          <h3 className="text-xl font-semibold">{deal.name} (Expired)</h3>
-          <p>{deal.description}</p>
-          <p>Price: ₱{deal.price} {deal.priceUnit}</p>
-          <p>Expired on: {deal.expiration}</p>
-          <img src={deal.image} alt={deal.name} className="w-full h-40 object-cover mt-2 rounded-md" />
-        </div>
-      ))}
-    </div>
-  );
 
   return (
-    <div className="p-8 w-full bg-white">
-      <h1 className="text-3xl font-bold mb-6">Manage Activity Deals</h1>
-      <h2 className="text-2xl font-semibold mb-4">Existing Activities</h2>
-      {renderExistingActivities()}
-      <h2 className="text-2xl font-semibold my-8">Create New Deal</h2>
-      {renderNewDealForm()}
-      <h2 className="text-2xl font-semibold my-8">Active Deals</h2>
-      {renderActiveDeals()}
-      <h2 className="text-2xl font-semibold my-8">Expired Deals</h2>
-      {renderExpiredDeals()}
+    <div className="p-8 bg-gray-50 min-h-screen w-full">
+      <div className="grid grid-cols-2 gap-8 max-w-7xl mx-auto">
 
-      {/* Modal for Editing Deal */}
-      {editingDeal && (
-        <Modal open={showDealModal} onClose={() => setShowDealModal(false)}>
-          <ModalContent>
-            <ModalHeader>
-              <h3>Edit Deal</h3>
-            </ModalHeader>
-            <ModalBody>
-              <Input
-                fullWidth
-                label="Activity Name"
-                value={editingDeal.name}
-                onChange={(e) => setEditingDeal({ ...editingDeal, name: e.target.value })}
+        {/* Left Section - Active and Expired Deals */}
+        <div className="bg-white shadow-lg rounded-lg p-6">
+          <h2 className="text-2xl font-bold mb-6">Manage Existing Product</h2>
+          <Select
+            placeholder="Select Activity"
+            onChange={handleActivityChange}
+            className="w-full mb-4"
+          >
+            <SelectSection title="Activities">
+              {activities.map(activity => (
+                <SelectItem key={activity.id} value={activity.id}>
+                  {activity.activityName}
+                </SelectItem>
+              ))}
+            </SelectSection>
+          </Select>
+          {selectedActivity && (
+            <div className="mb-4">
+              <p>Original Price: <span className="font-semibold">₱{originalPrice}</span></p>
+              <p>Discounted Price: <span className="font-semibold">₱{discountedPrice}</span></p>
+            </div>
+          )}
+          <div className="flex space-x-4 mb-4">
+            <Input
+              placeholder="Discount"
+              value={discount}
+              onChange={(e) => setDiscount(e.target.value)}
+              className="flex-1"
+            />
+            <Input
+              type="date"
+              value={expirationDate}
+              onChange={(e) => setExpirationDate(e.target.value)}
+              className="flex-1"
+            />
+          </div>
+          <Button onClick={handleAddDeal} className="w-full  text-white mb-6 rounded-md" color='success'>
+            {editingDeal ? "Update Deal" : "Add Deal"}
+          </Button>
+
+          {/* Active Deals */}
+          <h3 className="text-xl font-semibold mb-4">Active Deals</h3>
+          <div className="grid grid-cols-1 gap-4 max-h-80 overflow-y-auto">
+            {activeDeals.map(deal => (
+              <div key={deal.id} className="bg-white shadow-md rounded-lg p-4">
+                <div className="flex flex-col mb-2">
+                  <span className="font-bold">{activities.find(activity => activity.id === deal.activityId)?.activityName}</span>
+                  <span className="text-sm text-gray-600">Discount: {deal.discount}%</span>
+                  <span className="text-sm text-gray-600">Expiration: {new Date(deal.expirationDate).toLocaleDateString()}</span>
+                </div>
+                <div className="flex justify-between mt-4">
+                  <Button onClick={() => handleEditDeal(deal, false)} size="sm" color='primary'>Edit</Button>
+                  <Button onClick={() => handleDeleteDeal(deal.id, false)} size="sm" color="danger">Delete</Button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Expired Deals */}
+          <h3 className="text-xl font-semibold mt-8 mb-4">Expired Deals</h3>
+          <div className="grid grid-cols-1 gap-4 max-h-80 overflow-y-auto">
+            {expiredDeals.map(deal => (
+              <div key={deal.id} className="bg-white shadow-md rounded-lg p-4">
+                <div className="flex flex-col mb-2">
+                  <span className="font-bold">{activities.find(activity => activity.id === deal.activityId)?.activityName}</span>
+                  <span className="text-sm text-gray-600">Discount: {deal.discount}%</span>
+                  <span className="text-sm text-gray-600">Expiration: {new Date(deal.expirationDate).toLocaleDateString()}</span>
+                  <span className="text-sm text-gray-600">Booking Option: {deal.hasBookingOption ? "Yes" : "No"}</span>
+                </div>
+                <div className="flex justify-between mt-4">
+                  <Button onClick={() => handleDeleteDeal(deal.id, true)} size="sm" color="danger">Delete</Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right Section - New Deal */}
+        <div className="bg-white shadow-lg rounded-lg p-6">
+          <h2 className="text-2xl font-bold mb-6">Create New Deal</h2>
+          <Input
+            placeholder="Deal Name"
+            name="name"
+            value={newDeal.name}
+            onChange={handleNewDealChange}
+            className="w-full mb-4"
+          />
+          <Input
+            placeholder="Description"
+            name="description"
+            value={newDeal.description}
+            onChange={handleNewDealChange}
+            className="w-full mb-4"
+          />
+          <Input
+            placeholder="Price (₱)"
+            name="price"
+            value={newDeal.price}
+            onChange={handleNewDealChange}
+            className="w-full mb-4"
+          />
+          <Input
+            placeholder="Pricing Unit (e.g., per pax)"
+            name="pricingUnit"
+            value={newDeal.pricingUnit}
+            onChange={handleNewDealChange}
+            className="w-full mb-4"
+          />
+          <Input
+            type="date"
+            name="expirationDate"
+            value={newDeal.expirationDate}
+            onChange={handleNewDealChange}
+            className="w-full mb-4"
+          />
+          <div className="flex items-center mb-4">
+            <input
+              type="checkbox"
+              id="hasBookingOption"
+              checked={newDeal.hasBookingOption}
+              onChange={handleCheckboxChange}
+              className="mr-2"
+            />
+            <label htmlFor="hasBookingOption">Has Booking Option</label>
+          </div>
+          <div className="mb-4">
+          <div>Upload Image</div>
+            <input type="file" onChange={handleImageChange} />
+            {newDeal.image && (
+              <div className="mt-2">
+                <img src={URL.createObjectURL(newDeal.image)} alt="Preview" className="w-32 h-32 object-cover rounded-lg" />
+                <Button onClick={() => setNewDeal(prev => ({ ...prev, image: null }))} size="sm" color="danger" className="mt-2">Remove Image</Button>
+              </div>
+            )}
+          </div>
+          <Button onClick={handleAddNewDeal} className="w-full  text-white rounded-md" color='success'>Add New Deal</Button>
+
+          {/* New Active Deals */}
+          <h3 className="text-xl font-semibold mt-8 mb-4">New Active Deals</h3>
+          <div className="grid grid-cols-2 gap-4 max-h-80 overflow-y-auto">
+            {newActiveDeals.map(deal => (
+              <div key={deal.name} className="bg-white shadow-md rounded-lg p-4">
+                <div className="mb-4">
+                  <img
+                    src={deal.image ? URL.createObjectURL(deal.image) : '/placeholder.png'}
+                    alt={deal.name}
+                    className="w-full h-40 object-cover rounded-md"
+                  />
+                </div>
+                <div className="flex flex-col mb-2">
+                <span className="font-semibold">Deal Name: <span className='font-normal'>{deal.name}</span></span>
+                  <span className="font-semibold">Price: <span className='font-normal'>{deal.price} {deal.pricingUnit}</span></span>
+                  <span className="text-sm font-semibold">Booking Option: <span className='font-normal'>{deal.hasBookingOption ? "Yes" : "No"}</span></span>
+                  <span className="font-semibold">Description: <span className='font-normal'>{deal.description}</span></span>
+                </div>
+                <div className="flex justify-between mt-4">
+                  <Button onClick={() => handleEditNewDeal(deal, false)} size="sm" color='primary'>Edit</Button>
+                  <Button onClick={() => handleDeleteNewDeal(deal.name, false)} size="sm" color="danger">Delete</Button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* New Expired Deals */}
+          <h3 className="text-xl font-semibold mt-8 mb-4">New Expired Deals</h3>
+          <div className="grid grid-cols-2 gap-4 max-h-80 overflow-y-auto">
+            {newExpiredDeals.map(deal => (
+              <div key={deal.name} className="bg-white shadow-md rounded-lg p-4">
+                <div className="mb-4">
+                  <img
+                    src={deal.image ? URL.createObjectURL(deal.image) : '/placeholder.png'}
+                    alt={deal.name}
+                    className="w-full h-40 object-cover rounded-md"
+                  />
+                </div>
+                <div className="flex flex-col mb-2">
+                <span className="font-semibold">Deal Name: <span className='font-normal'>{deal.name}</span></span>
+                  <span className="font-semibold">Price: <span className='font-normal'>{deal.price} {deal.pricingUnit}</span></span>
+                  <span className="text-sm font-semibold">Booking Option: <span className='font-normal'>{deal.hasBookingOption ? "Yes" : "No"}</span></span>
+                  <span className="font-semibold">Description: <span className='font-normal'>{deal.description}</span></span>
+                </div>
+                <div className="flex justify-between mt-4">
+                  <Button onClick={() => handleDeleteNewDeal(deal.name, true)} size="sm" color="danger">Delete</Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+
+      {/* Modal for Editing Deals */}
+      <Modal isOpen={isOpen} onClose={() => { onClose(); setEditingDeal(null); }}>
+        <ModalContent>
+          <ModalHeader>{editingDeal ? "Edit Deal" : "Add Deal"}</ModalHeader>
+          <ModalBody>
+            <Input
+              placeholder="New Discount"
+              value={discount}
+              onChange={(e) => setDiscount(e.target.value)}
+              className="mb-4"
+            />
+            <Input
+              type="date"
+              value={expirationDate}
+              onChange={(e) => setExpirationDate(e.target.value)}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={() => { onClose(); setEditingDeal(null); }} color='danger'>Cancel</Button>
+            <Button onClick={handleAddDeal}color='success'>Save</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isNewDealOpen} onClose={onNewDealClose}>
+        <ModalContent>
+          <ModalHeader>Edit New Deal</ModalHeader>
+          <ModalBody>
+            <Input
+              placeholder="Deal Name"
+              name="name"
+              value={newDeal.name}
+              onChange={handleNewDealChange}
+              className="mb-2"
+            />
+            <Input
+              placeholder="Description"
+              name="description"
+              value={newDeal.description}
+              onChange={handleNewDealChange}
+              className="mb-2"
+            />
+            <Input
+              placeholder="Price (₱)"
+              name="price"
+              value={newDeal.price}
+              onChange={handleNewDealChange}
+              className="mb-2"
+            />
+            <Input
+              placeholder="Pricing Unit (e.g., per pax)"
+              name="pricingUnit"
+              value={newDeal.pricingUnit}
+              onChange={handleNewDealChange}
+              className="mb-2"
+            />
+            <Input
+              type="date"
+              name="expirationDate"
+              value={newDeal.expirationDate}
+              onChange={handleNewDealChange}
+              className="mb-2"
+            />
+            <div className="flex items-center mb-4">
+              <input
+                type="checkbox"
+                id="hasBookingOption"
+                checked={newDeal.hasBookingOption}
+                onChange={handleCheckboxChange}
+                className="mr-2"
               />
-              <Input
-                fullWidth
-                label="Description"
-                value={editingDeal.description}
-                onChange={(e) => setEditingDeal({ ...editingDeal, description: e.target.value })}
-              />
-              <Input
-                fullWidth
-                label="Price"
-                value={editingDeal.price}
-                onChange={(e) => setEditingDeal({ ...editingDeal, price: e.target.value })}
-              />
-              <Input
-                fullWidth
-                label="Expiration Date"
-                type="date"
-                value={editingDeal.expiration}
-                onChange={(e) => setEditingDeal({ ...editingDeal, expiration: e.target.value })}
-              />
-              <input type="file" accept="image/*" onChange={handleImageUpload} />
-              {imagePreview && (
-                <div>
-                  <img src={imagePreview} alt="Preview" className="w-full h-40 object-cover mt-2 rounded-md" />
-                  <Button flat auto color="error" onPress={handleRemoveImage}>
-                    Remove Image
-                  </Button>
+              <label htmlFor="hasBookingOption">Has Booking Option</label>
+            </div>
+            <div className="mb-4">
+              <input type="file" onChange={handleImageChange} />
+              {newDeal.image && (
+                <div className="mt-2">
+                  <img src={URL.createObjectURL(newDeal.image)} alt="Preview" className="w-32 h-32 object-cover" />
+                  <Button onClick={() => setNewDeal(prev => ({ ...prev, image: null }))} size="sm" color="danger">Remove Image</Button>
                 </div>
               )}
-            </ModalBody>
-            <ModalFooter>
-              <Button auto onPress={handleEditDealSubmit}>
-                Save Changes
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      )}
-
-      {/* Modal for Editing Activity */}
-      {editingActivity && (
-        <Modal open={showActivityModal} onClose={() => setShowActivityModal(false)}>
-          <ModalContent>
-            <ModalHeader>
-              <h3>Edit Activity</h3>
-            </ModalHeader>
-            <ModalBody>
-              <Input
-                fullWidth
-                label="Discount (%)"
-                value={editingActivity.discount}
-                onChange={(e) => setEditingActivity({ ...editingActivity, discount: e.target.value })}
-              />
-              <Input
-                fullWidth
-                label="Expiration Date"
-                type="date"
-                value={editingActivity.expiration}
-                onChange={(e) => setEditingActivity({ ...editingActivity, expiration: e.target.value })}
-              />
-            </ModalBody>
-            <ModalFooter>
-              <Button auto onPress={handleEditActivitySubmit}>
-                Save Changes
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      )}
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={onNewDealClose} color='danger'>Cancel</Button>
+            <Button onClick={handleAddNewDeal} color='success'>Save</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
-};
+}
 
 export default ActivityDeals;

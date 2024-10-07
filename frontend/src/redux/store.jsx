@@ -3,10 +3,11 @@ import businessReducer from './businessSlice';
 import activitiesReducer from './activitiesSlice';
 import accommodationReducer from './accomodationSlice';
 import restaurantServicesReducer from './restaurantServicesSlice';
-import shopReducer from './shopSlice'
-import activitydealSliceReducer from './activitydealSlice';
-import applicationSliceReducer from  './applicationSlice' 
-
+import shopReducer from './shopSlice';
+import activityDealsReducer from './activityDealsSlice';
+import accommodationDealsReducer from './accommodationDealsSlice'
+import restaurantDealsReducer from './restaurantDealsSlice'
+import shopDealsReducer from './shopDealsSlice'
 
 
 
@@ -18,8 +19,11 @@ const store = configureStore({
     accommodations: accommodationReducer, 
     restaurantServices : restaurantServicesReducer,
     shop: shopReducer,
-    activitydeals: activitydealSliceReducer, 
-    application: applicationSliceReducer
+    activityDeals: activityDealsReducer,
+    accommodationDeals: accommodationDealsReducer,
+    restaurantDeals: restaurantDealsReducer, 
+    shopDeals: shopDealsReducer,
+
 
   
   },

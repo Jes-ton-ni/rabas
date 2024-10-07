@@ -1,7 +1,21 @@
 import { createSlice, nanoid } from '@reduxjs/toolkit';
 
 const initialState = {
-  services: [],
+  services: [
+    {
+      id: nanoid(),
+      serviceName: "Valentine date Reservation Table",
+      pricing: "700",
+      pricingUnit: "per person",
+      hasBooking: true,
+      inclusions: ["Violin Performance", "3 course meal"],
+      images: [
+        "https://via.placeholder.com/150",
+        "https://via.placeholder.com/150"
+      ],
+      serviceType: "Fine Dining",
+    },
+  ],
 };
 
 const restaurantServicesSlice = createSlice({

@@ -1,7 +1,21 @@
 import { createSlice, nanoid } from '@reduxjs/toolkit';
 
 const initialState = {
-  accommodations: [],
+  accommodations: [
+    {
+      id: nanoid(),
+      accommodationName: "Family Delux",
+      pricing: "3500",
+      pricingUnit: "per person",
+      hasBooking: true,
+      inclusions: ["Double Deck Bed", "Freebies Towels", "Sofabed"],
+      images: [
+        "https://via.placeholder.com/150",
+        "https://via.placeholder.com/150"
+      ],
+      accommodationType: "Family Room",
+    },
+  ],
 };
 
 const accommodationSlice = createSlice({

@@ -1,7 +1,19 @@
 import { createSlice, nanoid } from '@reduxjs/toolkit';
 
 const initialState = {
-  products: [],
+  products: [
+    {
+      id: nanoid(),
+      productName: "Abaca wallet",
+      price: "300",
+      description: ["Best Traditional Product from Sorsogon"],
+      images: [
+        "https://via.placeholder.com/150",
+        "https://via.placeholder.com/150"
+      ],
+      category: "Souvenir Item",
+    },
+  ],
 };
 
 const shopSlice = createSlice({
