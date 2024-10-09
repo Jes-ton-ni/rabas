@@ -21,6 +21,7 @@ import { Link } from 'react-router-dom'; // Assuming this is already imported or
 const Nav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [userData, setUserData] = useState(null);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -90,12 +91,20 @@ const Nav = () => {
     }
   };
 
+  // Get the first letter of the username, fallback to empty string if userData is not available
+  const firstLetter = userData?.username?.charAt(0).toUpperCase() || '';
+
   useEffect(() => {
     // Fetch username if user is logged in
     if (isLoggedIn) {
       fetchUserData();
     }
   }, [isLoggedIn]);
+
+  // Only return the component content after userData is fetched
+  if (isLoggedIn === null || (isLoggedIn && !userData)) {
+    return null; 
+  }
 
   return (
     <div className="bg-light fixed  top-0 z-50  h-[7rem] w-full px-4 shadow-lg ">
@@ -283,7 +292,7 @@ const Nav = () => {
                 <div className="cursor-pointer ml-6">
                   <Avatar 
                     className='text-lg bg-color1 text-light hover:bg-color2/80 transition-colors duration-300' 
-                    name="A" 
+                    name={firstLetter} 
                   />
                 </div>
               </DropdownTrigger>

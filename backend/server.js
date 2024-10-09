@@ -191,6 +191,60 @@ app.put('/update-profile', async (req, res) => {
   }
 });
 
+// Multer configuration for storing uploaded images
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage });
+// Serve static files from the 'uploads' directory
+app.use('/uploads', express.static('uploads'));
+
+// Endpoint for uploading images
+app.post('/upload', upload.single('image'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: false, message: 'No file uploaded' });
+  }
+  // Return the file path or URL
+  return res.json({ success: true, imagePath: req.file.path });
+});
+
+// Endopoint for updating user profile
+app.put('/userProfile/:id', upload.single('image'), (req, res) => {
+  //console.log(req.file); // Log the file upload object
+  console.log(req.body); // Log the request body
+
+  const userId = req.params.id;
+  // Extract updated user data from request body
+  const {image, image_path} = req.body;
+
+  // Update user data in the database
+  let sql;
+  let params;
+
+  sql = 'UPDATE users SET image = ?, image_path = ? WHERE user_id = ?';
+  params = [image, image_path, userId];
+
+  console.log(sql, params); // Log SQL query and params for debugging
+
+  connection.query(sql, params, (err, results) => {
+    if (err) {
+      console.error('Error updating user profile:', err);
+      return res.status(500).json({ success: false, message: 'Failed to update user profile' });
+    }
+    if (results.affectedRows === 0) {
+      // No user found with the given ID
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    return res.json({ success: true, message: 'User updated successfully' });
+  });
+});
+
 // Endpoint for updating user password
 app.put('/update-password', async (req, res) => {
   try {
