@@ -24,6 +24,8 @@ const ActivitySections = () => {
   const [selectedActivities, setSelectedActivities] = useState([]);
   const [activityType, setActivityType] = useState('');
   const [selectedType, setSelectedType] = useState('');
+  const [termsAndConditions, setTermsAndConditions] = useState([]);
+  const [termsList, setTermsList] = useState([]); // New state for terms list
 
   const dispatch = useDispatch();
   const activities = useSelector((state) => state.activities.activities);
@@ -42,11 +44,22 @@ const ActivitySections = () => {
     setInclusionList(updatedInclusionList);
   }, [inclusionList]);
 
+  // Handlers for Terms and Conditions
+  const handleAddTerm = useCallback(() => {
+    if (termsAndConditions.trim()) {
+      setTermsList([...termsList, termsAndConditions.trim()]);
+      setTermsAndConditions('');
+    }
+  }, [termsAndConditions, termsList]);
+
+  const handleRemoveTerm = useCallback((index) => {
+    const updatedTermsList = termsList.filter((_, i) => i !== index);
+    setTermsList(updatedTermsList);
+  }, [termsList]);
+
   // Handlers for Image Upload
   const handleImageUpload = useCallback((e) => {
-    
     const files = Array.from(e.target.files);  
-    // Update the state with the newly selected files without a limit  
     setImages((prevImages) => [...prevImages, ...files]);  
   }, [images]);
 
@@ -68,10 +81,7 @@ const ActivitySections = () => {
   // Handlers for Deleting Selected Activities
   const handleDeleteSelected = useCallback(() => {
     if (selectedActivities.length > 0) {
-      // Dispatch the delete action for selected activities
       dispatch(deleteActivities(selectedActivities));
-
-      // Reset selected activities after deletion
       setSelectedActivities([]);
     }
   }, [selectedActivities, dispatch]);
@@ -79,9 +89,9 @@ const ActivitySections = () => {
   // Handlers for Checkbox Changes
   const handleCheckboxChange = useCallback((id, isChecked) => {
     if (isChecked) {
-      setSelectedActivities((prev) => [...prev, id]); // Add activity ID if checked
+      setSelectedActivities((prev) => [...prev, id]);
     } else {
-      setSelectedActivities((prev) => prev.filter((activityId) => activityId !== id)); // Remove activity ID if unchecked
+      setSelectedActivities((prev) => prev.filter((activityId) => activityId !== id));
     }
   }, []);
 
@@ -100,6 +110,7 @@ const ActivitySections = () => {
           typeof file === 'string' ? file : URL.createObjectURL(file)
         ),
         activityType,
+        termsAndConditions: termsList, // Include terms list
       };
 
       if (isEditing) {
@@ -127,6 +138,8 @@ const ActivitySections = () => {
     setIsEditing(false);
     setEditingActivityId(null);
     setActivityType('');
+    setTermsAndConditions('');
+    setTermsList([]); // Reset terms list
   };
 
   // Handler for Editing an Activity
@@ -141,6 +154,7 @@ const ActivitySections = () => {
     setIsEditing(true);
     setModalOpen(true);
     setActivityType(activity.activityType);
+    setTermsList(activity.termsAndConditions || []); // Set terms list
   };
 
   // Slider Settings for Image Carousel
@@ -172,7 +186,7 @@ const ActivitySections = () => {
           <Button
             color="danger"
             onClick={handleDeleteSelected}
-            disabled={!selectedActivities.length} // Disable delete button if no activities are selected
+            disabled={!selectedActivities.length}
           >
             Delete Selected
           </Button>
@@ -243,9 +257,18 @@ const ActivitySections = () => {
               </p>
 
               {/* Inclusions */}
+              <h1 className='text-sm font-semibold'>Inclusions or Details:</h1>
               <ul className="list-disc overflow-auto h-24 pl-4 text-xs">
                 {activity.inclusions.map((inclusion, i) => (
                   <li key={i}>{inclusion}</li>
+                ))}
+              </ul>
+
+              {/* Terms and Conditions */}
+              <h1 className='text-sm font-semibold'>Terms and Conditions:</h1>
+              <ul className="list-disc overflow-auto h-24 pl-4 text-xs">
+                {activity.termsAndConditions?.map((term, i) => (
+                  <li key={i}>{term}</li>
                 ))}
               </ul>
 
@@ -349,9 +372,47 @@ const ActivitySections = () => {
                       checked={hasBooking}
                       onChange={(e) => setHasBooking(e.target.checked)}
                     >
-                      Product has booking option
+                      Activity has booking option
                     </Checkbox>
                   </div>
+
+                  {/* Terms and Conditions */}
+                  {hasBooking && (
+                    <div className="mb-4">
+                      <Input
+                        label="Terms and Conditions"
+                        placeholder="Enter a term or condition"
+                        value={termsAndConditions}
+                        onChange={(e) => setTermsAndConditions(e.target.value)}
+                        fullWidth
+                      />
+                      <Button
+                        type="button"
+                        color="primary"
+                        className="mt-2 hover:bg-color2"
+                        onClick={handleAddTerm}
+                      >
+                        Add Term or Condition
+                      </Button>
+
+                      {/* Terms List */}
+                      <ul className="mt-3 flex items-center flex-wrap gap-3 pl-5 text-sm">
+                        {termsList.map((item, index) => (
+                          <li key={index} className="flex gap-3 items-center bg-light p-2 rounded-md">
+                            {item}
+                            <Button
+                              auto
+                              color="danger"
+                              size="sm"
+                              onClick={() => handleRemoveTerm(index)}
+                            >
+                              Remove
+                            </Button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                   {/* Inclusions */}
                   <div className="mb-4">

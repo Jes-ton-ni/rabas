@@ -19,7 +19,10 @@ import {
 import { MdRateReview } from 'react-icons/md';
 import { AiFillStar } from 'react-icons/ai';
 import { Carousel } from 'react-responsive-carousel';
-import 'react-responsive-carousel/lib/styles/carousel.min.css'; // Import carousel CSS
+import 'react-responsive-carousel/lib/styles/carousel.min.css';
+import AccommodationBookingForm from './bookingFormModal/AccommodationBookingForm';
+import TableReservationForm from './bookingFormModal/TableReservationForm';
+import AttractionActivitiesBookingForm from './bookingFormModal/AttractionActivitiesBookingForm';
 
 // Mock Data for each tab with amenities
 const mockData = {
@@ -105,7 +108,6 @@ const mockData = {
   ],
 };
 
-// Combine all data for the "All Products" tab
 const allProducts = [
   ...mockData.activities,
   ...mockData.accommodations,
@@ -132,7 +134,7 @@ const ReviewModal = ({ isOpen, onClose, product }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[100%] md:max-w-[800px]">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-full md:max-w-2xl">
       <ModalContent className="p-4">
         <ModalHeader>
           <h2 className="text-xl font-semibold">Write a Review for {product.title}</h2>
@@ -162,8 +164,6 @@ const ReviewModal = ({ isOpen, onClose, product }) => {
               />
             </div>
           </div>
-
-          {/* Display sample reviews */}
           <div className="mt-6">
             <h3 className="font-bold mb-2">Reviews</h3>
             <div className="space-y-4">
@@ -196,55 +196,51 @@ const ReviewModal = ({ isOpen, onClose, product }) => {
   );
 };
 
-// Product Card Component with Review Modal
-const ProductCard = ({ product, openImageModal }) => {
+// Product Card Component
+const ProductCard = ({ product, openImageModal, openBookingModal }) => {
   const [isReviewModalOpen, setReviewModalOpen] = useState(false);
 
   const openReviewModal = () => setReviewModalOpen(true);
   const closeReviewModal = () => setReviewModalOpen(false);
 
   return (
-    <Card variant="shadow" className="border-0 rounded-lg mb-4">
-      <CardBody className="">
-        <div className="flex items-center max-h-[300px] h-full w-full">
-          <img
-            src={product.imageUrl}
-            alt={product.title}
-            className="object-cover max-h-[260px] h-full max-w-3/4 w-full"
-          />
-          <Button
-            color="primary"
-            size="sm"
-            className="rounded-none absolute bottom-8 left-3"
-            onClick={() => openImageModal(product.images)}
-          >
-            View Images
-          </Button>
-          <div className="flex flex-col w-full h-[300px] overflow-auto p-3 justify-center">
-            <div className="flex justify-between items-center">
+    <Card variant="shadow" className="border-0 rounded-lg mb-4 transition-transform transform hover:scale-105">
+      <CardBody>
+        <div className="flex flex-col md:flex-row items-center h-full w-full">
+          <div className="relative w-full md:w-1/2">
+            <img
+              src={product.imageUrl}
+              alt={product.title}
+              className="object-cover w-full h-[250px] md:h-[300px] rounded-lg"
+            />
+            <Button
+              color="primary"
+              size="sm"
+              className="absolute bottom-4 right-4"
+              onClick={() => openImageModal(product.images)}
+            >
+              View Images
+            </Button>
+          </div>
+          <div className="relative flex flex-col w-full h-full justify-between p-4">
+            <div className="flex justify-between items-start">
               <div className="font-bold text-xl mb-2">{product.title}</div>
-              <span className="text-yellow-400 flex gap-2 items-center">
-                <p className="text-black">{product.rating}</p>
-                <span className="flex">
-                  {Array.from({ length: product.rating }).map((_, idx) => (
-                    <AiFillStar key={idx} className="text-yellow-500" />
-                  ))}
-                </span>
+              <div className="flex items-center gap-1">
+                <span className="text-black font-semibold">{product.rating}</span>
+                <AiFillStar className="text-yellow-500" />
                 <Tooltip content="Write a Review">
                   <Button size="sm" className="bg-transparent" onClick={openReviewModal}>
-                    <MdRateReview className="text-color1 text-lg cursor-pointer" />
+                    <MdRateReview className="text-lg cursor-pointer" />
                   </Button>
                 </Tooltip>
-              </span>
+              </div>
             </div>
-            <ul className="max-h-[200px] h-full overflow-y-auto mt-4 flex-col">
-              <li>{product.description}</li>
-            </ul>
-            <div className="h-full flex justify-between items-center">
-              <div>₱{product.price}</div>
+            <div className="text-gray-700 mb-4">{product.description}</div>
+            <div className="flex justify-between items-center mt-auto">
+              <div className="text-lg font-semibold">₱{product.price}</div>
               <div className="flex gap-2">
                 <Button color="primary">Inquire</Button>
-                <Button color="success" className="text-white">
+                <Button color="success" className="text-white" onClick={() => openBookingModal(product)}>
                   Book
                 </Button>
               </div>
@@ -252,8 +248,6 @@ const ProductCard = ({ product, openImageModal }) => {
           </div>
         </div>
       </CardBody>
-
-      {/* Review Modal */}
       <ReviewModal isOpen={isReviewModalOpen} onClose={closeReviewModal} product={product} />
     </Card>
   );
@@ -262,15 +256,15 @@ const ProductCard = ({ product, openImageModal }) => {
 // Image Modal Component
 const ImageModal = ({ isOpen, onClose, images }) => {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[100%] md:max-w-[1000px]">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-full md:max-w-3xl">
       <ModalContent className="p-4">
         <ModalHeader>
           <h2 className="text-xl font-semibold">Image Preview</h2>
         </ModalHeader>
         <ModalBody className="py-4 flex justify-center items-center">
-          <Carousel className="overflow-x-auto max-w-[900px] bg-dark" showArrows={true} emulateTouch={true}>
+          <Carousel className="overflow-x-auto max-w-full bg-dark" showArrows={true} emulateTouch={true}>
             {images.map((img, index) => (
-              <div key={index} className="flex justify-center items-center h-[600px]">
+              <div key={index} className="flex justify-center items-center h-[400px] md:h-[600px]">
                 <img src={img} alt={`Slide ${index + 1}`} className="object-cover h-full max-w-full" />
               </div>
             ))}
@@ -287,7 +281,17 @@ const ImageModal = ({ isOpen, onClose, images }) => {
 };
 
 // Filter Component
-const Filters = ({ activeTab, setSelectedType, setRatingFilter, budgetRange, setBudgetRange }) => {
+const Filters = ({ activeTab, setSelectedType, setRatingFilter, budgetRange, setBudgetRange, ratingFilter }) => {
+  const handleRatingClick = (rating) => {
+    if (rating === 'All') {
+      setRatingFilter([]); // Clear all ratings
+    } else {
+      setRatingFilter((prev) =>
+        prev.includes(rating) ? prev.filter((r) => r !== rating) : [...prev, rating]
+      );
+    }
+  };
+
   let filterOptions = [];
 
   switch (activeTab) {
@@ -325,17 +329,33 @@ const Filters = ({ activeTab, setSelectedType, setRatingFilter, budgetRange, set
         ))}
       </Select>
 
-      <div className="font-bold text-lg text-gray-700 mb-4">Filter by Ratings</div>
-      <Select
-        placeholder="Select Rating"
-        onChange={(e) => setRatingFilter(parseInt(e.target.value, 10))}
-        defaultValue="0"
-      >
-        <SelectItem key="0" value="0">All Ratings</SelectItem>
-        {[1, 2, 3, 4, 5].map((num) => (
-          <SelectItem key={num} value={num}>{num} ★</SelectItem>
+      {/* Ratings Filter */}
+      <div className="font-bold text-lg text-gray-700 mb-4">Ratings</div>
+      <div className="space-y-2">
+        <label className="flex items-center">
+          <input
+            type="checkbox"
+            onChange={() => handleRatingClick('All')}
+            checked={ratingFilter.length === 0}
+            className="form-checkbox text-color2"
+          />
+          <span className="ml-2 text-sm">All Ratings</span>
+        </label>
+        {[5, 4, 3, 2, 1].map((star) => (
+          <label key={star} className="flex items-center">
+            <input
+              type="checkbox"
+              onChange={() => handleRatingClick(star)}
+              checked={ratingFilter.includes(star)}
+              className="form-checkbox text-color2"
+            />
+            <span className="ml-2 text-sm flex items-center">
+              {'★'.repeat(star)}{'☆'.repeat(5 - star)}
+              <span className="ml-1">{star} Star{star > 1 ? 's' : ''}</span>
+            </span>
+          </label>
         ))}
-      </Select>
+      </div>
 
       <div className="font-bold text-lg text-gray-700 mb-4">Filter by Budget</div>
       <Slider
@@ -364,21 +384,29 @@ const LoadingSpinner = () => (
 const BusinessAllproducts = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [selectedType, setSelectedType] = useState('All');
-  const [ratingFilter, setRatingFilter] = useState(0);
+  const [ratingFilter, setRatingFilter] = useState([]);
   const [budgetRange, setBudgetRange] = useState([0, 10000]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImages, setModalImages] = useState([]);
+  const [activeModal, setActiveModal] = useState(null);
 
-  const openModal = (images) => {
+  const openImageModal = (images) => {
     setModalImages(images);
     setIsModalOpen(true);
   };
 
-  const closeModal = () => setIsModalOpen(false);
+  const closeImageModal = () => setIsModalOpen(false);
 
-  // Fetching or Simulating Fetching Data
+  const openBookingModal = (product) => {
+    if (product.type === 'Cabins' || product.type === 'Resorts') setActiveModal({ type: 'accommodation', product });
+    else if (product.type === 'Fine Dining' || product.type === 'Buffet') setActiveModal({ type: 'restaurant', product });
+    else if (product.type === 'Hiking' || product.type === 'Water Sports') setActiveModal({ type: 'activities', product });
+  };
+
+  const closeBookingModal = () => setActiveModal(null);
+
   useEffect(() => {
     setLoading(true);
     let data;
@@ -405,8 +433,8 @@ const BusinessAllproducts = () => {
     }
 
     // Apply Rating Filter
-    if (ratingFilter > 0) {
-      data = data.filter((item) => item.rating >= ratingFilter);
+    if (ratingFilter.length > 0) {
+      data = data.filter((item) => ratingFilter.includes(item.rating));
     }
 
     // Apply Budget Filter
@@ -422,7 +450,7 @@ const BusinessAllproducts = () => {
   }, [activeTab, selectedType, ratingFilter, budgetRange]);
 
   return (
-    <div className="min-h-screen container mx-auto p-6 bg-white rounded-md shadow-md mb-4 ">
+    <div className="min-h-screen container mx-auto p-4 md:p-6 bg-white rounded-md shadow-md mb-4">
       <div className="text-3xl font-semibold mb-6 text-gray-800">What We Offer</div>
 
       <div className="flex flex-col lg:flex-row gap-8">
@@ -434,13 +462,20 @@ const BusinessAllproducts = () => {
             setRatingFilter={setRatingFilter}
             budgetRange={budgetRange}
             setBudgetRange={setBudgetRange}
+            ratingFilter={ratingFilter}
           />
         </div>
 
         {/* Main Content Area */}
         <div className="flex flex-col w-full bg-white p-6 rounded-lg shadow-md">
           {/* Tabs */}
-          <Tabs aria-label="Business Offerings" variant="underlined" className="mb-4" onSelectionChange={(key) => setActiveTab(key)} selectedKey={activeTab}>
+          <Tabs
+            aria-label="Business Offerings"
+            variant="underlined"
+            className="mb-4"
+            onSelectionChange={(key) => setActiveTab(key)}
+            selectedKey={activeTab}
+          >
             <Tab key="all" title="All Products" />
             <Tab key="activities" title="Activities" />
             <Tab key="accommodations" title="Accommodations" />
@@ -453,7 +488,9 @@ const BusinessAllproducts = () => {
             {loading ? (
               <LoadingSpinner />
             ) : filteredData.length > 0 ? (
-              filteredData.map((product, index) => <ProductCard key={index} product={product} openImageModal={openModal} />)
+              filteredData.map((product, index) => (
+                <ProductCard key={index} product={product} openImageModal={openImageModal} openBookingModal={openBookingModal} />
+              ))
             ) : (
               <div>No results found</div>
             )}
@@ -462,7 +499,12 @@ const BusinessAllproducts = () => {
       </div>
 
       {/* Image Modal */}
-      <ImageModal isOpen={isModalOpen} onClose={closeModal} images={modalImages} />
+      <ImageModal isOpen={isModalOpen} onClose={closeImageModal} images={modalImages} />
+
+      {/* Conditionally Render Modals */}
+      {activeModal?.type === 'accommodation' && <AccommodationBookingForm isOpen={true} onClose={closeBookingModal} product={activeModal.product} />}
+      {activeModal?.type === 'restaurant' && <TableReservationForm isOpen={true} onClose={closeBookingModal} product={activeModal.product} />}
+      {activeModal?.type === 'activities' && <AttractionActivitiesBookingForm isOpen={true} onClose={closeBookingModal} product={activeModal.product} />}
     </div>
   );
 };

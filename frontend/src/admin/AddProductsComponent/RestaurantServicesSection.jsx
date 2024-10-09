@@ -25,6 +25,8 @@ const RestaurantServicesSection = () => {
   const [selectedServices, setSelectedServices] = useState([]);
   const [serviceType, setServiceType] = useState('');
   const [selectedType, setSelectedType] = useState('');
+  const [termsAndConditions, setTermsAndConditions] = useState([]);
+  const [termsList, setTermsList] = useState([]); // New state for terms list
 
   const dispatch = useDispatch();
   const services = useSelector((state) => state.restaurantServices.services);
@@ -43,11 +45,22 @@ const RestaurantServicesSection = () => {
     setInclusionList(updatedInclusionList);
   };
 
+  // Handlers for Terms and Conditions
+  const handleAddTerm = () => {
+    if (termsAndConditions.trim()) {
+      setTermsList([...termsList, termsAndConditions.trim()]);
+      setTermsAndConditions('');
+    }
+  };
+
+  const handleRemoveTerm = (index) => {
+    const updatedTermsList = termsList.filter((_, i) => i !== index);
+    setTermsList(updatedTermsList);
+  };
+
   // Handlers for Image Upload
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-   
-    // Update the state with the newly selected files without a limit  
     setImages((prevImages) => [...prevImages, ...files]);  
   };
 
@@ -88,6 +101,7 @@ const RestaurantServicesSection = () => {
           typeof file === 'string' ? file : URL.createObjectURL(file)
         ),
         serviceType,
+        termsAndConditions: termsList, // Include terms list
       };
 
       if (isEditing) {
@@ -115,6 +129,8 @@ const RestaurantServicesSection = () => {
     setIsEditing(false);
     setEditingServiceId(null);
     setServiceType('');
+    setTermsAndConditions('');
+    setTermsList([]); // Reset terms list
   };
 
   // Handler for Editing a Service
@@ -129,15 +145,16 @@ const RestaurantServicesSection = () => {
     setIsEditing(true);
     setModalOpen(true);
     setServiceType(service.serviceType);
+    setTermsList(service.termsAndConditions || []); // Set terms list
   };
 
   // Slider Settings for Image Carousel
   const getSliderSettings = (numImages) => ({
-    infinite: numImages > 1,  // Infinite scroll only if more than 1 image
+    infinite: numImages > 1,
     slidesToShow: 1,
     slidesToScroll: 1,
     speed: 500,
-    arrows: numImages > 1,  // Show next/prev buttons only if more than 1 image
+    arrows: numImages > 1,
   });
 
   // Get Unique Service Types for Tabs
@@ -236,9 +253,18 @@ const RestaurantServicesSection = () => {
               </p>
 
               {/* Inclusions */}
+              <h1 className='text-sm font-semibold'>Inclusions or Details:</h1>
               <ul className="list-disc overflow-auto h-24 pl-4 text-xs">
                 {service.inclusions.map((inclusion, i) => (
                   <li key={i}>{inclusion}</li>
+                ))}
+              </ul>
+
+              {/* Terms and Conditions */}
+              <h1 className='text-sm font-semibold'>Terms and Conditions:</h1>
+              <ul className="list-disc overflow-auto h-24 pl-4 text-xs">
+                {service.termsAndConditions?.map((term, i) => (
+                  <li key={i}>{term}</li>
                 ))}
               </ul>
 
@@ -345,9 +371,47 @@ const RestaurantServicesSection = () => {
                       isSelected={hasBooking}
                       onChange={(e) => setHasBooking(e.target.checked)}
                     >
-                      Product has booking option
+                      Service has booking option
                     </Checkbox>
                   </div>
+
+                  {/* Terms and Conditions */}
+                  {hasBooking && (
+                    <div className="mb-4">
+                      <Input
+                        label="Terms and Conditions"
+                        placeholder="Enter a term or condition"
+                        value={termsAndConditions}
+                        onChange={(e) => setTermsAndConditions(e.target.value)}
+                        fullWidth
+                      />
+                      <Button
+                        type="button"
+                        color="primary"
+                        className="mt-2 hover:bg-color2"
+                        onClick={handleAddTerm}
+                      >
+                        Add Term or Condition
+                      </Button>
+
+                      {/* Terms List */}
+                      <ul className="mt-3 flex items-center flex-wrap gap-3 pl-5 text-sm">
+                        {termsList.map((item, index) => (
+                          <li key={index} className="flex gap-3 items-center bg-light p-2 rounded-md">
+                            {item}
+                            <Button
+                              auto
+                              color="danger"
+                              size="sm"
+                              onClick={() => handleRemoveTerm(index)}
+                            >
+                              Remove
+                            </Button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                   {/* Inclusions */}
                   <div className="mb-4">
@@ -384,32 +448,33 @@ const RestaurantServicesSection = () => {
                       ))}
                     </ul>
                   </div>
-                    {/* Image Upload */}
-                    <div className="mb-4">
-                      {/* Hidden input field */}
-                      <input
-                        id="imageUpload"
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                      />
-                      
-                      {/* Label with FaImage icon to trigger the file input */}
-                      <label
-                        htmlFor="imageUpload"
-                        className="flex items-center justify-center gap-2 cursor-pointer p-3 border border-gray-300 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
-                      >
-                        <FaImage className="text-2xl text-gray-600" />
-                        <span className="text-sm font-semibold text-gray-600">Upload Images</span>
-                      </label>
 
-                      {/* Text below the input */}
-                      <p className="text-sm font-semibold mt-2 text-gray-500">
-                        You can upload up to 5 images.
-                      </p>
-                    </div>
+                  {/* Image Upload */}
+                  <div className="mb-4">
+                    {/* Hidden input field */}
+                    <input
+                      id="imageUpload"
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                    
+                    {/* Label with FaImage icon to trigger the file input */}
+                    <label
+                      htmlFor="imageUpload"
+                      className="flex items-center justify-center gap-2 cursor-pointer p-3 border border-gray-300 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+                    >
+                      <FaImage className="text-2xl text-gray-600" />
+                      <span className="text-sm font-semibold text-gray-600">Upload Images</span>
+                    </label>
+
+                    {/* Text below the input */}
+                    <p className="text-sm font-semibold mt-2 text-gray-500">
+                      You can upload up to 5 images.
+                    </p>
+                  </div>
 
                   {/* Uploaded Images Preview with Remove Option */}
                   <div className="mb-4 flex flex-wrap gap-3">
