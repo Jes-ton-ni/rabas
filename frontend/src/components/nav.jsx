@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Logo from '../assets/rabas.png';
 import Logo2 from '../assets/Rabasorso.png'
+import { Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
 import LoginSignup from '@/auth/loginSignup';
 import {
   NavigationMenu,
@@ -15,6 +16,7 @@ import { GiPositionMarker } from "react-icons/gi";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { FaPersonWalking } from "react-icons/fa6";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
+import { Link } from 'react-router-dom'; // Assuming this is already imported or added
 
 const Nav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -23,6 +25,77 @@ const Nav = () => {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+
+  const handleLogout = async (e) => {
+    e.preventDefault(); // Prevent default anchor behavior
+    try {
+      const response = await fetch('http://localhost:5000/logout', {
+        method: 'POST',
+        credentials: 'include' // Include cookies in the request
+      });
+      if (response.ok) {
+        // Logout successful
+        console.log('Logout successful');
+        // Redirect to the login page
+        window.location.href = '/';
+      } else {
+        // Logout failed
+        console.error('Logout failed');
+      }
+    } catch (error) {
+      console.error('Error logging out:', error);
+      // Handle error, display error message or any appropriate action
+    }
+  };
+
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
+
+  // Function to check login status
+  const checkLoginStatus = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/check-login', {
+        method: 'GET',
+        credentials: 'include' // Include cookies in the request
+      });
+      if (response.ok) {
+        const data = await response.json(); // Parse response body as JSON
+        // Check the value of isLoggedIn
+        setIsLoggedIn(data.isLoggedIn);
+        
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Error checking login status:', error);
+      // Handle error, e.g., show an error message to the user
+    }
+  };  
+
+  useEffect(() => {
+    // Call the function to check login status when the component mounts
+    checkLoginStatus();
+  }, []);
+
+  // Fetch username from the server
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/get-userData', {
+        method: 'GET',
+        credentials: 'include' // Include cookies in the request
+      });
+      const data = await response.json();
+      setUserData(data.userData);
+    } catch (error) {
+      console.error('Error fetching username:', error);
+    }
+  };
+
+  useEffect(() => {
+    // Fetch username if user is logged in
+    if (isLoggedIn) {
+      fetchUserData();
+    }
+  }, [isLoggedIn]);
 
   return (
     <div className="bg-light fixed  top-0 z-50  h-[7rem] w-full px-4 shadow-lg ">
@@ -203,13 +276,39 @@ const Nav = () => {
           <div className="hover:text-gray-700 cursor-pointer hover:font-semibold duration-100 text-lg font-light text-color1 flex items-center gap-1">
             <h1>About</h1>
           </div>
+
+          {isLoggedIn ? (
+            <Dropdown placement="bottom-end ">
+              <DropdownTrigger>
+                <div className="cursor-pointer ml-6">
+                  <Avatar 
+                    className='text-lg bg-color1 text-light hover:bg-color2/80 transition-colors duration-300' 
+                    name="A" 
+                  />
+                </div>
+              </DropdownTrigger>
+              <DropdownMenu  >
+                <DropdownItem key="profile">
+                  <Link to='/userprofile' className="block w-full text-left">
+                    Profile
+                  </Link>
+                </DropdownItem>
+                <DropdownItem key="logout" onClick={handleLogout} >Logout</DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          ) : (
+            <div className="text-color1 cursor-pointer  ml-6" onClick={onOpen}>
+              <FaRegCircleUser className="text-3xl hover:bg-color2/70 hover:text-light duration-300 rounded-full" />
+            </div>
+          )}
           
-          <div className="text-color1 cursor-pointer  ml-6" onClick={onOpen}>
+          {/* <div className="text-color1 cursor-pointer  ml-6" onClick={onOpen}>
             <FaRegCircleUser className="text-3xl hover:bg-color2/70 hover:text-light duration-300 rounded-full" />
-          </div>
+          </div> */}
+
         </div>
       </div>
-          {/* User Modal */}
+        {/* User Modal */}
         <Modal
           backdrop="opaque"
           isOpen={isOpen}

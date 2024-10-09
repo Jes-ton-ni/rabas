@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Navuser from '@/components/navuser';
+import Nav from '@/components/nav';
 import Footer from '@/components/Footer';
 import { Avatar } from '@nextui-org/react';
 import Search from '@/components/Search';
@@ -38,7 +38,7 @@ const UserProfile = () => {
 
   return (
     <div className='mx-auto  min-h-screen font-sans'>
-      <Navuser />
+      <Nav />
       <div className='container p-3 rounded-md mt-[7.2rem] flex justify-center'>
         <Search />
       </div>

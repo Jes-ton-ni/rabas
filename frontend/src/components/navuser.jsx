@@ -215,16 +215,20 @@ const NavUser = () => {
           </div>
           
           <Dropdown placement="bottom-end ">
-          <DropdownTrigger>
-          <div className="cursor-pointer ml-6">
-            <Avatar 
-              className='text-lg bg-color1 text-light hover:bg-color2/80 transition-colors duration-300' 
-              name="A" 
-            />
-          </div>
-        </DropdownTrigger>
+            <DropdownTrigger>
+              <div className="cursor-pointer ml-6">
+                <Avatar 
+                  className='text-lg bg-color1 text-light hover:bg-color2/80 transition-colors duration-300' 
+                  name="A" 
+                />
+              </div>
+            </DropdownTrigger>
             <DropdownMenu  >
-             <DropdownItem key="profile"><Link to='/userprofile' className="block w-full text-left">Profile</Link></DropdownItem>
+              <DropdownItem key="profile">
+                <Link to='/userprofile' className="block w-full text-left">
+                  Profile
+                </Link>
+              </DropdownItem>
               <DropdownItem key="logout"  >Logout</DropdownItem>
             </DropdownMenu>
           </Dropdown>
