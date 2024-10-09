@@ -57,7 +57,7 @@ const LoginSignup = () => {
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {         
-          window.location.href = '/login'; // Redirect to home page after the alert is closed
+          window.location.href = '/'; // Redirect to home page after the alert is closed
         });
       } else {
         Swal.fire({
