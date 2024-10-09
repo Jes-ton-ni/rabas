@@ -11,6 +11,7 @@ import Dashboard from './admin/businessdashboard'
 import Profile from './admin/businessprofile'
 import Product from './admin/businessproducts'
 import Deals from './admin/businessdeals'
+import Maps from './components/map-picker'
 import UserProfile from './user/userprofile';
 import Booking from '@/admin/businessbooking'
 
@@ -31,6 +32,7 @@ function App() {
           <Route path='/profileadmin' element={<Profile />} />
           <Route path='/productsadmin' element={<Product />} />
           <Route path='/dealsadmin' element={<Deals />} />
+          <Route path='/maps' element={<Maps />} />
           <Route path='/userprofile' element={<UserProfile />} />
           <Route path='/bookingadmin' element={<Booking />} />
         </Routes>
