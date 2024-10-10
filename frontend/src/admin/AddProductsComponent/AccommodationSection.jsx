@@ -24,6 +24,8 @@ const AccommodationSection = () => {
   const [selectedAccommodations, setSelectedAccommodations] = useState([]);
   const [accommodationType, setAccommodationType] = useState('');
   const [selectedType, setSelectedType] = useState('');
+  const [termsAndConditions, setTermsAndConditions] = useState([]);
+  const [termsList, setTermsList] = useState([]); // New state for terms list
 
   const dispatch = useDispatch();
   const accommodations = useSelector((state) => state.accommodations.accommodations);
@@ -42,10 +44,22 @@ const AccommodationSection = () => {
     setInclusionList(updatedInclusionList);
   };
 
+  // Handlers for Terms and Conditions
+  const handleAddTerm = () => {
+    if (termsAndConditions.trim()) {
+      setTermsList([...termsList, termsAndConditions.trim()]);
+      setTermsAndConditions('');
+    }
+  };
+
+  const handleRemoveTerm = (index) => {
+    const updatedTermsList = termsList.filter((_, i) => i !== index);
+    setTermsList(updatedTermsList);
+  };
+
   // Handlers for Image Upload
   const handleImageUpload = (e) => {  
     const files = Array.from(e.target.files);  
-    // Update the state with the newly selected files without a limit  
     setImages((prevImages) => [...prevImages, ...files]);  
   };  
 
@@ -86,6 +100,7 @@ const AccommodationSection = () => {
           typeof file === 'string' ? file : URL.createObjectURL(file)
         ),
         accommodationType,
+        termsAndConditions: termsList, // Include terms list
       };
 
       if (isEditing) {
@@ -113,6 +128,8 @@ const AccommodationSection = () => {
     setIsEditing(false);
     setEditingAccommodationId(null);
     setAccommodationType('');
+    setTermsAndConditions('');
+    setTermsList([]); // Reset terms list
   };
 
   // Handler for Editing an Accommodation
@@ -127,6 +144,7 @@ const AccommodationSection = () => {
     setIsEditing(true);
     setModalOpen(true);
     setAccommodationType(accommodation.accommodationType);
+    setTermsList(accommodation.termsAndConditions || []); // Set terms list
   };
 
   // Slider Settings for Image Carousel
@@ -233,9 +251,19 @@ const AccommodationSection = () => {
               </p>
 
               {/* Inclusions */}
+              <h1 className='text-sm font-semibold'>Inclusions or Details:</h1>
               <ul className="list-disc overflow-auto h-24 pl-4 text-xs">
                 {accommodation.inclusions.map((inclusion, i) => (
+               
                   <li key={i}>{inclusion}</li>
+                ))}
+              </ul>
+
+              {/* Terms and Conditions */}
+              <h1 className='text-sm font-semibold'>Terms and Conditions:</h1>
+              <ul className="list-disc overflow-auto h-24 pl-4 text-xs">
+                {accommodation.termsAndConditions?.map((term, i) => (
+                  <li key={i}>{term}</li>
                 ))}
               </ul>
 
@@ -343,6 +371,44 @@ const AccommodationSection = () => {
                     </Checkbox>
                   </div>
 
+                  {/* Terms and Conditions */}
+                  {hasBooking && (
+                    <div className="mb-4">
+                      <Input
+                        label="Terms and Conditions"
+                        placeholder="Enter a term or condition"
+                        value={termsAndConditions}
+                        onChange={(e) => setTermsAndConditions(e.target.value)}
+                        fullWidth
+                      />
+                      <Button
+                        type="button"
+                        color="primary"
+                        className="mt-2 hover:bg-color2"
+                        onClick={handleAddTerm}
+                      >
+                        Add Term or Condition
+                      </Button>
+
+                      {/* Terms List */}
+                      <ul className="mt-3 flex items-center flex-wrap gap-3 pl-5 text-sm">
+                        {termsList.map((item, index) => (
+                          <li key={index} className="flex gap-3 items-center bg-light p-2 rounded-md">
+                            {item}
+                            <Button
+                              auto
+                              color="danger"
+                              size="sm"
+                              onClick={() => handleRemoveTerm(index)}
+                            >
+                              Remove
+                            </Button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
                   {/* Inclusions */}
                   <div className="mb-4">
                     <Input
@@ -379,30 +445,27 @@ const AccommodationSection = () => {
                     </ul>
                   </div>
 
-                    {/* Image Upload */}
-                    <div className="mb-4">
-                      {/* Hidden input field */}
-                      <input
-                        id="imageUpload"
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                      />
-                      
-                      {/* Label with FaImage icon to trigger the file input */}
-                      <label
-                        htmlFor="imageUpload"
-                        className="flex items-center justify-center gap-2 cursor-pointer p-3 border border-gray-300 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
-                      >
-                        <FaImage className="text-2xl text-gray-600" />
-                        <span className="text-sm font-semibold text-gray-600">Upload Images</span>
-                      </label>
-
-                      
-                     
-                    </div>
+                  {/* Image Upload */}
+                  <div className="mb-4">
+                    {/* Hidden input field */}
+                    <input
+                      id="imageUpload"
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                    
+                    {/* Label with FaImage icon to trigger the file input */}
+                    <label
+                      htmlFor="imageUpload"
+                      className="flex items-center justify-center gap-2 cursor-pointer p-3 border border-gray-300 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+                    >
+                      <FaImage className="text-2xl text-gray-600" />
+                      <span className="text-sm font-semibold text-gray-600">Upload Images</span>
+                    </label>
+                  </div>
 
                   {/* Uploaded Images Preview with Remove Option */}
                   <div className="mb-4 flex flex-wrap gap-3">
