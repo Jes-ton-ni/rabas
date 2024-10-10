@@ -142,7 +142,7 @@ app.get('/get-userData', (req, res) => {
   // Check if user is logged in and session contains user_id
   if (req.session.user && req.session.user.user_id) {
     const userId = req.session.user.user_id;
-    const sql = 'SELECT user_id, Fname, Lname, username, contact, email FROM users WHERE user_id = ?';
+    const sql = 'SELECT user_id, Fname, Lname, username, contact, email, image, image_path FROM users WHERE user_id = ?';
 
     connection.query(sql, [userId], (err, results) => {
       if (err) {
@@ -194,44 +194,52 @@ app.put('/update-profile', async (req, res) => {
 // Multer configuration for storing uploaded images
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/');
+    cb(null, 'uploads/'); // Store files in the 'uploads' directory
   },
   filename: function (req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname)); // Filename includes timestamp to avoid conflicts
   }
 });
 
 const upload = multer({ storage: storage });
+
 // Serve static files from the 'uploads' directory
 app.use('/uploads', express.static('uploads'));
 
-// Endpoint for uploading images
-app.post('/upload', upload.single('image'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ success: false, message: 'No file uploaded' });
-  }
-  // Return the file path or URL
-  return res.json({ success: true, imagePath: req.file.path });
-});
-
-// Endopoint for updating user profile
-app.put('/userProfile/:id', upload.single('image'), (req, res) => {
-  //console.log(req.file); // Log the file upload object
-  console.log(req.body); // Log the request body
-
+// Endpoint for updating user profile
+app.put('/updateUserProfile/:id', upload.single('profilePic'), (req, res) => {
   const userId = req.params.id;
-  // Extract updated user data from request body
-  const {image, image_path} = req.body;
+  let { username } = req.body;
+  let imagePath = req.body.image_path; // Existing image path
+  let imageFileName = req.body.image;  // Existing image filename
 
-  // Update user data in the database
-  let sql;
-  let params;
+  // If a new file is uploaded, replace both image path and filename
+  if (req.file) {
+    imagePath = req.file.path; // Update the image path with the newly uploaded file
+    imageFileName = req.file.filename; // Save the uploaded filename
+  }
 
-  sql = 'UPDATE users SET image = ?, image_path = ? WHERE user_id = ?';
-  params = [image, image_path, userId];
+  // Build dynamic SQL query for updating fields
+  let sql = 'UPDATE users SET ';
+  const params = [];
 
-  console.log(sql, params); // Log SQL query and params for debugging
+  // Only update the username if it's provided
+  if (username) {
+    sql += 'username = ?, ';
+    params.push(username);
+  }
 
+  // Always update image filename and image path if file was uploaded
+  if (imageFileName && imagePath) {
+    sql += 'image = ?, image_path = ?, ';
+    params.push(imageFileName, imagePath);
+  }
+
+  // Remove the last comma and space from the SQL query
+  sql = sql.slice(0, -2) + ' WHERE user_id = ?';
+  params.push(userId);
+
+  // Execute the query
   connection.query(sql, params, (err, results) => {
     if (err) {
       console.error('Error updating user profile:', err);
@@ -241,7 +249,7 @@ app.put('/userProfile/:id', upload.single('image'), (req, res) => {
       // No user found with the given ID
       return res.status(404).json({ success: false, message: 'User not found' });
     }
-    return res.json({ success: true, message: 'User updated successfully' });
+    return res.json({ success: true, message: 'User updated successfully', updatedUserData: { username, imageFileName, imagePath } });
   });
 });
 

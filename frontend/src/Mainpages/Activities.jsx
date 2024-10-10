@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import Nav from '../components/navuser';
+import Nav from '../components/nav';
 import Hero from '../components/heroactivity';
 import Search from '../components/Search';
 import Footer from '@/components/Footer';

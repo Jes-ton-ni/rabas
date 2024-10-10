@@ -1,5 +1,5 @@
 import React from 'react'
-import Nav from '../components/navuser'
+import Nav from '../components/nav'
 import Footer from '../components/Footer'
 import Hero from '../components/herodestination'
 import { Link } from 'react-router-dom'; 
