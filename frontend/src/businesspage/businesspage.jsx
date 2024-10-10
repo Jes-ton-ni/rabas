@@ -9,7 +9,7 @@ import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 import { AiOutlineLike } from "react-icons/ai";
 import { Button } from '@nextui-org/react';
 import { IoStar, IoStarHalf, IoStarOutline } from "react-icons/io5";
-import Section from './BusinessComponents/BusinessSection';
+import Section from './BusinessComponents/BusinessSectionDeals';
 import Allproducts from '../businesspage/BusinessComponents/BusinessAllproducts';
 
 const BusinessPage = () => {

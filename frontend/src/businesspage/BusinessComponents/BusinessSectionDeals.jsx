@@ -55,7 +55,7 @@ const BusinessSection = () => {
       {/* Header Section */}
       <div className='flex justify-between items-center p-2'>
         <h1 className='text-2xl font-semibold'>Deals</h1>
-        <h1 className='text-lg font-semibold text-blue-700 hover:text-blue-400 cursor-pointer' onClick={openModal}>
+        <h1 className='text-md font-semibold text-blue-600 hover:text-blue-400 cursor-pointer' onClick={openModal}>
           See More
         </h1>
       </div>

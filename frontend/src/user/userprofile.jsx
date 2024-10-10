@@ -45,8 +45,17 @@ const UserProfile = () => {
 
       <div className='container mx-auto flex flex-col md:flex-row mb-2 gap-4'>
         <div className='h-auto bg-white p-4 w-full md:w-[300px] flex flex-col justify-between shadow-lg shadow-slate-800 rounded-md items-center'>
-          <div className='flex flex-col items-center gap-2 flex-grow'>
-            <Avatar className='h-[10rem] w-[10rem] mt-24' src={updatedProfile.profilePic || 'https://i.pravatar.cc/150?u=placeholder'} />
+          <div className='flex flex-col items-center gap-2 flex-grow justify-center'>
+          <div className='relative flex items-center w-28 h-28'>
+                        <Avatar className='w-full h-full object-cover rounded-full' src={profilePic || 'https://i.pravatar.cc/150?u=placeholder'} />
+                        <input type='file' className='hidden' accept='image/*' onChange={handleFileChange} id='fileInput' />
+                        <div
+                          onClick={() => document.getElementById('fileInput').click()}
+                          className='absolute bottom-0 right-0 bg-color1 text-white rounded-full w-9 h-9 hover:bg-color2 flex justify-center items-center cursor-pointer'
+                        >
+                          +
+                        </div>
+                      </div>
             <div className='text-2xl font-light'>{updatedProfile.username || 'Alepse Thennek'}</div>
           </div>
           <Button className='text-white bg-color1 hover:bg-color2' onPress={onBusinessOpen}> + Apply Business Account </Button>
@@ -70,17 +79,8 @@ const UserProfile = () => {
                       />
                     </div>
                     <div>
-                      <h1 className='text-slate-500'>Change Profile Pic</h1>
-                      <div className='relative flex items-center w-28 h-28'>
-                        <Avatar className='w-full h-full object-cover rounded-full' src={profilePic || 'https://i.pravatar.cc/150?u=placeholder'} />
-                        <input type='file' className='hidden' accept='image/*' onChange={handleFileChange} id='fileInput' />
-                        <div
-                          onClick={() => document.getElementById('fileInput').click()}
-                          className='absolute bottom-0 right-0 bg-color1 text-white rounded-full w-9 h-9 hover:bg-color2 flex justify-center items-center cursor-pointer'
-                        >
-                          +
-                        </div>
-                      </div>
+                 
+                     
                     </div>
                   </div>
                   <Button onClick={handleUpdateProfile} className='bg-color1 text-white hover:bg-color2 self-end mt-4'>
