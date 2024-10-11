@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2'); // npm install mysql2
 const cors = require('cors'); // npm install cors
@@ -20,10 +21,10 @@ app.use(cors({
 app.use(express.json()); // Parse JSON bodies
 
 const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '0511',
-  database: 'rabas'
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
 });
 
 // Error handling for database connection
@@ -37,11 +38,11 @@ console.log('Connected to database');
 
 // MySQL session store configuration
 const sessionStore = new MySQLStore({
-  database: 'rabas',
+  database: process.env.SESSION_DB_NAME,
   table: 'sessions',
-  host: 'localhost',
-  user: 'root',
-  password: '0511',
+  host: process.env.SESSION_DB_HOST,
+  user: process.env.SESSION_DB_USER,
+  password: process.env.SESSION_DB_PASSWORD,
   expiration: 86400000, // Session expiration time in milliseconds
   createDatabaseTable: true, // Automatically create sessions table if not exists
   schema: {
@@ -348,6 +349,57 @@ app.post('/signup', async (req, res) => {
   } catch (error) {
     console.error('Error hashing password:', error);
     return res.status(500).json({ success: false, message: 'Error hashing password' });
+  }
+});
+
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client('YOUR_GOOGLE_CLIENT_ID'); // Replace with your Google Client ID
+
+//google login endpoint
+app.post('/google-login', async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: 'YOUR_GOOGLE_CLIENT_ID', // Specify the client ID of the app
+    });
+
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, given_name: firstName, family_name: lastName } = payload;
+
+    // Check if the user exists in your database
+    const checkUserSql = 'SELECT * FROM users WHERE email = ?';
+    connection.query(checkUserSql, [email], (err, results) => {
+      if (err) {
+        console.error('Error querying the database:', err);
+        return res.status(500).json({ success: false, message: 'Internal server error' });
+      }
+
+      if (results.length > 0) {
+        // User already exists, login the user
+        return res.json({ success: true, message: 'Login successful', user: results[0] });
+      } else {
+        // User doesn't exist, create a new user in the database
+        const insertUserSql = 'INSERT INTO users (username, Fname, Lname, address, email, contact) VALUES (?, ?, ?, ?, ?, ?)';
+        const defaultUsername = email.split('@')[0]; // Generate username from email
+        const defaultAddress = 'N/A'; // You can set a default address if none is provided
+        const defaultPhone = 'N/A'; // Default phone number if not available
+
+        connection.query(insertUserSql, [defaultUsername, firstName, lastName, defaultAddress, email, defaultPhone], (insertErr, insertResults) => {
+          if (insertErr) {
+            console.error('Error inserting user into the database:', insertErr);
+            return res.status(500).json({ success: false, message: 'Internal server error' });
+          }
+
+          console.log('New Google user created successfully.');
+          return res.json({ success: true, message: 'Signup and login successful', userId: insertResults.insertId });
+        });
+      }
+    });
+  } catch (error) {
+    console.error('Error verifying Google token:', error);
+    return res.status(401).json({ success: false, message: 'Invalid Google token' });
   }
 });
 
