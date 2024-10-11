@@ -12,8 +12,10 @@ import Profile from './admin/businessprofile'
 import Product from './admin/businessproducts'
 import Deals from './admin/businessdeals'
 import Maps from './components/map-picker'
-import UserProfile from './user/userprofile';
+import UserProfile from './user/userprofile'
 import Booking from '@/admin/businessbooking'
+import SuperAdminDashboard from '@/admin/SuperAdmin/SuperAdminDashboard'
+import SuperAdminUsers from './admin/SuperAdmin/SuperAdminUsers';
 
 
 function App() {
@@ -28,13 +30,15 @@ function App() {
           <Route path='/food' element={<Food />} />
           <Route path='/shop' element={<Shop />} />
           <Route path='/business' element={<Business />} />
-          <Route path='/admin' element={<Dashboard />} />
-          <Route path='/profileadmin' element={<Profile />} />
-          <Route path='/productsadmin' element={<Product />} />
-          <Route path='/dealsadmin' element={<Deals />} />
+          <Route path='/businessadmindashboard' element={<Dashboard />} />
+          <Route path='/businessprofileadmin' element={<Profile />} />
+          <Route path='/businessproductsadmin' element={<Product />} />
+          <Route path='/businessdealsadmin' element={<Deals />} />
           <Route path='/maps' element={<Maps />} />
           <Route path='/userprofile' element={<UserProfile />} />
-          <Route path='/bookingadmin' element={<Booking />} />
+          <Route path='/businessbookingadmin' element={<Booking />} />
+          <Route path='/superadmindashboard' element={<SuperAdminDashboard />} />
+          <Route path='/superadminusers' element={<SuperAdminUsers />} />
         </Routes>
      
     </Router>

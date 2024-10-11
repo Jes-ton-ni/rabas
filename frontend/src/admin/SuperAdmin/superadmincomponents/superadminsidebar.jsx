@@ -1,27 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { MdDashboard } from "react-icons/md";
-import { RiProfileFill } from "react-icons/ri";
-import { CiBoxes } from "react-icons/ci";
-import { IoPricetagsOutline } from "react-icons/io5";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from 'react-router-dom';
+import { TbWorld } from 'react-icons/tb';
+import { CgLogOut } from 'react-icons/cg';
+import { MdDashboard } from 'react-icons/md';
+import { RiUserLine } from 'react-icons/ri';
+import { IoMdRibbon } from 'react-icons/io';
+import { FaBox, FaCalendar, FaBars, FaTimes } from 'react-icons/fa';
 import { Button } from '@nextui-org/react';
-import { FaBars, FaTimes, FaCalendar } from 'react-icons/fa';
-import { CgLogOut } from "react-icons/cg";
-import { TbWorld } from "react-icons/tb";
+import { MdDomainVerification } from "react-icons/md";
 
-const Sidebar = () => {
+const SuperAdminSidebar = () => {
   const [activeNav, setActiveNav] = useState('Dashboard');
-  const [sidebarOpen, setSidebarOpen] = useState(false); // For mobile toggle
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile toggle state
   const location = useLocation();
 
+  // Define nav items with icons, labels, and paths
   const navItems = [
-    { icon: <MdDashboard className="text-2xl" />, label: 'Dashboard', path: '/businessadmindashboard' },
-    { icon: <RiProfileFill className="text-2xl" />, label: 'Business Profile', path: '/businessprofileadmin' },
-    { icon: <CiBoxes className="text-2xl" />, label: 'Business Products', path: '/businessproductsadmin' },
-    { icon: <IoPricetagsOutline className="text-2xl" />, label: 'Business Deals', path: '/businessdealsadmin' },
-    { icon: <FaCalendar className="text-2xl" />, label: 'Business Bookings', path: '/businessbookingadmin' }
+    { icon: <MdDashboard className="text-2xl" />, label: 'Dashboard', path: '/superadmindashboard' },
+    { icon: <RiUserLine className="text-2xl" />, label: 'Users', path: '/superadminusers' },
+    { icon: <IoMdRibbon className="text-2xl" />, label: 'Ranking', path: '/ranking' },
+    { icon: <FaBox className="text-2xl" />, label: 'Products', path: '/products' },
+    { icon: <FaBox className="text-2xl" />, label: 'Transportation', path: '/transportation' },
+    { icon: <MdDomainVerification  className="text-2xl" />, label: 'Verification', path: '/verification' },
+    { icon: <FaBox className="text-2xl" />, label: 'Reports', path: '/reports' },
   ];
 
+  // Update active navigation item based on current route
   useEffect(() => {
     const currentItem = navItems.find(item => item.path === location.pathname);
     if (currentItem) {
@@ -30,10 +34,10 @@ const Sidebar = () => {
   }, [location]);
 
   return (
-    <div className=''>
+    <div className="">
       {/* Mobile Toggle Button */}
       <div className="flex justify-between items-center bg-color1 p-4 lg:hidden">
-        <h1 className="font-bold text-xl text-white">Business Management</h1>
+        <h1 className="font-bold text-xl text-white">Super Admin Panel</h1>
         <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-white text-3xl">
           {sidebarOpen ? <FaTimes /> : <FaBars />}
         </button>
@@ -48,7 +52,7 @@ const Sidebar = () => {
         <div>
           {/* Logo and title */}
           <div className="flex flex-col items-center mt-3">
-            <h1 className="font-bold text-2xl lg:text-3xl text-white text-center">Business Management</h1>
+            <h1 className="font-bold text-2xl lg:text-3xl text-white text-center">RabaSorsogon</h1>
             <div className="w-full flex justify-center mt-3">
               <div className="w-[150px] lg:w-[200px] mt-3 bg-slate-600 h-[2px]"></div>
             </div>
@@ -78,8 +82,9 @@ const Sidebar = () => {
             </ul>
           </nav>
         </div>
-             {/* Buttons */}
-             <div className="flex flex-col gap-2 mt-9 items-center ">
+
+        {/* Action Buttons */}
+        <div className="flex flex-col gap-2 mt-9 items-center">
           <Button className="bg-color3 text-black font-medium w-full flex items-center justify-center gap-2">
             <TbWorld /> Go to Business Page
           </Button>
@@ -87,7 +92,6 @@ const Sidebar = () => {
             <CgLogOut /> Logout
           </Button>
         </div>
-      
       </div>
 
       {/* Overlay for mobile when sidebar is open */}
@@ -101,4 +105,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default SuperAdminSidebar;
