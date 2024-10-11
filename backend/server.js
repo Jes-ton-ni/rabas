@@ -532,6 +532,89 @@ app.post('/admin/logout', (req, res) => {
   }
 });
 
+// Business application endpoint
+app.post('/submitBusinessApplication', async (req, res) => {
+  const {
+    user_id,
+    firstName,
+    lastName,
+    businessName,
+    businessTerritory,
+    certificateNo,
+    businessScope,
+    businessType,
+    category,
+    location    
+  } = req.body;
+
+  console.log('Received business application request:', req.body);
+
+  // Input validation (ensure all fields are provided)
+  if (
+    !user_id || !firstName || !lastName || !businessName || !businessTerritory ||
+    !certificateNo || !businessScope || !businessType || !category || !location
+  ) {
+    return res.status(400).json({ error: 'Please fill in all required fields' });
+  }
+
+  // Function to generate a random 6-digit number for application_id
+  const generateApplicationId = () => {
+    return Math.floor(100000 + Math.random() * 900000); // Generates a number between 100000 and 999999
+  };
+
+  // Function to check if application_id exists in the database
+  const isApplicationIdUnique = async (application_id) => {
+    const sql = 'SELECT COUNT(*) AS count FROM business_applications WHERE application_id = ?';
+    return new Promise((resolve, reject) => {
+      connection.query(sql, [application_id], (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0].count === 0); // Returns true if unique (count is 0)
+      });
+    });
+  };
+
+  // Generate a unique 6-digit application_id
+  let application_id;
+  let unique = false;
+
+  while (!unique) {
+    application_id = generateApplicationId();
+    unique = await isApplicationIdUnique(application_id);
+  }
+
+  try {
+    // SQL query to insert business application data into the database, including application_id
+    const sql = `
+      INSERT INTO business_applications (
+        application_id, user_id, firstName, lastName, businessName, businessTerritory,
+        certNumber, businessScope, businessType, category, location
+      ) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    // Execute the SQL query
+    connection.query(
+      sql, 
+      [application_id, user_id, firstName, lastName, businessName, businessTerritory, certificateNo, businessScope, businessType, category, location],
+      (err, results) => {
+        if (err) {
+          console.error('Error executing SQL query:', err);
+
+          // Handle potential errors, e.g., unique constraints, SQL errors
+          return res.status(500).json({ success: false, message: 'Internal server error', error: err.message });
+        }
+
+        console.log('Business application submitted successfully. Affected rows:', results.affectedRows);
+
+        // Return a success response with the generated application_id
+        return res.json({ success: true, message: 'Business application submitted successfully', application_id });
+      }
+    );
+  } catch (error) {
+    console.error('Error processing business application:', error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
 
 //Para sa pag display ng business
 // Endpoint to fetch businesses

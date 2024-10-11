@@ -10,7 +10,8 @@ import withReactContent from 'sweetalert2-react-content';
 const MySwal = withReactContent(Swal);
 
 
-const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange }) => {
+const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userData }) => {
+  // console.log(userData);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -300,36 +301,62 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange }) => {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (validateStep(step)) {
       if (step < 3) {
         setStep(step + 1);
       } else if (step === 3) {
-        // Clean up formData before moving to the final step
-        const { customCategory, ...cleanedFormData } = formData;
-        setFormData(cleanedFormData);
         setStep(4);
-      } else {
-        // Submit application
-        showApplicationSentDialog();
+      } else if (step === 4) {
+        try {
+          const response = await fetch('http://localhost:5000/submitBusinessApplication', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              ...formData,
+              user_id: userData.user_id,
+            }),
+          });
+  
+          const data = await response.json(); // Parse the response JSON
+  
+          if (!response.ok) {
+            console.error('Server Error:', data);  // Log the server response for errors
+            throw new Error('Failed to submit application');
+          }
+  
+          MySwal.fire({
+            icon: 'success',
+            title: 'Application Sent!',
+            text: `Application ID: ${data.application_id}. We will get back to you via your business email or phone number.`,
+            confirmButtonColor: '#0F3D3E',
+            confirmButtonText: 'OK',
+          }).then(() => {
+            onBusinessOpenChange(false); // Close the modal
+          });
+  
+        } catch (error) {
+          console.error('Error:', error);
+          MySwal.fire({
+            icon: 'error',
+            title: 'Submission Failed',
+            text: 'There was an error submitting your application. Please try again.',
+            confirmButtonColor: '#0F3D3E',
+          });
+        }
       }
     } else {
       MySwal.fire({
         icon: 'error',
         title: 'Oops...',
         text: 'Please fill in all required fields before proceeding.',
-        allowOutsideClick: false,
-        allowEscapeKey: false,
         confirmButtonColor: '#0F3D3E',
-      }).then((result) => {
-        // This prevents the main modal from closing
-        if (result.isConfirmed || result.isDismissed) {
-          return false;
-        }
       });
     }
   };
-
+  
 
   const handleBack = () => {
     if (step > 1) {

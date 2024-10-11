@@ -356,6 +356,7 @@ const UserProfile = ({ activities = [] }) => {
       <BusinessApplicationModal
         isBusinessOpen={isBusinessOpen}
         onBusinessOpenChange={onBusinessOpenChange}
+        userData={userData}
       />
       <Footer />
     </div>
