@@ -9,7 +9,7 @@ import { GiPositionMarker } from 'react-icons/gi';
 
 const UserProfile = ({ activities = [] }) => {
   // Debugging: Log activities to ensure data is passed correctly
-  console.log('Activities:', activities);
+  // console.log('Activities:', activities);
 
   const [selected, setSelected] = useState("profile");
   const [profilePicFile, setProfilePicFile] = useState(null); // State to hold uploaded file for profile pic
@@ -23,6 +23,7 @@ const UserProfile = ({ activities = [] }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(null); // User login status
   const [userData, setUserData] = useState(null); // State to store fetched user data
   const [likedPages, setLikedPages] = useState([]); // State for storing user's liked pages
+  const [businessApplications, setBusinessApplications] = useState([]);
 
   // Function to check login status
   const checkLoginStatus = useCallback(async () => {
@@ -61,6 +62,26 @@ const UserProfile = ({ activities = [] }) => {
     }
   };
 
+  // Fetching business applications for the logged-in user
+  const fetchBusinessApplications = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/businesses-application', {
+        method: 'GET',
+        credentials: 'include' // Include cookies for session-based authentication
+      });
+      const data = await response.json();
+      console.log('Fetched Business Applications:', data);
+      
+      if (response.ok) {
+        setBusinessApplications(data.business_applications); // Set fetched applications
+      } else {
+        console.error('Failed to fetch business applications:', data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching business applications:', error);
+    }
+  };
+
   useEffect(() => {
     checkLoginStatus(); // Check login status when component mounts
   }, [checkLoginStatus]);
@@ -68,6 +89,7 @@ const UserProfile = ({ activities = [] }) => {
   useEffect(() => {
     if (isLoggedIn) {
       fetchUserData(); // Fetch user data if logged in
+      fetchBusinessApplications(); // Fetch business applications if logged in
     }
   }, [isLoggedIn]);
 
@@ -204,7 +226,33 @@ const UserProfile = ({ activities = [] }) => {
 
             </div>
           </div>
-          <Button className='text-white bg-color1 hover:bg-color2' onPress={onBusinessOpen}> + Apply Business Account </Button>
+          {businessApplications.length > 0 ? (
+            businessApplications.map((application) => {
+              if (application.status === 0) {
+                // Show 'Pending Application' button if status is 0
+                return (
+                  <Button key={application.application_id} className='text-white bg-yellow-500 hover:bg-yellow-600'>
+                    Pending Application
+                  </Button>
+                );
+              } else if (application.status === 1) {
+                // Show business name if status is 1
+                return (
+                  <Button 
+                  className='text-white bg-color1 hover:bg-color2'
+                  key={application.application_id}>
+                    <p>{application.businessName}</p>
+                  </Button>
+                );
+              }
+            })
+          ) : (
+            // If no application exists, show 'Apply Business Account' button
+            <Button className='text-white bg-color1 hover:bg-color2' onPress={onBusinessOpen}> 
+              + Apply Business Account 
+            </Button>
+          )}
+
         </div>
 
         {/* Main content */}

@@ -668,6 +668,27 @@ app.post('/submitBusinessApplication', async (req, res) => {
   }
 });
 
+// Endpoint to fetch applications for the logged-in user
+app.get('/businesses-application', (req, res) => {
+  const userId = req.session.user.user_id; 
+
+  const sql = `
+    SELECT * FROM business_applications WHERE user_id = ?
+  `;
+  
+  // Execute the SQL query with the user ID
+  connection.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error('Error executing SQL query:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+    
+    // Send the list of business applications for the logged-in user
+    return res.json({ success: true, business_applications: results });
+  });
+});
+
+
 //Para sa pag display ng business
 // Endpoint to fetch businesses
 app.get('/businesses', (req, res) => {
