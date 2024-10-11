@@ -9,9 +9,7 @@ import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
 
-
 const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userData }) => {
-  // console.log(userData);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -331,7 +329,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
             icon: 'success',
             title: 'Application Sent!',
             text: `Application ID: ${data.application_id}. We will get back to you via your business email or phone number.`,
-            confirmButtonColor: '#0F3D3E',
+            confirmButtonColor:'#0BDA51',
             confirmButtonText: 'OK',
           }).then(() => {
             onBusinessOpenChange(false); // Close the modal
@@ -343,7 +341,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
             icon: 'error',
             title: 'Submission Failed',
             text: 'There was an error submitting your application. Please try again.',
-            confirmButtonColor: '#0F3D3E',
+            confirmButtonColor:'#0BDA51',
           });
         }
       }
@@ -352,7 +350,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
         icon: 'error',
         title: 'Oops...',
         text: 'Please fill in all required fields before proceeding.',
-        confirmButtonColor: '#0F3D3E',
+        confirmButtonColor:'#0BDA51',
       });
     }
   };
@@ -369,7 +367,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
       icon: 'success',
       title: 'Application Sent!',
       text: 'We will get back to you via your business email or phone number.',
-      confirmButtonColor: '#0F3D3E',
+      confirmButtonColor:'#0BDA51',
       confirmButtonText: 'OK'
     }).then(() => {
       onBusinessOpenChange(false);
@@ -382,8 +380,8 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
       text: "You will lose all entered data if you close this form.",
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#0F3D3E',
-      cancelButtonColor: '#d33',
+      confirmButtonColor:'#0BDA51',
+      cancelButtonColor: '#D33736',
       confirmButtonText: 'Yes, close it!'
     }).then((result) => {
       if (result.isConfirmed) {
@@ -393,51 +391,51 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
   };
 
   return (
-    <Modal
-    size="2xl"
-    isOpen={isBusinessOpen}
-    hideCloseButton={true}
-    aria-labelledby="modal-title"
-  >
-    <ModalContent>
-      <ModalHeader>
-        <h2 id="modal-title" className="text-2xl font-bold">
-          Apply for Business Account
-        </h2>
-        <Button
-          auto
-          flat
-          color="danger"
-          onClick={handleCloseModal}
-          className=" absolute right-2 top-2 "
-          size="sm"
-        >
-          <FaTimes/>
-       
-        </Button>
-      </ModalHeader>
-      <ModalBody>
-        <Progress value={(step / 4) * 100} className="mb-4" />
-        {renderStep()}
-      </ModalBody>
-      <ModalFooter>
-        <Button auto flat color="error" onClick={handleBack} disabled={step === 1}>
-          Back
-        </Button>
-        <Button auto color="primary" onClick={handleNext}>
-          {step === 4 ? (
-            <>
-              <FaCheck className="mr-2" />
-              Submit Application
-            </>
-          ) : (
-            "Next"
-          )}
-        </Button>
-      </ModalFooter>
-    </ModalContent>
-  </Modal>
+<Modal  
+  size="2xl"  
+  isOpen={isBusinessOpen}  
+  hideCloseButton={true}  
+  aria-labelledby="modal-title"  
+>  
+  <ModalContent className="w-full h-full sm:max-w-md md:max-w-lg lg:max-w-2xl max-h-screen overflow-auto flex justify-centere">  
+    <ModalHeader className="flex justify-between items-center">  
+      <h2 id="modal-title" className="text-2xl font-bold">  
+        Apply for Business Account  
+      </h2>  
+      <Button  
+        auto  
+        flat  
+        color="danger"  
+        onClick={handleCloseModal}  
+        className="absolute right-2 top-2"  
+        size="sm"  
+      >  
+        <FaTimes />  
+      </Button>  
+    </ModalHeader>  
+    <ModalBody className="p-4 overflow-y-auto max-h-[80vh]">  
+      <Progress value={(step / 4) * 100} className="mb-4" />  
+      {renderStep()}  
+    </ModalBody>  
+    <ModalFooter className="flex justify-between">  
+      <Button auto flat color="error" onClick={handleBack} disabled={step === 1}>  
+        Back  
+      </Button>  
+      <Button auto color="primary" onClick={handleNext}>  
+        {step === 4 ? (  
+          <>  
+            <FaCheck className="mr-2" />  
+            Submit Application  
+          </>  
+        ) : (  
+          "Next"  
+        )}  
+      </Button>  
+    </ModalFooter>  
+  </ModalContent>  
+</Modal>
+
   );
 };
 
-export default BusinessApplicationModal;
+export default BusinessApplicationModal; 

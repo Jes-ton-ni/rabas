@@ -5,6 +5,13 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   businessName: '',
   businessLogo: null,
+  businessCard: {
+    cardImage: null,
+    category: 'Relaxation', 
+    location: 'Donsol',
+    description: 'Relax and enjoy the scenic beach view.',
+    priceRange: '₱500-2000',
+  },
   heroImages: [],
   aboutUs: '',
   facilities: [],
@@ -136,6 +143,13 @@ const businessSlice = createSlice({
         info.id === id ? { ...info, icon } : info
       );
     },
+    updateBusinessCard: (state, action) => {
+      const { cardImage, description, location, priceRange } = action.payload;
+      if (cardImage !== undefined) state.businessCard.cardImage = cardImage;
+      if (description !== undefined) state.businessCard.description = description;
+      if (location !== undefined) state.businessCard.location = location;
+      if (priceRange !== undefined) state.businessCard.priceRange = priceRange;
+    },
   },
 });
 
@@ -155,6 +169,7 @@ export const {
   updateContactInfo,
   removeContactInfo,
   updateContactIcon,
+  updateBusinessCard,
 } = businessSlice.actions;
 
 export default businessSlice.reducer;
