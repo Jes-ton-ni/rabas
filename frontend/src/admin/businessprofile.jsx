@@ -1,11 +1,11 @@
-// BusinessProfile.jsx
-
 import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Sidebar from '../components/sidebar';
 import { FaUpload, FaSave, FaPlus, FaTrash } from 'react-icons/fa';
 import { Tabs, Tab, Card, CardBody, Input, Button, Modal, ModalContent, ModalHeader, ModalBody } from "@nextui-org/react";
 import { businessIcons } from '../businesspage/BusinessComponents/businessIcons';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 import {
   updateBusinessData,
   addFacility,
@@ -21,7 +21,8 @@ import {
   addContactInfo,
   updateContactInfo,
   removeContactInfo,
-  updateContactIcon
+  updateContactIcon,
+  updateBusinessCard 
 } from '../redux/businessSlice';
 
 const BusinessProfile = () => {
@@ -31,6 +32,43 @@ const BusinessProfile = () => {
   const heroImagesInputRef = useRef(null);
   const [isIconModalOpen, setIsIconModalOpen] = useState(false);
   const [currentEditingField, setCurrentEditingField] = useState(null);
+  const businessCard = useSelector((state) => state.business.businessCard);
+  const [cardImage, setCardImage] = useState(businessCard.cardImage);
+  const [description, setDescription] = useState(businessCard.description);
+  const [location, setLocation] = useState(businessCard.location);
+  const [priceRange, setPriceRange] = useState(businessCard.priceRange);
+
+  const MySwal = withReactContent(Swal);
+
+  // Handle updating the business card
+  const handleUpdate = () => {
+    if (!cardImage || !description || !location || !priceRange) {
+      MySwal.fire({
+        title: 'Error',
+        text: 'Please fill in all fields for the business card.',
+        icon: 'error',
+        confirmButtonColor: '#0BDA51',
+      });
+      return;
+    }
+    dispatch(updateBusinessCard({ cardImage, description, location, priceRange }));
+    MySwal.fire({
+      title: 'Success',
+      text: 'Business card updated successfully!',
+      icon: 'success',
+      confirmButtonColor: '#0BDA51',
+    });
+  };
+
+  // Handle file upload for the business card image
+  const handleCardImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => setCardImage(e.target.result); // Set the image as base64 string
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Handle file upload for business logo
   const handleLogoUpload = (event) => {
@@ -49,82 +87,76 @@ const BusinessProfile = () => {
     dispatch(updateBusinessData({ heroImages: [...businessData.heroImages, ...newImages] }));
   };
 
-  // Handle adding new contact info
-  const handleAddContactInfo = () => {
-    dispatch(addContactInfo());
+  // Handle removing a hero image
+  const handleRemoveHeroImage = (index) => {
+    MySwal.fire({
+      title: 'Are you sure?',
+      text: 'This will remove the hero image.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0BDA51',
+      cancelButtonColor: '#D33736',
+      confirmButtonText: 'Yes, remove it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(updateBusinessData({ heroImages: businessData.heroImages.filter((_, i) => i !== index) }));
+        MySwal.fire({
+          title: 'Removed!',
+          text: 'The image has been removed.',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51',
+        });
+      }
+    });
   };
 
-  // Handle changes in contact info
-  const handleContactInfoChange = (id, field, value) => {
-    dispatch(updateContactInfo({ id, field, value }));
-  };
-
-  // Handle removing contact info
+  // Handle removing a contact info
   const handleRemoveContactInfo = (id) => {
-    dispatch(removeContactInfo({ id }));
+    MySwal.fire({
+      title: 'Are you sure?',
+      text: 'This will remove the contact info.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0BDA51',
+      cancelButtonColor: '#D33736',
+      confirmButtonText: 'Yes, remove it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(removeContactInfo({ id }));
+        MySwal.fire({
+          title: 'Removed!',
+          text: 'The contact info has been removed.',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51',
+        });
+      }
+    });
   };
 
-  // Handle adding new facility
-  const handleAddFacility = () => {
-    dispatch(addFacility());
-  };
-
-  // Handle changes in facility info
-  const handleFacilityChange = (index, field, value) => {
-    dispatch(updateFacility({ index, field, value }));
-  };
-
-  // Handle removing facility
+  // Handle removing a facility
   const handleRemoveFacility = (index) => {
-    dispatch(removeFacility({ index }));
+    MySwal.fire({
+      title: 'Are you sure?',
+      text: 'This will remove the facility.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0BDA51',
+      cancelButtonColor: '#D33736',
+      confirmButtonText: 'Yes, remove it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(removeFacility({ index }));
+        MySwal.fire({
+          title: 'Removed!',
+          text: 'The facility has been removed.',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51',
+        });
+      }
+    });
   };
 
-  // Handle adding new policy
-  const handleAddPolicy = () => {
-    dispatch(addPolicy());
-  };
-
-  // Handle changes in policy info
-  const handlePolicyChange = (index, field, value) => {
-    dispatch(updatePolicy({ index, field, value }));
-  };
-
-  // Handle removing policy
-  const handleRemovePolicy = (index) => {
-    dispatch(removePolicy({ index }));
-  };
-
-  // Handle adding new policy item
-  const handleAddPolicyItem = (policyIndex) => {
-    dispatch(addPolicyItem({ policyIndex }));
-  };
-
-  // Handle changes in policy item
-  const handlePolicyItemChange = (policyIndex, itemIndex, value) => {
-    dispatch(updatePolicyItem({ policyIndex, itemIndex, value }));
-  };
-
-  // Handle removing policy item
-  const handleRemovePolicyItem = (policyIndex, itemIndex) => {
-    dispatch(removePolicyItem({ policyIndex, itemIndex }));
-  };
-
-  // Handle changes in opening hours
-  const handleOpeningHoursChange = (index, field, value) => {
-    // Create a copy of the openingHours array
-    const updatedHours = [...businessData.openingHours];
-    
-    // Update the specific field of the copied object
-    updatedHours[index] = {
-      ...updatedHours[index],
-      [field]: value,
-    };
-    
-    // Dispatch the updated array to the store
-    dispatch(updateBusinessData({ openingHours: updatedHours }));
-  };
-  
-  // Open icon modal
+  // Handle opening the icon picker modal
   const openIconModal = (field) => {
     setCurrentEditingField(field);
     setIsIconModalOpen(true);
@@ -142,17 +174,35 @@ const BusinessProfile = () => {
     setIsIconModalOpen(false);
   };
 
-  // Handle save action
+  // Handle saving the entire profile
   const handleSave = () => {
-    // Implement API call to save data
-    console.log('Saving business profile...', businessData);
+    MySwal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to save the business profile?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#0BDA51',
+      cancelButtonColor: '#D33736',
+      confirmButtonText: 'Yes, save it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Implement API call or save logic
+        console.log('Saving business profile...', businessData);
+        MySwal.fire({
+          title: 'Saved!',
+          text: 'Your business profile has been saved.',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51',
+        });
+      }
+    });
   };
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen mx-auto bg-gray-100 font-sans">
       <Sidebar />
       
-      <div className="flex-1 p-4 lg:p-8 max-h-screen overflow-y-auto ">
+      <div className="flex-1 p-4 lg:p-8 max-h-screen overflow-y-auto">
         <div className='flex justify-between items-center mb-3'>
           <h1 className="text-2xl lg:text-3xl font-semibold text-gray-800">Business Profile</h1>
           <Button
@@ -168,10 +218,16 @@ const BusinessProfile = () => {
           <Tab key="general" title="General Info">
             <Card>
               <CardBody>
-                <div className='flex flex-col lg:flex-row items-center mb-6'>
+              <h3 className="text-lg font-bold mb-4 p-5">Update Business Logo and Name</h3>
+                <div className='flex flex-col lg:flex-row items-center mb-6 shadow-lg p-3 rounded-sm shadow-slate-400'>
                   <div className='relative w-24 h-24 lg:mr-6 mb-4 lg:mb-0'>
+                        
                     {businessData.businessLogo ? (
-                      <img src={businessData.businessLogo} alt="Business Logo" className='w-full h-full object-cover rounded-full' />
+                      <img
+                        src={businessData.businessLogo}
+                        alt="Business Logo"
+                        className='w-full h-full object-cover rounded-full'
+                      />
                     ) : (
                       <div className='w-full h-full bg-gray-200 rounded-full flex items-center justify-center'>
                         <FaUpload className='text-gray-400 text-2xl' />
@@ -199,6 +255,101 @@ const BusinessProfile = () => {
                     className='text-xl lg:text-2xl font-semibold w-full'
                   />
                 </div>
+
+                <div className="mb-6 shadow-md rounded-md p-6 shadow-slate-400 ">
+                  <h3 className="text-lg font-bold mb-4">Update Business Card</h3>
+                  <div className="space-y-4">
+                  <div className="mb-6">
+  <label className="block text-sm font-medium text-gray-700 mb-1">Card Image</label>
+  
+  {/* Display the uploaded image preview if available */}
+  {cardImage ? (
+    <div className="relative w-full h-48 mb-3">
+      <img
+        src={cardImage}
+        alt="Card Preview"
+        className="w-full h-full object-cover rounded-md shadow-md"
+      />
+      <button
+        onClick={() => setCardImage(null)}  // Option to clear the image
+        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition"
+      >
+        <FaTrash size={14} />
+      </button>
+    </div>
+  ) : (
+    <div className="border-2 border-dashed border-gray-300 rounded-md p-4 flex justify-center items-center">
+      <input 
+        type="file"
+        accept="image/*"
+        onChange={handleCardImageUpload}
+        className="hidden"
+        id="cardImageUpload"
+      />
+      <label
+        htmlFor="cardImageUpload"
+        className="cursor-pointer bg-color1 text-white px-4 py-2 rounded-md hover:bg-color2 transition"
+      >
+        <FaUpload className="inline mr-2" />
+        Upload Image
+      </label>
+    </div>
+  )}
+</div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                      <textarea
+                        value={description || ''}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Enter description"
+                        className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-color1"
+                        rows="3"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                      <input
+                        type="text"
+                        value={location || ''}
+                        onChange={(e) => setLocation(e.target.value)}
+                        placeholder="Enter location"
+                        className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-color1"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Budget Range</label>
+                      <input
+                        type="text"
+                        value={priceRange || ''}
+                        onChange={(e) => setPriceRange(e.target.value)}
+                        placeholder="Enter budget range"
+                        className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-color1"
+                      />
+                    </div>
+                    <button
+                      onClick={handleUpdate}
+                      className="mt-4 w-full bg-color1 text-white p-2 rounded-md hover:bg-color2 transition"
+                    >
+                      Update Business Card
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <h3 className="text-lg font-bold mb-4">Business Card Preview</h3>
+                  <div className="border border-gray-300 rounded-md p-4">
+                    {cardImage && (
+                      <img
+                        src={cardImage}
+                        alt="Business Card"
+                        className="w-full h-48 object-cover rounded-md mb-4"
+                      />
+                    )}
+                    <p><strong>Description:</strong> {description}</p>
+                    <p><strong>Location:</strong> {location}</p>
+                    <p><strong>Price Range:</strong> {priceRange}</p>
+                  </div>
+                </div>
               </CardBody>
             </Card>
           </Tab>
@@ -212,7 +363,7 @@ const BusinessProfile = () => {
                     <div key={index} className="relative">
                       <img src={image} alt={`Hero ${index + 1}`} className='w-full h-40 object-cover rounded-lg' />
                       <Button
-                        onClick={() => dispatch(updateBusinessData({ heroImages: businessData.heroImages.filter((_, i) => i !== index) }))}
+                        onClick={() => handleRemoveHeroImage(index)}
                         className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
                       >
                         <FaTrash size={12} />
@@ -258,14 +409,14 @@ const BusinessProfile = () => {
                     <Input
                       type="text"
                       value={info.label}
-                      onChange={(e) => handleContactInfoChange(info.id, 'label', e.target.value)}
+                      onChange={(e) => dispatch(updateContactInfo({ id: info.id, field: 'label', value: e.target.value }))}
                       placeholder="Label (e.g. Email, Phone, Facebook)"
                       className='flex-grow'
                     />
                     <Input
                       type="text"
                       value={info.value}
-                      onChange={(e) => handleContactInfoChange(info.id, 'value', e.target.value)}
+                      onChange={(e) => dispatch(updateContactInfo({ id: info.id, field: 'value', value: e.target.value }))}
                       placeholder="Url if needed"
                       className='flex-grow'
                     />
@@ -274,7 +425,7 @@ const BusinessProfile = () => {
                     </Button>
                   </div>
                 ))}
-                <Button onClick={handleAddContactInfo} className="mt-2 bg-color1 text-white hover:bg-color2 transition">Add Contact Info</Button>
+                <Button onClick={() => dispatch(addContactInfo())} className="mt-2 bg-color1 text-white hover:bg-color2 transition">Add Contact Info</Button>
 
                 <h3 className="text-md lg:text-lg font-semibold mt-4 mb-2">Opening Hours</h3>
                 {businessData.openingHours.map((hours, index) => (
@@ -288,14 +439,14 @@ const BusinessProfile = () => {
                     <Input
                       type="time"
                       value={hours.open}
-                      onChange={(e) => handleOpeningHoursChange(index, 'open', e.target.value)}
+                      onChange={(e) => dispatch(updateBusinessData({ openingHours: businessData.openingHours.map((h, i) => i === index ? { ...h, open: e.target.value } : h) }))}
                       placeholder="Open"
                       className='w-full lg:w-1/4'
                     />
                     <Input
                       type="time"
                       value={hours.close}
-                      onChange={(e) => handleOpeningHoursChange(index, 'close', e.target.value)}
+                      onChange={(e) => dispatch(updateBusinessData({ openingHours: businessData.openingHours.map((h, i) => i === index ? { ...h, close: e.target.value } : h) }))}
                       placeholder="Close"
                       className='w-full lg:w-1/4'
                     />
@@ -318,7 +469,7 @@ const BusinessProfile = () => {
                       <Input 
                         type="text"
                         value={facility.name}
-                        onChange={(e) => handleFacilityChange(index, 'name', e.target.value)}
+                        onChange={(e) => dispatch(updateFacility({ index, field: 'name', value: e.target.value }))}
                         placeholder="Facility name"
                         className='w-[15rem]'
                       />
@@ -330,7 +481,7 @@ const BusinessProfile = () => {
                 </div>
               </CardBody>
             </Card>
-            <Button onClick={handleAddFacility} className="mt-2 bg-color1 text-white hover:bg-color2 transition">Add Facility</Button>
+            <Button onClick={() => dispatch(addFacility())} className="mt-2 bg-color1 text-white hover:bg-color2 transition">Add Facility</Button>
           </Tab>
 
           <Tab key="policies" title="Policies">
@@ -342,7 +493,7 @@ const BusinessProfile = () => {
                     <Input
                       type="text"
                       value={policy.title}
-                      onChange={(e) => handlePolicyChange(policyIndex, 'title', e.target.value)}
+                      onChange={(e) => dispatch(updatePolicy({ index: policyIndex, field: 'title', value: e.target.value }))}
                       placeholder="Policy title"
                       className='mb-2'
                     />
@@ -351,27 +502,25 @@ const BusinessProfile = () => {
                         <Input
                           type="text"
                           value={item}
-                          onChange={(e) => handlePolicyItemChange(policyIndex, itemIndex, e.target.value)}
+                          onChange={(e) => dispatch(updatePolicyItem({ policyIndex, itemIndex, value: e.target.value }))}
                           placeholder="Policy item"
                           className='flex-grow'
                         />
-                        <Button onClick={() => handleRemovePolicyItem(policyIndex, itemIndex)} className="bg-red-500 text-white p-2">
+                        <Button onClick={() => dispatch(removePolicyItem({ policyIndex, itemIndex }))} className="bg-red-500 text-white p-2">
                           <FaTrash size={16} />
                         </Button>
                       </div>
                     ))}
-                    <Button onClick={() => handleAddPolicyItem(policyIndex)} className="mr-2">Add Item</Button>
-                    <Button onClick={() => handleRemovePolicy(policyIndex)} className="bg-red-500 text-white">Remove Policy</Button>
+                    <Button onClick={() => dispatch(addPolicyItem({ policyIndex }))} className="mr-2">Add Item</Button>
+                    <Button onClick={() => dispatch(removePolicy({ policyIndex }))} className="bg-red-500 text-white">Remove Policy</Button>
                   </div>
                 ))}
-                <Button onClick={handleAddPolicy} className="mt-2 bg-color1 text-white hover:bg-color2 transition">Add Policy</Button>
+                <Button onClick={() => dispatch(addPolicy())} className="mt-2 bg-color1 text-white hover:bg-color2 transition">Add Policy</Button>
               </CardBody>
             </Card>
           </Tab>
         </Tabs>
-
       </div>
-    
 
       <Modal isOpen={isIconModalOpen} onClose={() => setIsIconModalOpen(false)}>
         <ModalContent>
