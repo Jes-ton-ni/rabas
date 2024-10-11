@@ -670,7 +670,13 @@ app.post('/submitBusinessApplication', async (req, res) => {
 
 // Endpoint to fetch applications for the logged-in user
 app.get('/businesses-application', (req, res) => {
-  const userId = req.session.user.user_id; 
+
+  const userId = req.session?.user?.user_id;
+
+  if (!userId) {
+    // Send a response if userId is not found
+    return res.status(400).json({ success: false, message: 'User not logged in or user ID missing' });
+  }
 
   const sql = `
     SELECT * FROM business_applications WHERE user_id = ?
