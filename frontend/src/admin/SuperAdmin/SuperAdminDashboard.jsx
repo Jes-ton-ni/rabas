@@ -153,20 +153,20 @@ const SuperAdminDashboard = () => {
         <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
-          <div className="bg-red-500 text-white p-4 rounded shadow-md">
+        <div className="grid grid-cols-4 gap-4 mb-6 text-center">
+          <div className="bg-red-400 text-white p-4 rounded shadow-md">
             <h2 className="text-lg">Pending Verifications</h2>
             <p className="text-2xl font-bold">5</p>
           </div>
-          <div className="bg-green-500 text-white p-4 rounded shadow-md">
+          <div className="bg-green-400 text-white p-4 rounded shadow-md">
             <h2 className="text-lg">Business Owners</h2>
             <p className="text-2xl font-bold">5</p>
           </div>
-          <div className="bg-purple-500 text-white p-4 rounded shadow-md">
+          <div className="bg-purple-400 text-white p-4 rounded shadow-md">
             <h2 className="text-lg">Tourists</h2>
             <p className="text-2xl font-bold">10</p>
           </div>
-          <div className="bg-pink-500 text-white p-4 rounded shadow-md">
+          <div className="bg-pink-400 text-white p-4 rounded shadow-md">
             <h2 className="text-lg">Reports</h2>
             <p className="text-2xl font-bold">4</p>
           </div>

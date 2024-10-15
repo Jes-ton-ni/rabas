@@ -16,6 +16,10 @@ import UserProfile from './user/userprofile'
 import Booking from '@/admin/businessbooking'
 import SuperAdminDashboard from '@/admin/SuperAdmin/SuperAdminDashboard'
 import SuperAdminUsers from './admin/SuperAdmin/SuperAdminUsers';
+import SuperAdminProducts from './admin/SuperAdmin/SuperAdminProducts';
+import SuperAdminVerification from './admin/SuperAdmin/SuperAdminVerification';
+import SuperAdminReports from './admin/SuperAdmin/SuperAdminReports';
+import SuperAdminTransportation from './admin/SuperAdmin/SuperAdminTransportation';
 
 
 function App() {
@@ -39,6 +43,10 @@ function App() {
           <Route path='/businessbookingadmin' element={<Booking />} />
           <Route path='/superadmindashboard' element={<SuperAdminDashboard />} />
           <Route path='/superadminusers' element={<SuperAdminUsers />} />
+          <Route path='/superadminproducts' element={<SuperAdminProducts />} />
+          <Route path='/superadminverification' element={<SuperAdminVerification />} />
+          <Route path='/superadminreports' element={<SuperAdminReports />} />
+          <Route path='/superadmintransportation' element={<SuperAdminTransportation />} />
         </Routes>
      
     </Router>

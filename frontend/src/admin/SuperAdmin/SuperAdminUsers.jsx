@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import SuperAdminSidebar from './superadmincomponents/superadminsidebar';
 import { Tabs, Tab, Card, CardBody } from '@nextui-org/react';
+import SearchBar from './superadmincomponents/SearchBar'; // Import the SearchBar component
 
 const SuperAdminUsers = () => {
   // Sample data for the table
@@ -27,32 +28,23 @@ const SuperAdminUsers = () => {
         <h1 className="text-3xl font-bold mb-4">Users</h1>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="bg-red-500 text-white p-4 rounded shadow-md">
+        <div className="grid grid-cols-3 gap-4 mb-6 text-center">
+          <div className="bg-red-400 text-white p-4 rounded shadow-md">
             <h2 className="text-lg">Tourists</h2>
             <p className="text-2xl font-bold">10</p>
           </div>
-          <div className="bg-green-500 text-white p-4 rounded shadow-md">
+          <div className="bg-green-400 text-white p-4 rounded shadow-md">
             <h2 className="text-lg">Business Owners</h2>
             <p className="text-2xl font-bold">5</p>
           </div>
-          <div className="bg-purple-500 text-white p-4 rounded shadow-md">
+          <div className="bg-purple-400 text-white p-4 rounded shadow-md">
             <h2 className="text-lg">Total Users</h2>
             <p className="text-2xl font-bold">15</p>
           </div>
         </div>
 
         {/* Search Bar */}
-        <div className="flex items-center shadow-md mb-4">
-          <input
-            type="text"
-            placeholder="Search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="border p-2 flex-1 rounded-l"
-          />
-          <button className="bg-color2 text-white p-2  rounded-r">Search</button>
-        </div>
+        <SearchBar placeholder="Search users..." onSearch={setSearchQuery} />
 
         {/* Tabs */}
         <Tabs
@@ -66,8 +58,8 @@ const SuperAdminUsers = () => {
                 {/* All Users Table */}
                 <div className="overflow-x-auto">
                   <table className="min-w-full bg-white shadow-md rounded-lg">
-                    <thead>
-                      <tr>
+                    <thead className=''>
+                      <tr className='bg-gray-200 text-gray-600 uppercase text-sm leading-normal'>
                         <th className="py-2 px-4 border-b">Name</th>
                         <th className="py-2 px-4 border-b">Type of Users</th>
                         <th className="py-2 px-4 border-b">Actions</th> {/* New Actions column */}

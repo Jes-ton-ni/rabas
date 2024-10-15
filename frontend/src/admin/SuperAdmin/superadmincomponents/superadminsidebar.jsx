@@ -5,9 +5,10 @@ import { CgLogOut } from 'react-icons/cg';
 import { MdDashboard } from 'react-icons/md';
 import { RiUserLine } from 'react-icons/ri';
 import { IoMdRibbon } from 'react-icons/io';
-import { FaBox, FaCalendar, FaBars, FaTimes } from 'react-icons/fa';
+import { FaBox, FaCar, FaBars, FaTimes } from 'react-icons/fa';
 import { Button } from '@nextui-org/react';
 import { MdDomainVerification } from "react-icons/md";
+import { TbReport } from "react-icons/tb";
 
 const SuperAdminSidebar = () => {
   const [activeNav, setActiveNav] = useState('Dashboard');
@@ -18,11 +19,10 @@ const SuperAdminSidebar = () => {
   const navItems = [
     { icon: <MdDashboard className="text-2xl" />, label: 'Dashboard', path: '/superadmindashboard' },
     { icon: <RiUserLine className="text-2xl" />, label: 'Users', path: '/superadminusers' },
-    { icon: <IoMdRibbon className="text-2xl" />, label: 'Ranking', path: '/ranking' },
-    { icon: <FaBox className="text-2xl" />, label: 'Products', path: '/products' },
-    { icon: <FaBox className="text-2xl" />, label: 'Transportation', path: '/transportation' },
-    { icon: <MdDomainVerification  className="text-2xl" />, label: 'Verification', path: '/verification' },
-    { icon: <FaBox className="text-2xl" />, label: 'Reports', path: '/reports' },
+    { icon: <FaBox className="text-2xl" />, label: 'Products', path: '/superadminproducts' },
+    { icon: <FaCar className="text-2xl" />, label: 'Transportation', path: '/superadmintransportation' },
+    { icon: <MdDomainVerification  className="text-2xl" />, label: 'Verification', path: '/superadminverification' },
+    { icon: <TbReport className="text-2xl" />, label: 'Reports', path: '/superadminreports' },
   ];
 
   // Update active navigation item based on current route
