@@ -5,27 +5,20 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   businessName: '',
   businessLogo: null,
+  coverPhoto: null,
   businessCard: {
     cardImage: null,
-    category: 'Relaxation', 
-    location: 'Donsol',
-    description: 'Relax and enjoy the scenic beach view.',
-    priceRange: '₱500-2000',
+    category: '', 
+    location: '',
+    description: '',
+    priceRange: '',
   },
   heroImages: [],
   aboutUs: '',
   facilities: [],
   policies: [],
   contactInfo: [],
-  openingHours: [
-    { day: 'Monday', open: '', close: '' },
-    { day: 'Tuesday', open: '', close: '' },
-    { day: 'Wednesday', open: '', close: '' },
-    { day: 'Thursday', open: '', close: '' },
-    { day: 'Friday', open: '', close: '' },
-    { day: 'Saturday', open: '', close: '' },
-    { day: 'Sunday', open: '', close: '' },
-  ],
+  openingHours: [],
 };
 
 const businessSlice = createSlice({
@@ -35,10 +28,15 @@ const businessSlice = createSlice({
     // General business data update
     updateBusinessData: (state, action) => {
       Object.assign(state, action.payload);
+      // console.log("Opening Hours:", state.openingHours);
     },
 
     // Facilities-related reducers
     addFacility: (state) => {
+      // ENsure falities is an array before pushing new data
+      if (!state.facilities) {
+        state.facilities = [];
+      }
       state.facilities.push({ icon: null, name: '', description: '' });
     },
     updateFacility: (state, action) => {
@@ -68,6 +66,10 @@ const businessSlice = createSlice({
 
     // Policies-related reducers
     addPolicy: (state) => {
+      // Ensure policies is an array before pushing new data
+      if (!state.policies) {
+        state.policies = [];
+      }
       state.policies.push({ title: '', items: [''] });
     },
     updatePolicy: (state, action) => {
@@ -113,6 +115,10 @@ const businessSlice = createSlice({
 
     // Contact Info reducers
     addContactInfo: (state) => {
+      // Ensure contactInfo is an array before pushing new data
+      if (!state.contactInfo) {
+        state.contactInfo = [];
+      }
       state.contactInfo.push({ id: Date.now(), icon: 'FaPlus', label: '', value: '' });
     },
     updateContactInfo: (state, action) => {

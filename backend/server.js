@@ -696,21 +696,153 @@ app.get('/businesses-application', (req, res) => {
 
 
 //Para sa pag display ng business
+
 // Endpoint to fetch businesses
-app.get('/businesses', (req, res) => {
-  const sql = `
-    SELECT * FROM business
-  `;
+app.get('/get-businessData', (req, res) => {
+  const userId = req.session?.user?.user_id;
+
+  if (!userId) {
+    return res.status(400).json({ success: false, message: 'User not logged in or user ID missing' });
+  }
+
+  const sql = `SELECT * FROM businesses WHERE user_id = ?`;
   
-  // Execute the SQL query
-  connection.query(sql, (err, results) => {
+  connection.query(sql, [userId], (err, results) => {
     if (err) {
       console.error('Error executing SQL query:', err);
       return res.status(500).json({ success: false, message: 'Internal server error' });
     }
-    // Send the list of businesses as the response
-    return res.json({ success: true, businesses: results });
+
+    if (results.length > 0) {
+      return res.json({ success: true, businessData: results });
+    } else {
+      return res.status(404).json({ success: false, message: 'Business data not found' });
+    }
   });
+});
+
+// Endpoint for updating business logo
+app.put('/updateBusinessLogo/:id', upload.single('businessLogo'), (req, res) => {
+  const businessId = req.params.id;
+
+  // Check if a new logo file was uploaded
+  if (!req.file) {
+    return res.status(400).json({ success: false, message: 'No logo file uploaded' });
+  }
+
+  // Prepare the new logo path
+  const newLogoPath = req.file.path; // Update with the correct path where the logo is stored
+
+  // Update the businessLogo field in the businesses table
+  connection.query('UPDATE businesses SET businessLogo = ? WHERE business_id = ?', [newLogoPath, businessId], (err, results) => {
+    if (err) {
+      console.error('Error updating business logo:', err);
+      return res.status(500).json({ success: false, message: 'Failed to update business logo' });
+    }
+
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Business not found' });
+    }
+
+    return res.json({
+      success: true,
+      message: 'Business logo updated successfully',
+      updatedLogoPath: newLogoPath,
+    });
+  });
+});
+
+// Endpoint for updating business card image
+app.put('/updateBusinessCardImage/:id', upload.single('businessCardImage'), (req, res) => {
+  const businessId = req.params.id;
+
+  // Fetch the current business data to get the existing businessCard JSON
+  connection.query(
+    'SELECT businessCard FROM businesses WHERE business_id = ?', 
+    [businessId], (err, results) => {
+    if (err) {
+      console.error('Error fetching business data:', err);
+      return res.status(500).json({ success: false, message: 'Failed to fetch business data' });
+    }
+    
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: 'Business not found' });
+    }
+
+    // The businessCard is already a JavaScript object, no need to parse it
+    let businessCard = results[0].businessCard;
+
+    // Update the cardImage if a new file was uploaded
+    if (req.file) {
+      businessCard.cardImage = req.file.path; // Update the cardImage path
+    }
+
+    // Update the database with the modified businessCard JSON
+    connection.query('UPDATE businesses SET businessCard = ? WHERE business_id = ?', [JSON.stringify(businessCard), businessId], (err) => {
+      if (err) {
+        console.error('Error updating business card image:', err);
+        return res.status(500).json({ success: false, message: 'Failed to update business card image' });
+      }
+
+      return res.json({
+        success: true,
+        message: 'Business card image updated successfully',
+        updatedBusinessCard: businessCard,
+      });
+    });
+  });
+});
+
+// Endpoint for updating business details
+app.put('/updateBusinessDetails/:id', (req, res) => {
+  const businessId = req.params.id;
+  const { description, location, priceRange } = req.body;
+
+  if (!description || !location || !priceRange) {
+    return res.status(400).json({ success: false, message: 'All fields are required' });
+  }
+
+  // Fetch the current business data to get the existing businessCard JSON
+  connection.query(
+    'SELECT businessCard FROM businesses WHERE business_id = ?', 
+    [businessId], 
+    (err, results) => {
+      if (err) {
+        console.error('Error fetching business details:', err);
+        return res.status(500).json({ success: false, message: 'Failed to fetch business details' });
+      }
+
+      if (results.length === 0) {
+        return res.status(404).json({ success: false, message: 'Business not found' });
+      }
+
+      // Parse businessCard if it exists, otherwise use an empty object
+      let businessCard = results[0].businessCard;
+
+      // Update the businessCard object with the new details
+      businessCard.description = description;
+      businessCard.location = location;
+      businessCard.priceRange = priceRange;
+
+      // Update the database with the modified businessCard JSON
+      connection.query(
+        'UPDATE businesses SET businessCard = ? WHERE business_id = ?', 
+        [JSON.stringify(businessCard), businessId], 
+        (err) => {
+          if (err) {
+            console.error('Error updating business card details:', err);
+            return res.status(500).json({ success: false, message: 'Failed to update business card details' });
+          }
+
+          return res.json({
+            success: true,
+            message: 'Business details updated successfully',
+            updatedDetails: { description, location, priceRange },
+          });
+        }
+      );
+    }
+  );
 });
 
 //Para sa pag display ng accomodations

@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Sidebar from '../components/sidebar';
+import { Switch } from "@nextui-org/react";
 import { FaUpload, FaSave, FaPlus, FaTrash } from 'react-icons/fa';
 import { Tabs, Tab, Card, CardBody, Input, Button, Modal, ModalContent, ModalHeader, ModalBody } from "@nextui-org/react";
 import { businessIcons } from '../businesspage/BusinessComponents/businessIcons';
@@ -28,55 +29,188 @@ import {
 const BusinessProfile = () => {
   const dispatch = useDispatch();
   const businessData = useSelector((state) => state.business);
-  const fileInputRef = useRef(null);
-  const heroImagesInputRef = useRef(null);
+  const businessCard = useSelector((state) => state.business.businessCard);
+
   const [isIconModalOpen, setIsIconModalOpen] = useState(false);
   const [currentEditingField, setCurrentEditingField] = useState(null);
-  const businessCard = useSelector((state) => state.business.businessCard);
+
+  //business card states
   const [cardImage, setCardImage] = useState(businessCard.cardImage);
   const [description, setDescription] = useState(businessCard.description);
   const [location, setLocation] = useState(businessCard.location);
   const [priceRange, setPriceRange] = useState(businessCard.priceRange);
 
+  //logo preview
+  const [logoPreview, setLogoPreview] = useState('');
+  const [previewImage, setPreviewImage] = useState(null);
+  const [confirmUpload, setConfirmUpload] = useState(false);
+  const [fileToUpload, setFileToUpload] = useState(null);
+
   const MySwal = withReactContent(Swal);
+  const fileInputRef = useRef(null);
+  const heroImagesInputRef = useRef(null);
+
+  // Fetching business data from the backend and updating Redux
+  const fetchBusinessData = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/get-businessData', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const data = await response.json();
+      if (data.success && data.businessData.length > 0) {
+        dispatch(updateBusinessData(data.businessData[0])); // Update Redux store with fetched business data
+      }
+    } catch (error) {
+      console.error('Error fetching business data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBusinessData(); // Fetch business data on component mount
+  }, []);
+
+   // Synchronize local state with Redux state
+   useEffect(() => {
+    setCardImage(businessCard.cardImage || '');
+    setDescription(businessCard.description || '');
+    setLocation(businessCard.location || '');
+    setPriceRange(businessCard.priceRange || '');
+  }, [businessCard]);
+
+  // Handle updates with centralized error handling
+  const handleApiCall = async (url, method, body) => {
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(`Error during API call: ${error.message}`);
+      throw error; // Propagate the error for handling
+    }
+  };
 
   // Handle updating the business card
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     if (!cardImage || !description || !location || !priceRange) {
-      MySwal.fire({
-        title: 'Error',
-        text: 'Please fill in all fields for the business card.',
-        icon: 'error',
-        confirmButtonColor: '#0BDA51',
-      });
-      return;
+      return showAlert('Error', 'Please fill in all fields for the business card.', 'error');
     }
-    dispatch(updateBusinessCard({ cardImage, description, location, priceRange }));
+
+    const updateData = { description, location, priceRange };
+    
+    try {
+      const data = await handleApiCall(`http://localhost:5000/updateBusinessDetails/${businessData.business_id}`, 'PUT', updateData);
+      if (data.success) {
+        fetchBusinessData(); // Update local state with new business details
+        dispatch(updateBusinessCard(updateData)); // Update Redux state with the new details
+        showAlert('Success', 'Business card updated successfully!', 'success');
+      }
+    } catch (error) {
+      console.error('Failed to update business details:', error);
+    }
+  };
+
+  const showAlert = (title, text, icon) => {
     MySwal.fire({
-      title: 'Success',
-      text: 'Business card updated successfully!',
-      icon: 'success',
+      title,
+      text,
+      icon,
       confirmButtonColor: '#0BDA51',
     });
   };
 
-  // Handle file upload for the business card image
+  // Function to handle the card image upload
   const handleCardImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => setCardImage(e.target.result); // Set the image as base64 string
-      reader.readAsDataURL(file);
+      reader.onloadend = () => {
+        setPreviewImage(reader.result); // Set the image preview
+        setFileToUpload(file); // Save the file to upload
+        setConfirmUpload(true); // Show confirmation modal
+      };
+      reader.readAsDataURL(file); // Read the file as a data URL
     }
   };
 
-  // Handle file upload for business logo
-  const handleLogoUpload = (event) => {
+
+  const handleConfirmUpload = async () => {
+    const formData = new FormData();
+    formData.append('businessCardImage', fileToUpload); // Append the file
+
+    try {
+      const data = await handleApiCall(`http://localhost:5000/updateBusinessCardImage/${businessData.business_id}`, 'PUT', formData);
+      if (data.success) {
+        fetchBusinessData(); // Update local state with the URL
+        dispatch(updateBusinessCard({ cardImage: data.imageFileName })); // Update Redux state with the filename
+        setPreviewImage(null); // Clear the preview after successful upload
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    } finally {
+      setConfirmUpload(false); // Close confirmation modal
+    }
+  };
+
+  const handleCancelUpload = () => {
+    setConfirmUpload(false); // Close confirmation modal
+    setPreviewImage(null); // Clear the preview
+    setFileToUpload(null); // Clear the file to upload
+  };
+
+  // Function to handle removing the image
+  const handleRemoveCardImage = () => {
+    showAlertWithConfirmation('Are you sure?', 'This will remove the card image.', () => {
+      setCardImage(null); // Clear local state
+      dispatch(updateBusinessCard({ cardImage: null })); // Update Redux state to remove the image
+      showAlert('Removed!', 'The card image has been removed.', 'success');
+    });
+  };
+
+  const showAlertWithConfirmation = (title, text, onConfirm) => {
+    MySwal.fire({
+      title,
+      text,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0BDA51',
+      cancelButtonColor: '#D33736',
+      confirmButtonText: 'Yes, remove it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        onConfirm();
+      }
+    });
+  };
+
+  const handleLogoUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => dispatch(updateBusinessData({ businessLogo: e.target.result }));
-      reader.readAsDataURL(file);
+      reader.onload = (e) => setLogoPreview(e.target.result); // Update the logo preview state
+
+      reader.onloadend = async () => {
+        const formData = new FormData();
+        formData.append('businessLogo', file); // Append the logo file
+
+        try {
+          const data = await handleApiCall(`http://localhost:5000/updateBusinessLogo/${businessData.business_id}`, 'PUT', formData);
+          if (data.success) {
+            fetchBusinessData(); // Fetch the updated business data
+            dispatch(updateBusinessData({ businessLogo: data.updatedLogoPath })); // Update Redux state with the logo path
+          } else {
+            console.error('Error updating logo:', data.message);
+          }
+        } catch (error) {
+          console.error('Error uploading logo:', error);
+        }
+      };
+
+      reader.readAsDataURL(file); // Read the file as a data URL
     }
   };
 
@@ -89,70 +223,24 @@ const BusinessProfile = () => {
 
   // Handle removing a hero image
   const handleRemoveHeroImage = (index) => {
-    MySwal.fire({
-      title: 'Are you sure?',
-      text: 'This will remove the hero image.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#0BDA51',
-      cancelButtonColor: '#D33736',
-      confirmButtonText: 'Yes, remove it!',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(updateBusinessData({ heroImages: businessData.heroImages.filter((_, i) => i !== index) }));
-        MySwal.fire({
-          title: 'Removed!',
-          text: 'The image has been removed.',
-          icon: 'success',
-          confirmButtonColor: '#0BDA51',
-        });
-      }
+    showAlertWithConfirmation('Are you sure?', 'This will remove the hero image.', () => {
+      dispatch(updateBusinessData({ heroImages: businessData.heroImages.filter((_, i) => i !== index) }));
+      showAlert('Removed!', 'The image has been removed.', 'success');
     });
   };
 
   // Handle removing a contact info
   const handleRemoveContactInfo = (id) => {
-    MySwal.fire({
-      title: 'Are you sure?',
-      text: 'This will remove the contact info.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#0BDA51',
-      cancelButtonColor: '#D33736',
-      confirmButtonText: 'Yes, remove it!',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(removeContactInfo({ id }));
-        MySwal.fire({
-          title: 'Removed!',
-          text: 'The contact info has been removed.',
-          icon: 'success',
-          confirmButtonColor: '#0BDA51',
-        });
-      }
+    showAlertWithConfirmation('Are you sure?', 'This will remove the contact information.', () => {
+      dispatch(removeContactInfo(id));
+      showAlert('Removed!', 'The contact information has been removed.', 'success');
     });
   };
 
-  // Handle removing a facility
-  const handleRemoveFacility = (index) => {
-    MySwal.fire({
-      title: 'Are you sure?',
-      text: 'This will remove the facility.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#0BDA51',
-      cancelButtonColor: '#D33736',
-      confirmButtonText: 'Yes, remove it!',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(removeFacility({ index }));
-        MySwal.fire({
-          title: 'Removed!',
-          text: 'The facility has been removed.',
-          icon: 'success',
-          confirmButtonColor: '#0BDA51',
-        });
-      }
+  const handleRemovePolicy = (id) => {
+    showAlertWithConfirmation('Are you sure?', 'This will remove the policy.', () => {
+      dispatch(removePolicy(id));
+      showAlert('Removed!', 'The policy has been removed.', 'success');
     });
   };
 
@@ -176,27 +264,17 @@ const BusinessProfile = () => {
 
   // Handle saving the entire profile
   const handleSave = () => {
-    MySwal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to save the business profile?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#0BDA51',
-      cancelButtonColor: '#D33736',
-      confirmButtonText: 'Yes, save it!',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Implement API call or save logic
+    showAlertWithConfirmation(
+      'Are you sure?',
+      'Do you want to save the business profile?',
+      () => {
+        // You can implement the API call here
         console.log('Saving business profile...', businessData);
-        MySwal.fire({
-          title: 'Saved!',
-          text: 'Your business profile has been saved.',
-          icon: 'success',
-          confirmButtonColor: '#0BDA51',
-        });
+        showAlert('Saved!', 'Your business profile has been saved.', 'success');
       }
-    });
+    );
   };
+
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen mx-auto bg-gray-100 font-sans">
@@ -224,7 +302,10 @@ const BusinessProfile = () => {
                         
                     {businessData.businessLogo ? (
                       <img
-                        src={businessData.businessLogo}
+                        src={businessData.businessLogo.startsWith('uploads')
+                          ? `http://localhost:5000/${businessData.businessLogo}`
+                          : businessData.businessLogo
+                        }
                         alt="Business Logo"
                         className='w-full h-full object-cover rounded-full'
                       />
@@ -259,47 +340,63 @@ const BusinessProfile = () => {
                 <div className="mb-6 shadow-md rounded-md p-6 shadow-slate-400 ">
                   <h3 className="text-lg font-bold mb-4">Update Business Card</h3>
                   <div className="space-y-4">
-                  <div className="mb-6">
-  <label className="block text-sm font-medium text-gray-700 mb-1">Card Image</label>
-  
-  {/* Display the uploaded image preview if available */}
-  {cardImage ? (
-    <div className="relative w-full h-48 mb-3">
-      <img
-        src={cardImage}
-        alt="Card Preview"
-        className="w-full h-full object-cover rounded-md shadow-md"
-      />
-      <button
-        onClick={() => setCardImage(null)}  // Option to clear the image
-        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition"
-      >
-        <FaTrash size={14} />
-      </button>
-    </div>
-  ) : (
-    <div className="border-2 border-dashed border-gray-300 rounded-md p-4 flex justify-center items-center">
-      <input 
-        type="file"
-        accept="image/*"
-        onChange={handleCardImageUpload}
-        className="hidden"
-        id="cardImageUpload"
-      />
-      <label
-        htmlFor="cardImageUpload"
-        className="cursor-pointer bg-color1 text-white px-4 py-2 rounded-md hover:bg-color2 transition"
-      >
-        <FaUpload className="inline mr-2" />
-        Upload Image
-      </label>
-    </div>
-  )}
-</div>
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Card Image</label>
+                      
+                      {/* Display the uploaded image preview if available */}
+                      {cardImage ? (
+                        <div className="relative w-full h-48 mb-3">
+                          <img
+                            src={`http://localhost:5000/${cardImage}`
+                            }
+                            alt="Card Preview"
+                            className="w-full h-full object-cover rounded-md shadow-md"
+                          />
+                          <button
+                            onClick={() => handleRemoveCardImage()}  // Updated function to remove the image
+                            className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition"
+                          >
+                            <FaTrash size={14} />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="border-2 border-dashed border-gray-300 rounded-md p-4 flex justify-center items-center">
+                          <input 
+                            type="file"
+                            accept="image/*"
+                            onChange={handleCardImageUpload}
+                            className="hidden"
+                            id="cardImageUpload"
+                          />
+                          <label
+                            htmlFor="cardImageUpload"
+                            className="cursor-pointer bg-color1 text-white px-4 py-2 rounded-md hover:bg-color2 transition"
+                          >
+                            <FaUpload className="inline mr-2" />
+                            Upload Image
+                          </label>
+                          {confirmUpload && (
+                            <Modal isOpen={true} onClose={handleCancelUpload}>
+                              <ModalContent>
+                                <ModalHeader>Confirm Upload</ModalHeader>
+                                <ModalBody>
+                                  <p>Are you sure you want to upload this image?</p>
+                                  <img src={previewImage} alt="Image to upload" style={{ width: '100px', height: '100px' }} />
+                                  <div>
+                                    <Button onClick={handleConfirmUpload}>Yes</Button>
+                                    <Button onClick={handleCancelUpload}>No</Button>
+                                  </div>
+                                </ModalBody>
+                              </ModalContent>
+                            </Modal>
+                          )}
+                        </div>
+                      )}
+                    </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                       <textarea
-                        value={description || ''}
+                        value={description|| ''}
                         onChange={(e) => setDescription(e.target.value)}
                         placeholder="Enter description"
                         className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-color1"
@@ -340,11 +437,15 @@ const BusinessProfile = () => {
                   <div className="border border-gray-300 rounded-md p-4">
                     {cardImage && (
                       <img
-                        src={cardImage}
+                        src={cardImage.startsWith('uploads') 
+                          ? `http://localhost:5000/${cardImage}` 
+                          : cardImage
+                        }
                         alt="Business Card"
                         className="w-full h-48 object-cover rounded-md mb-4"
                       />
                     )}
+                    <p><strong>Business Name:</strong> {businessData.businessName}</p>
                     <p><strong>Description:</strong> {description}</p>
                     <p><strong>Location:</strong> {location}</p>
                     <p><strong>Price Range:</strong> {priceRange}</p>
@@ -359,17 +460,22 @@ const BusinessProfile = () => {
               <CardBody>
                 <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">Cover Photo</h2>
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4'>
-                  {businessData.heroImages.map((image, index) => (
-                    <div key={index} className="relative">
-                      <img src={image} alt={`Hero ${index + 1}`} className='w-full h-40 object-cover rounded-lg' />
-                      <Button
-                        onClick={() => handleRemoveHeroImage(index)}
-                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
-                      >
-                        <FaTrash size={12} />
-                      </Button>
-                    </div>
-                  ))}
+                {businessData.heroImages && Array.isArray(businessData.heroImages) && businessData.heroImages.map((image, index) => (
+                  <div key={index} className="relative">
+                    <img 
+                      src={`http://localhost:5000/${image}`}  // Apply the base URL to the image
+                      alt={`Hero ${index + 1}`} 
+                      className="w-full h-40 object-cover rounded-lg" 
+                    />
+                    <Button
+                      onClick={() => handleRemoveHeroImage(index)}
+                      className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
+                    >
+                      <FaTrash size={12} />
+                    </Button>
+                  </div>
+                ))}
+
                 </div>
                 <input
                   type="file"
@@ -401,7 +507,7 @@ const BusinessProfile = () => {
                 />
 
                 <h3 className="text-md lg:text-lg font-semibold mt-4 mb-2">Contact Information</h3>
-                {businessData.contactInfo.map((info) => (
+                {businessData.contactInfo && Array.isArray(businessData.contactInfo) && businessData.contactInfo.map((info) => (
                   <div key={info.id} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
                     <Button onClick={() => openIconModal(`contact-${info.id}`)} className="min-w-[40px] h-[40px] p-0">
                       {React.createElement(businessIcons.find(icon => icon.name === info.icon)?.icon || FaPlus, { size: 20 })}
@@ -425,10 +531,11 @@ const BusinessProfile = () => {
                     </Button>
                   </div>
                 ))}
+
                 <Button onClick={() => dispatch(addContactInfo())} className="mt-2 bg-color1 text-white hover:bg-color2 transition">Add Contact Info</Button>
 
                 <h3 className="text-md lg:text-lg font-semibold mt-4 mb-2">Opening Hours</h3>
-                {businessData.openingHours.map((hours, index) => (
+                {businessData.openingHours && Array.isArray(businessData.openingHours) && businessData.openingHours.map((hours, index) => (
                   <div key={index} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
                     <Input
                       type="text"
@@ -436,20 +543,40 @@ const BusinessProfile = () => {
                       readOnly
                       className='w-full lg:w-1/4'
                     />
+
+                    {/* Time inputs are enabled/disabled based on switch */}
                     <Input
                       type="time"
                       value={hours.open}
-                      onChange={(e) => dispatch(updateBusinessData({ openingHours: businessData.openingHours.map((h, i) => i === index ? { ...h, open: e.target.value } : h) }))}
-                      placeholder="Open"
+                      onChange={(e) => dispatch(updateBusinessData({
+                        openingHours: businessData.openingHours.map((h, i) => i === index ? { ...h, open: e.target.value } : h)
+                      }))}
+                      disabled={hours.open === "Closed"}
                       className='w-full lg:w-1/4'
                     />
+
                     <Input
                       type="time"
                       value={hours.close}
-                      onChange={(e) => dispatch(updateBusinessData({ openingHours: businessData.openingHours.map((h, i) => i === index ? { ...h, close: e.target.value } : h) }))}
-                      placeholder="Close"
+                      onChange={(e) => dispatch(updateBusinessData({
+                        openingHours: businessData.openingHours.map((h, i) => i === index ? { ...h, close: e.target.value } : h)
+                      }))}
+                      disabled={hours.close === "Closed"}
                       className='w-full lg:w-1/4'
                     />
+
+                    {/* Toggle switch to set day open or closed */}
+                    <Switch
+                      color='success'
+                      isSelected={hours.open !== "Closed"}
+                      onChange={(e) => dispatch(updateBusinessData({
+                        openingHours: businessData.openingHours.map((h, i) => 
+                          i === index ? { ...h, open: e.target.checked ? "08:00" : "Closed", close: e.target.checked ? "17:00" : "Closed" } : h
+                        )
+                      }))}
+                    >
+                      <span className='font-semibold text-md'>{hours.open === "Closed" ? "Closed" : "Open"}</span>
+                    </Switch>
                   </div>
                 ))}
               </CardBody>
@@ -461,7 +588,7 @@ const BusinessProfile = () => {
               <CardBody className='h-[300px] overflow-x-auto scrollbar-hide'>
                 <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">Facilities & Amenities</h2>
                 <div className='flex justify-start flex-wrap gap-3'>
-                  {businessData.facilities.map((facility, index) => (
+                {businessData.facilities && Array.isArray(businessData.facilities) && businessData.facilities && businessData.facilities.map((facility, index) => (
                     <div key={index} className='flex lg:flex-row items-center gap-2 mb-2'>
                       <Button onClick={() => openIconModal(`facility-${index}`)} className="min-w-[40px] h-[40px] p-0">
                         {facility.icon ? React.createElement(businessIcons.find(icon => icon.name === facility.icon)?.icon, { size: 20 }) : <FaPlus size={20} />}
@@ -488,7 +615,7 @@ const BusinessProfile = () => {
             <Card>
               <CardBody>
                 <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">Policies</h2>
-                {businessData.policies.map((policy, policyIndex) => (
+                {businessData.policies && Array.isArray(businessData.policies) && businessData.policies.map((policy, policyIndex) => (
                   <div key={policyIndex} className='mb-4'>
                     <Input
                       type="text"
