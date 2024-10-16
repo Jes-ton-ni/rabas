@@ -3,6 +3,7 @@ const express = require('express');
 const mysql = require('mysql2'); // npm install mysql2
 const cors = require('cors'); // npm install cors
 const multer = require('multer'); // npm install multer
+const fs = require('fs');
 const path = require('path'); // path is a built-in Node.js module, no need to install
 const session = require('express-session'); // npm install express-session
 const MySQLStore = require('express-mysql-session')(session); // npm install express-mysql-session
@@ -866,6 +867,166 @@ app.put('/updateBusinessDetails/:id', (req, res) => {
       );
     }
   );
+});
+
+// Endpoint for updating business cover images
+app.put('/updateBusinessCover/:id', upload.array('heroImages', 10), (req, res) => {
+  const businessId = req.params.id;
+
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).json({ success: false, message: "No files uploaded" });
+  }
+
+  // Map the uploaded files to their file paths
+  const newHeroImages = req.files.map(file => file.path);
+
+  // Fetch the current heroImages JSON or string from the businesses table
+  connection.query('SELECT heroImages FROM businesses WHERE business_id = ?', [businessId], (err, results) => {
+    if (err) {
+      console.error('Error fetching business heroImages:', err);
+      return res.status(500).json({ success: false, message: 'Failed to fetch business heroImages' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: 'Business not found' });
+    }
+
+    // Check if heroImages is null and handle accordingly
+    let currentHeroImages = results[0].heroImages;
+
+    if (currentHeroImages === null) {
+      currentHeroImages = []; // Initialize as an empty array if it's null
+    } else {
+      // Convert to string in case it's a buffer or other type
+      if (typeof currentHeroImages !== 'string') {
+        currentHeroImages = currentHeroImages.toString();
+      }
+
+      // Check if it's valid JSON, if not treat it as a comma-separated string
+      try {
+        currentHeroImages = JSON.parse(currentHeroImages);
+      } catch (parseError) {
+        // Handle comma-separated string format
+        currentHeroImages = currentHeroImages.split(',');
+      }
+    }
+
+    // Merge new images with the current heroImages
+    const updatedHeroImages = [...currentHeroImages, ...newHeroImages];
+
+    // Check if updatedHeroImages is empty
+    if (updatedHeroImages.length === 0) {
+      // Set heroImages to null if there are no images left
+      connection.query(
+        'UPDATE businesses SET heroImages = NULL WHERE business_id = ?',
+        [businessId],
+        (err) => {
+          if (err) {
+            console.error('Error updating business cover images:', err);
+            return res.status(500).json({ success: false, message: 'Failed to update business cover images' });
+          }
+
+          return res.json({
+            success: true,
+            message: 'Business cover images updated successfully, no images left',
+          });
+        }
+      );
+    } else {
+      // Update the database with the modified heroImages as a JSON string
+      connection.query(
+        'UPDATE businesses SET heroImages = ? WHERE business_id = ?',
+        [JSON.stringify(updatedHeroImages), businessId],
+        (err) => {
+          if (err) {
+            console.error('Error updating business cover images:', err);
+            return res.status(500).json({ success: false, message: 'Failed to update business cover images' });
+          }
+
+          return res.json({
+            success: true,
+            message: 'Business cover images updated successfully',
+            updatedHeroImages, // Respond with the updated images
+          });
+        }
+      );
+    }
+  });
+});
+
+// Endpoint to delete cover photo
+app.delete('/businessCoverPhoto/:id', (req, res) => {
+  const businessId = req.params.id;
+  const { imagePath } = req.body; // Image path to be deleted should be passed in the request body
+
+  if (!imagePath) {
+    return res.status(400).json({ success: false, message: 'No image path provided' });
+  }
+
+  // Fetch the current heroImages from the businesses table
+  connection.query('SELECT heroImages FROM businesses WHERE business_id = ?', [businessId], (err, results) => {
+    if (err) {
+      console.error('Error fetching heroImages:', err);
+      return res.status(500).json({ success: false, message: 'Failed to fetch business heroImages' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: 'Business not found' });
+    }
+
+    let currentHeroImages = results[0].heroImages;
+
+    // Check if heroImages is null
+    if (currentHeroImages === null) {
+      return res.status(404).json({ success: false, message: 'No cover photos to delete' });
+    }
+
+    // Convert to string in case it's a buffer or other type
+    if (typeof currentHeroImages !== 'string') {
+      currentHeroImages = currentHeroImages.toString();
+    }
+
+    // Parse heroImages from JSON or comma-separated string
+    try {
+      currentHeroImages = JSON.parse(currentHeroImages);
+    } catch (parseError) {
+      currentHeroImages = currentHeroImages.split(',');
+    }
+
+    // Find and remove the specified image path from heroImages
+    const updatedHeroImages = currentHeroImages.filter(img => img !== imagePath);
+
+    if (updatedHeroImages.length === currentHeroImages.length) {
+      return res.status(404).json({ success: false, message: 'Image not found in heroImages' });
+    }
+
+    // Update the database with the modified heroImages
+    connection.query(
+      'UPDATE businesses SET heroImages = ? WHERE business_id = ?',
+      [updatedHeroImages.length > 0 ? JSON.stringify(updatedHeroImages) : null, businessId],
+      (err) => {
+        if (err) {
+          console.error('Error updating heroImages:', err);
+          return res.status(500).json({ success: false, message: 'Failed to update heroImages' });
+        }
+
+        // Remove the file from the server
+        const filePath = path.join(__dirname, imagePath); // Build the full path to the file
+        fs.unlink(filePath, (unlinkErr) => {
+          if (unlinkErr) {
+            console.error('Error deleting the image file:', unlinkErr);
+            return res.status(500).json({ success: false, message: 'Failed to delete the image file from server' });
+          }
+
+          return res.json({
+            success: true,
+            message: 'Cover photo deleted successfully',
+            updatedHeroImages: updatedHeroImages.length > 0 ? updatedHeroImages : null, // Respond with the updated list of hero images
+          });
+        });
+      }
+    );
+  });
 });
 
 //Para sa pag display ng accomodations
