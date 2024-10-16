@@ -734,21 +734,44 @@ app.put('/updateBusinessLogo/:id', upload.single('businessLogo'), (req, res) => 
   // Prepare the new logo path
   const newLogoPath = req.file.path; // Update with the correct path where the logo is stored
 
-  // Update the businessLogo field in the businesses table
-  connection.query('UPDATE businesses SET businessLogo = ? WHERE business_id = ?', [newLogoPath, businessId], (err, results) => {
+  // Fetch the current business logo to delete the old file
+  connection.query('SELECT businessLogo FROM businesses WHERE business_id = ?', [businessId], (err, results) => {
     if (err) {
-      console.error('Error updating business logo:', err);
-      return res.status(500).json({ success: false, message: 'Failed to update business logo' });
+      console.error('Error fetching business logo:', err);
+      return res.status(500).json({ success: false, message: 'Failed to fetch business logo' });
     }
 
-    if (results.affectedRows === 0) {
+    if (results.length === 0) {
       return res.status(404).json({ success: false, message: 'Business not found' });
     }
 
-    return res.json({
-      success: true,
-      message: 'Business logo updated successfully',
-      updatedLogoPath: newLogoPath,
+    // Get the current logo path
+    const currentLogoPath = results[0].businessLogo;
+
+    // Update the businessLogo field in the businesses table
+    connection.query('UPDATE businesses SET businessLogo = ? WHERE business_id = ?', [newLogoPath, businessId], (err, updateResults) => {
+      if (err) {
+        console.error('Error updating business logo:', err);
+        return res.status(500).json({ success: false, message: 'Failed to update business logo' });
+      }
+
+      if (updateResults.affectedRows === 0) {
+        return res.status(404).json({ success: false, message: 'Business not found' });
+      }
+
+      // Remove the old logo file from the server
+      fs.unlink(currentLogoPath, (unlinkErr) => {
+        if (unlinkErr) {
+          console.error('Error deleting the old logo file:', unlinkErr);
+          return res.status(500).json({ success: false, message: 'Failed to delete the old logo file from server' });
+        }
+
+        return res.json({
+          success: true,
+          message: 'Business logo updated successfully',
+          updatedLogoPath: newLogoPath,
+        });
+      });
     });
   });
 });
@@ -952,6 +975,65 @@ app.put('/updateBusinessCover/:id', upload.array('heroImages', 10), (req, res) =
       );
     }
   });
+});
+
+// Endpoint to delete business card image
+app.delete('/businessCardImage/:id', (req, res) => {
+  const businessId = req.params.id;
+
+  // Fetch the current business data to get the existing businessCard JSON
+  connection.query(
+    'SELECT businessCard FROM businesses WHERE business_id = ?', 
+    [businessId], (err, results) => {
+      if (err) {
+        console.error('Error fetching business data:', err);
+        return res.status(500).json({ success: false, message: 'Failed to fetch business data' });
+      }
+
+      if (results.length === 0) {
+        return res.status(404).json({ success: false, message: 'Business not found' });
+      }
+
+      // The businessCard is already a JavaScript object, no need to parse it
+      let businessCard = results[0].businessCard;
+
+      // Check if there is a cardImage to delete
+      if (!businessCard || !businessCard.cardImage) {
+        return res.status(404).json({ success: false, message: 'No business card image to delete' });
+      }
+
+      // Store the path of the current cardImage to delete it from the server
+      const cardImagePath = businessCard.cardImage;
+
+      // Set cardImage to null in the businessCard object
+      businessCard.cardImage = null;
+
+      // Update the database with the modified businessCard JSON
+      connection.query(
+        'UPDATE businesses SET businessCard = ? WHERE business_id = ?', 
+        [JSON.stringify(businessCard), businessId], (err) => {
+          if (err) {
+            console.error('Error updating business card image:', err);
+            return res.status(500).json({ success: false, message: 'Failed to update business card image' });
+          }
+
+          // Remove the file from the server
+          fs.unlink(cardImagePath, (unlinkErr) => {
+            if (unlinkErr) {
+              console.error('Error deleting the image file:', unlinkErr);
+              return res.status(500).json({ success: false, message: 'Failed to delete the image file from server' });
+            }
+
+            return res.json({
+              success: true,
+              message: 'Business card image deleted successfully',
+              updatedBusinessCard: businessCard, // Respond with the updated business card
+            });
+          });
+        }
+      );
+    }
+  );
 });
 
 // Endpoint to delete cover photo

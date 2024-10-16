@@ -41,12 +41,10 @@ const BusinessProfile = () => {
   const [location, setLocation] = useState(businessCard.location);
   const [priceRange, setPriceRange] = useState(businessCard.priceRange);
 
-  //logo preview
-  const [logoPreview, setLogoPreview] = useState('');
-
   //card preview
   const [previewImage, setPreviewImage] = useState(null);
   const [confirmUpload, setConfirmUpload] = useState(false);
+
   const [fileToUpload, setFileToUpload] = useState(null);
 
   const [isEditingName, setIsEditingName] = useState(false); // Edit mode state
@@ -195,52 +193,55 @@ const BusinessProfile = () => {
       .catch(error => console.error('Error updating business details:', error));
   };
 
-  
-  // Function to handle the card image upload
+  // Function to handle image upload and confirmation
   const handleCardImageUpload = (event) => {
     const file = event.target.files[0];
+    const businessId = businessData.business_id; // Get the business ID from your state
 
     if (file) {
       const reader = new FileReader();
+      
+      // Read the file as Data URL for preview
       reader.onloadend = () => {
-        setPreviewImage(reader.result); // Set the image preview
+        const previewImage = reader.result; // Store the preview image
+        
+        // SweetAlert2 confirmation
+        Swal.fire({
+          title: 'Confirm Upload',
+          text: 'Are you sure you want to upload this image?',
+          imageUrl: previewImage,
+          imageWidth: 200,
+          imageHeight: 200,
+          showCancelButton: true,
+          confirmButtonText: 'Yes, upload it!',
+          cancelButtonText: 'No, cancel!',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const formData = new FormData();
+            formData.append('businessCardImage', file); // Append the file to FormData
+
+            // Make an API call to upload the logo
+            fetch(`http://localhost:5000/updateBusinessCardImage/${businessId}`, {
+              method: 'PUT',
+              body: formData,
+            })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  fetchBusinessData(); // Fetch the updated business data
+                  dispatch(updateBusinessData({ cardImage: data.updatedBusinessCard.cardImage })); // Update Redux state with the new card image
+                  Swal.fire('Uploaded!', 'Your image has been uploaded.', 'success'); // Success message
+                } else {
+                  Swal.fire('Error!', data.message, 'error'); // Error message
+                }
+              })
+              .catch(error => Swal.fire('Error!', 'Failed to upload the image.', 'error')); // Catch any errors
+          }
+        });
       };
-      reader.readAsDataURL(file); // Read the file as a data URL
 
-      setFileToUpload(file); // Save the file to upload
-      setConfirmUpload(true); // Show confirmation modal
+      reader.readAsDataURL(file); // Read the file
     }
-  };
-
-  const handleConfirmUpload = () => {
-    const formData = new FormData();
-    formData.append('businessCardImage', fileToUpload); // Append the file
-    formData.append('businessName', "Example Business Name"); // Append any other data
-
-    // Make an API call to upload the image
-    fetch(`http://localhost:5000/updateBusinessCardImage/${businessData.business_id}`, {
-      method: 'PUT',
-      body: formData,
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          fetchBusinessData(); // Update local state with the URL
-          dispatch(updateBusinessCard({ cardImage: data.imageFileName })); // Update Redux state with the filename
-          setPreviewImage(null); // Clear the preview after successful upload
-          setFileToUpload(null); // Clear the file to upload
-        }
-      })
-      .catch(error => console.error('Error uploading image:', error))
-      .finally(() => {
-        setConfirmUpload(false); // Close confirmation modal
-      });
-  };
-
-  const handleCancelUpload = () => {
-    setConfirmUpload(false); // Close confirmation modal
-    setPreviewImage(null); // Clear the preview
-    setFileToUpload(null); // Clear the file to upload
   };
 
   // Function to handle removing the image
@@ -255,13 +256,42 @@ const BusinessProfile = () => {
       confirmButtonText: 'Yes, remove it!',
     }).then((result) => {
       if (result.isConfirmed) {
-        setCardImage(null); // Clear local state
-        dispatch(updateBusinessCard({ cardImage: null })); // Update Redux state to remove the image
-        MySwal.fire({
-          title: 'Removed!',
-          text: 'The card image has been removed.',
-          icon: 'success',
-          confirmButtonColor: '#0BDA51',
+        // Make API call to delete the card image on the server
+        fetch(`http://localhost:5000/businessCardImage/${businessData.business_id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ imagePath: cardImage }), // Pass the current card image path
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            setCardImage(null); // Clear local state
+            dispatch(updateBusinessCard({ cardImage: null })); // Update Redux state to remove the image
+            MySwal.fire({
+              title: 'Removed!',
+              text: 'The card image has been removed.',
+              icon: 'success',
+              confirmButtonColor: '#0BDA51',
+            });
+          } else {
+            MySwal.fire({
+              title: 'Error!',
+              text: data.message,
+              icon: 'error',
+              confirmButtonColor: '#D33736',
+            });
+          }
+        })
+        .catch((error) => {
+          console.error('Error deleting card image:', error);
+          MySwal.fire({
+            title: 'Error!',
+            text: 'Failed to remove the card image.',
+            icon: 'error',
+            confirmButtonColor: '#D33736',
+          });
         });
       }
     });
@@ -274,37 +304,57 @@ const BusinessProfile = () => {
     if (file) {
       const reader = new FileReader();
   
-      // Set the preview once the file is read
-      reader.onload = (e) => {
-        setLogoPreview(e.target.result); // Update the logo preview state
-      };
-  
-      // Make an API call to upload the logo once the file is read
+      // Read the file as a data URL to display a preview
       reader.onloadend = () => {
-        const formData = new FormData();
-        formData.append('businessLogo', file); // Append the logo file
+        const imageUrl = reader.result; // This will be the base64 image data
   
-        // Make an API call to upload the logo
-        fetch(`http://localhost:5000/updateBusinessLogo/${businessId}`, {
-          method: 'PUT',
-          body: formData,
-        })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              fetchBusinessData(); // Fetch the updated business data
-              dispatch(updateBusinessData({ businessLogo: data.updatedLogoPath })); // Update Redux state with the logo path
-            } else {
-              console.error('Error updating logo:', data.message);
-            }
-          })
-          .catch(error => console.error('Error uploading logo:', error));
+        // Show confirmation dialog with image preview using SweetAlert2
+        Swal.fire({
+          title: 'Confirm Upload',
+          text: "Are you sure you want to upload this logo?",
+          icon: 'warning',
+          html: `<div style="display: flex; flex-direction: column; align-items: center;">
+                   <img src="${imageUrl}" alt="Logo Preview" style="width: 600px; height: auto; border-radius: 8px; margin-top: 10px;" />
+                   <span style="margin-top: 10px;">Are you sure you want to upload this logo?</span>
+                 </div>`, // Center the image and text
+          showCancelButton: true,
+          confirmButtonText: 'Yes, upload it!',
+          cancelButtonText: 'No, cancel!',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const formData = new FormData();
+            formData.append('businessLogo', file); // Append the logo file
+  
+            // Make an API call to upload the logo
+            fetch(`http://localhost:5000/updateBusinessLogo/${businessId}`, {
+              method: 'PUT',
+              body: formData,
+            })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  fetchBusinessData(); // Fetch the updated business data
+                  dispatch(updateBusinessData({ businessLogo: data.updatedLogoPath })); // Update Redux state with the logo path
+                  Swal.fire('Uploaded!', 'Your logo has been uploaded.', 'success'); // Success message
+                } else {
+                  console.error('Error updating logo:', data.message);
+                  Swal.fire('Error!', data.message, 'error'); // Error message
+                }
+              })
+              .catch(error => {
+                console.error('Error uploading logo:', error);
+                Swal.fire('Error!', 'There was an error uploading the logo.', 'error'); // General error message
+              });
+          } else {
+            Swal.fire('Cancelled', 'Your logo upload was cancelled.', 'info'); // Cancel message
+          }
+        });
       };
   
       reader.readAsDataURL(file); // Read the file as a data URL
     }
   };
-
+  
   // Handle file upload for hero images
   const handleHeroImagesUpload = (event) => {
     const files = Array.from(event.target.files);
@@ -624,21 +674,6 @@ const BusinessProfile = () => {
                             <FaUpload className="inline mr-2" />
                             Upload Image
                           </label>
-                          {confirmUpload && (
-                            <Modal isOpen={true} onClose={handleCancelUpload}>
-                              <ModalContent>
-                                <ModalHeader>Confirm Upload</ModalHeader>
-                                <ModalBody>
-                                  <p>Are you sure you want to upload this image?</p>
-                                  <img src={previewImage} alt="Image to upload" style={{ width: '100px', height: '100px' }} />
-                                  <div>
-                                    <Button onClick={handleConfirmUpload}>Yes</Button>
-                                    <Button onClick={handleCancelUpload}>No</Button>
-                                  </div>
-                                </ModalBody>
-                              </ModalContent>
-                            </Modal>
-                          )}
                         </div>
                       )}
                     </div>
