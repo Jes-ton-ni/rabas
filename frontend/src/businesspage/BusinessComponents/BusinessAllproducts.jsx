@@ -256,25 +256,20 @@ const ProductCard = ({ product, openImageModal, openBookingModal }) => {
 // Image Modal Component
 const ImageModal = ({ isOpen, onClose, images }) => {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-full md:max-w-3xl">
+    <Modal isOpen={isOpen} onClose={onClose} size='full' className="w-full h-full ">
       <ModalContent className="p-4">
         <ModalHeader>
           <h2 className="text-xl font-semibold">Image Preview</h2>
         </ModalHeader>
-        <ModalBody className="py-4 flex justify-center items-center">
-          <Carousel className="overflow-x-auto max-w-full bg-dark" showArrows={true} emulateTouch={true}>
+        <ModalBody className="py-4 flex justify-center  items-center flex-row gap-4  overflow-y-auto max-h-screen p-6">
+          <Carousel className="overflow-x-auto w-full  bg-dark" showArrows={true} emulateTouch={true}>
             {images.map((img, index) => (
-              <div key={index} className="flex justify-center items-center h-[400px] md:h-[600px]">
+              <div key={index} className="flex justify-center items-center max-h-[500px]">
                 <img src={img} alt={`Slide ${index + 1}`} className="object-cover h-full max-w-full" />
               </div>
             ))}
           </Carousel>
         </ModalBody>
-        <ModalFooter className="flex justify-end">
-          <Button color="danger" onClick={onClose}>
-            Close
-          </Button>
-        </ModalFooter>
       </ModalContent>
     </Modal>
   );
@@ -400,9 +395,13 @@ const BusinessAllproducts = () => {
   const closeImageModal = () => setIsModalOpen(false);
 
   const openBookingModal = (product) => {
-    if (product.type === 'Cabins' || product.type === 'Resorts') setActiveModal({ type: 'accommodation', product });
-    else if (product.type === 'Fine Dining' || product.type === 'Buffet') setActiveModal({ type: 'restaurant', product });
-    else if (product.type === 'Hiking' || product.type === 'Water Sports') setActiveModal({ type: 'activities', product });
+    if (product.type === 'Cabins' || product.type === 'Resorts') {
+      setActiveModal({ type: 'accommodation', product });
+    } else if (product.type === 'Fine Dining' || product.type === 'Buffet') {
+      setActiveModal({ type: 'restaurant', product });
+    } else if (product.type === 'Hiking' || product.type === 'Water Sports') {
+      setActiveModal({ type: 'activities', product });
+    }
   };
 
   const closeBookingModal = () => setActiveModal(null);

@@ -615,11 +615,11 @@ const BusinessProfile = () => {
                       />
                       <AiOutlineCheck
                         onClick={handleSaveName}
-                        className="cursor-pointer text-green-600 ml-2"
+                        className="cursor-pointer text-green-600 ml-2 text-md text-2xl"
                       />
                       <AiOutlineClose
                         onClick={handleCancelEdit}
-                        className="cursor-pointer text-red-600 ml-2"
+                        className="cursor-pointer text-red-600 ml-2 text-2xl"
                       />
                     </>
                   ) : (
@@ -630,7 +630,7 @@ const BusinessProfile = () => {
                       </p>
                       <AiOutlineEdit
                         onClick={handleEditName}
-                        className="cursor-pointer text-gray-600 ml-2"
+                        className="cursor-pointer text-gray-600 ml-2 text-2xl"
                       />
                     </>
                   )}
