@@ -42,6 +42,8 @@ const BusinessProfile = () => {
 
   //logo preview
   const [logoPreview, setLogoPreview] = useState('');
+  
+  //card preview
   const [previewImage, setPreviewImage] = useState(null);
   const [confirmUpload, setConfirmUpload] = useState(false);
   const [fileToUpload, setFileToUpload] = useState(null);
@@ -78,82 +80,95 @@ const BusinessProfile = () => {
     setPriceRange(businessCard.priceRange || '');
   }, [businessCard]);
 
-  // Handle updates with centralized error handling
-  const handleApiCall = async (url, method, body) => {
-    try {
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error(`Error during API call: ${error.message}`);
-      throw error; // Propagate the error for handling
-    }
-  };
-
   // Handle updating the business card
-  const handleUpdate = async () => {
+  const handleUpdate = () => {
+
     if (!cardImage || !description || !location || !priceRange) {
-      return showAlert('Error', 'Please fill in all fields for the business card.', 'error');
+      MySwal.fire({
+        title: 'Error',
+        text: 'Please fill in all fields for the business card.',
+        icon: 'error',
+        confirmButtonColor: '#0BDA51',
+      });
+      return;
     }
 
-    const updateData = { description, location, priceRange };
-    
-    try {
-      const data = await handleApiCall(`http://localhost:5000/updateBusinessDetails/${businessData.business_id}`, 'PUT', updateData);
-      if (data.success) {
-        fetchBusinessData(); // Update local state with new business details
-        dispatch(updateBusinessCard(updateData)); // Update Redux state with the new details
-        showAlert('Success', 'Business card updated successfully!', 'success');
-      }
-    } catch (error) {
-      console.error('Failed to update business details:', error);
-    }
+    const formData = new FormData();
+    formData.append('description', description);
+    formData.append('location', location);
+    formData.append('priceRange', priceRange);
+  
+    // Make an API call to update the business details
+    fetch(`http://localhost:5000/updateBusinessDetails/${businessData.business_id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        description,
+        location,
+        priceRange,
+      }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Assuming there's a function to fetch and update the business data in state
+          fetchBusinessData(); // Update local state with new business details
+          dispatch(updateBusinessCard({ description, location, priceRange })); // Update Redux state with the new details
+
+          MySwal.fire({
+            title: 'Success',
+            text: 'Business card updated successfully!',
+            icon: 'success',
+            confirmButtonColor: '#0BDA51',
+          });
+          
+        }
+      })
+      .catch(error => console.error('Error updating business details:', error));
   };
 
-  const showAlert = (title, text, icon) => {
-    MySwal.fire({
-      title,
-      text,
-      icon,
-      confirmButtonColor: '#0BDA51',
-    });
-  };
-
+  
   // Function to handle the card image upload
   const handleCardImageUpload = (event) => {
     const file = event.target.files[0];
+
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewImage(reader.result); // Set the image preview
-        setFileToUpload(file); // Save the file to upload
-        setConfirmUpload(true); // Show confirmation modal
       };
       reader.readAsDataURL(file); // Read the file as a data URL
+
+      setFileToUpload(file); // Save the file to upload
+      setConfirmUpload(true); // Show confirmation modal
     }
   };
 
-
-  const handleConfirmUpload = async () => {
+  const handleConfirmUpload = () => {
     const formData = new FormData();
     formData.append('businessCardImage', fileToUpload); // Append the file
+    formData.append('businessName', "Example Business Name"); // Append any other data
 
-    try {
-      const data = await handleApiCall(`http://localhost:5000/updateBusinessCardImage/${businessData.business_id}`, 'PUT', formData);
-      if (data.success) {
-        fetchBusinessData(); // Update local state with the URL
-        dispatch(updateBusinessCard({ cardImage: data.imageFileName })); // Update Redux state with the filename
-        setPreviewImage(null); // Clear the preview after successful upload
-      }
-    } catch (error) {
-      console.error('Error uploading image:', error);
-    } finally {
-      setConfirmUpload(false); // Close confirmation modal
-    }
+    // Make an API call to upload the image
+    fetch(`http://localhost:5000/updateBusinessCardImage/${businessData.business_id}`, {
+      method: 'PUT',
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          fetchBusinessData(); // Update local state with the URL
+          dispatch(updateBusinessCard({ cardImage: data.imageFileName })); // Update Redux state with the filename
+          setPreviewImage(null); // Clear the preview after successful upload
+          setFileToUpload(null); // Clear the file to upload
+        }
+      })
+      .catch(error => console.error('Error uploading image:', error))
+      .finally(() => {
+        setConfirmUpload(false); // Close confirmation modal
+      });
   };
 
   const handleCancelUpload = () => {
@@ -164,17 +179,9 @@ const BusinessProfile = () => {
 
   // Function to handle removing the image
   const handleRemoveCardImage = () => {
-    showAlertWithConfirmation('Are you sure?', 'This will remove the card image.', () => {
-      setCardImage(null); // Clear local state
-      dispatch(updateBusinessCard({ cardImage: null })); // Update Redux state to remove the image
-      showAlert('Removed!', 'The card image has been removed.', 'success');
-    });
-  };
-
-  const showAlertWithConfirmation = (title, text, onConfirm) => {
     MySwal.fire({
-      title,
-      text,
+      title: 'Are you sure?',
+      text: 'This will remove the card image.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#0BDA51',
@@ -182,34 +189,52 @@ const BusinessProfile = () => {
       confirmButtonText: 'Yes, remove it!',
     }).then((result) => {
       if (result.isConfirmed) {
-        onConfirm();
+        setCardImage(null); // Clear local state
+        dispatch(updateBusinessCard({ cardImage: null })); // Update Redux state to remove the image
+        MySwal.fire({
+          title: 'Removed!',
+          text: 'The card image has been removed.',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51',
+        });
       }
     });
   };
 
-  const handleLogoUpload = async (event) => {
+  const handleLogoUpload = (event) => {
     const file = event.target.files[0];
+    const businessId = businessData.business_id; // Get the business ID from your state
+  
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => setLogoPreview(e.target.result); // Update the logo preview state
-
-      reader.onloadend = async () => {
+  
+      // Set the preview once the file is read
+      reader.onload = (e) => {
+        setLogoPreview(e.target.result); // Update the logo preview state
+      };
+  
+      // Make an API call to upload the logo once the file is read
+      reader.onloadend = () => {
         const formData = new FormData();
         formData.append('businessLogo', file); // Append the logo file
-
-        try {
-          const data = await handleApiCall(`http://localhost:5000/updateBusinessLogo/${businessData.business_id}`, 'PUT', formData);
-          if (data.success) {
-            fetchBusinessData(); // Fetch the updated business data
-            dispatch(updateBusinessData({ businessLogo: data.updatedLogoPath })); // Update Redux state with the logo path
-          } else {
-            console.error('Error updating logo:', data.message);
-          }
-        } catch (error) {
-          console.error('Error uploading logo:', error);
-        }
+  
+        // Make an API call to upload the logo
+        fetch(`http://localhost:5000/updateBusinessLogo/${businessId}`, {
+          method: 'PUT',
+          body: formData,
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              fetchBusinessData(); // Fetch the updated business data
+              dispatch(updateBusinessData({ businessLogo: data.updatedLogoPath })); // Update Redux state with the logo path
+            } else {
+              console.error('Error updating logo:', data.message);
+            }
+          })
+          .catch(error => console.error('Error uploading logo:', error));
       };
-
+  
       reader.readAsDataURL(file); // Read the file as a data URL
     }
   };
@@ -223,24 +248,70 @@ const BusinessProfile = () => {
 
   // Handle removing a hero image
   const handleRemoveHeroImage = (index) => {
-    showAlertWithConfirmation('Are you sure?', 'This will remove the hero image.', () => {
-      dispatch(updateBusinessData({ heroImages: businessData.heroImages.filter((_, i) => i !== index) }));
-      showAlert('Removed!', 'The image has been removed.', 'success');
+    MySwal.fire({
+      title: 'Are you sure?',
+      text: 'This will remove the hero image.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0BDA51',
+      cancelButtonColor: '#D33736',
+      confirmButtonText: 'Yes, remove it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(updateBusinessData({ heroImages: businessData.heroImages.filter((_, i) => i !== index) }));
+        MySwal.fire({
+          title: 'Removed!',
+          text: 'The image has been removed.',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51',
+        });
+      }
     });
   };
 
   // Handle removing a contact info
   const handleRemoveContactInfo = (id) => {
-    showAlertWithConfirmation('Are you sure?', 'This will remove the contact information.', () => {
-      dispatch(removeContactInfo(id));
-      showAlert('Removed!', 'The contact information has been removed.', 'success');
+    MySwal.fire({
+      title: 'Are you sure?',
+      text: 'This will remove the contact info.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0BDA51',
+      cancelButtonColor: '#D33736',
+      confirmButtonText: 'Yes, remove it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(removeContactInfo({ id }));
+        MySwal.fire({
+          title: 'Removed!',
+          text: 'The contact info has been removed.',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51',
+        });
+      }
     });
   };
 
-  const handleRemovePolicy = (id) => {
-    showAlertWithConfirmation('Are you sure?', 'This will remove the policy.', () => {
-      dispatch(removePolicy(id));
-      showAlert('Removed!', 'The policy has been removed.', 'success');
+  // Handle removing a facility
+  const handleRemoveFacility = (index) => {
+    MySwal.fire({
+      title: 'Are you sure?',
+      text: 'This will remove the facility.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0BDA51',
+      cancelButtonColor: '#D33736',
+      confirmButtonText: 'Yes, remove it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(removeFacility({ index }));
+        MySwal.fire({
+          title: 'Removed!',
+          text: 'The facility has been removed.',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51',
+        });
+      }
     });
   };
 
@@ -264,17 +335,27 @@ const BusinessProfile = () => {
 
   // Handle saving the entire profile
   const handleSave = () => {
-    showAlertWithConfirmation(
-      'Are you sure?',
-      'Do you want to save the business profile?',
-      () => {
-        // You can implement the API call here
+    MySwal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to save the business profile?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#0BDA51',
+      cancelButtonColor: '#D33736',
+      confirmButtonText: 'Yes, save it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Implement API call or save logic
         console.log('Saving business profile...', businessData);
-        showAlert('Saved!', 'Your business profile has been saved.', 'success');
+        MySwal.fire({
+          title: 'Saved!',
+          text: 'Your business profile has been saved.',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51',
+        });
       }
-    );
+    });
   };
-
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen mx-auto bg-gray-100 font-sans">

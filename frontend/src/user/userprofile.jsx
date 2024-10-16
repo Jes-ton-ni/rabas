@@ -240,6 +240,7 @@ const UserProfile = ({ activities = [] }) => {
                 return (
                   <Button 
                   className='text-white bg-color1 hover:bg-color2'
+                  onClick={() => window.location.href = '/businessadmindashboard'}
                   key={application.application_id}>
                     <p>{application.businessName}</p>
                   </Button>
