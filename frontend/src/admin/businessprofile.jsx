@@ -208,13 +208,13 @@ const BusinessProfile = () => {
         // SweetAlert2 confirmation
         Swal.fire({
           title: 'Confirm Upload',
-          text: 'Are you sure you want to upload this image?',
-          imageUrl: previewImage,
-          imageWidth: 200,
-          imageHeight: 200,
+          text: '',
+          html: `<div style="display: flex; flex-direction: column; align-items: center;">
+                   <img src="${previewImage}" alt="Logo Preview" style="width: 600px; height: auto; border-radius: 8px; margin-top: 10px;" />
+                 </div>`, // Center the image and text
           showCancelButton: true,
-          confirmButtonText: 'Yes, upload it!',
-          cancelButtonText: 'No, cancel!',
+          confirmButtonText: 'Upload',
+          cancelButtonText: 'Cancel',
         }).then((result) => {
           if (result.isConfirmed) {
             const formData = new FormData();
@@ -311,15 +311,13 @@ const BusinessProfile = () => {
         // Show confirmation dialog with image preview using SweetAlert2
         Swal.fire({
           title: 'Confirm Upload',
-          text: "Are you sure you want to upload this logo?",
-          icon: 'warning',
+          text: "",
           html: `<div style="display: flex; flex-direction: column; align-items: center;">
                    <img src="${imageUrl}" alt="Logo Preview" style="width: 600px; height: auto; border-radius: 8px; margin-top: 10px;" />
-                   <span style="margin-top: 10px;">Are you sure you want to upload this logo?</span>
                  </div>`, // Center the image and text
           showCancelButton: true,
-          confirmButtonText: 'Yes, upload it!',
-          cancelButtonText: 'No, cancel!',
+          confirmButtonText: 'Upload',
+          cancelButtonText: 'Cancel',
         }).then((result) => {
           if (result.isConfirmed) {
             const formData = new FormData();
@@ -335,7 +333,7 @@ const BusinessProfile = () => {
                 if (data.success) {
                   fetchBusinessData(); // Fetch the updated business data
                   dispatch(updateBusinessData({ businessLogo: data.updatedLogoPath })); // Update Redux state with the logo path
-                  Swal.fire('Uploaded!', 'Your logo has been uploaded.', 'success'); // Success message
+                  Swal.fire('Uploaded!', '', 'success'); // Success message
                 } else {
                   console.error('Error updating logo:', data.message);
                   Swal.fire('Error!', data.message, 'error'); // Error message
@@ -346,7 +344,7 @@ const BusinessProfile = () => {
                 Swal.fire('Error!', 'There was an error uploading the logo.', 'error'); // General error message
               });
           } else {
-            Swal.fire('Cancelled', 'Your logo upload was cancelled.', 'info'); // Cancel message
+            // Swal.fire('Cancelled', 'Your logo upload was cancelled.', 'info'); // Cancel message
           }
         });
       };
