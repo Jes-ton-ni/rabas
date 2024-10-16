@@ -308,12 +308,58 @@ const BusinessProfile = () => {
   // Handle file upload for hero images
   const handleHeroImagesUpload = (event) => {
     const files = Array.from(event.target.files);
-    const newImages = files.map(file => URL.createObjectURL(file));
-    dispatch(updateBusinessData({ heroImages: [...businessData.heroImages, ...newImages] }));
+    
+    if (files.length === 0) return; // Exit if no files are selected
+
+    const formData = new FormData();
+
+    // Append each selected file to the formData object (use the correct field name: 'heroImages')
+    files.forEach((file) => {
+      formData.append('heroImages', file);
+    });
+
+    // Make API call to upload the hero images
+    fetch(`http://localhost:5000/updateBusinessCover/${businessData.business_id}`, {
+      method: 'PUT',
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          // Update Redux store with the new hero images
+          dispatch(updateBusinessData({ heroImages: data.updatedHeroImages }));
+
+          MySwal.fire({
+            title: 'Success',
+            text: 'Hero images updated successfully!',
+            icon: 'success',
+            confirmButtonColor: '#0BDA51',
+          });
+        } else {
+          console.error('Error updating hero images:', data.message);
+          MySwal.fire({
+            title: 'Error',
+            text: 'Failed to update hero images.',
+            icon: 'error',
+            confirmButtonColor: '#D33736',
+          });
+        }
+      })
+      .catch((error) => {
+        console.error('Error uploading hero images:', error);
+        MySwal.fire({
+          title: 'Error',
+          text: 'An error occurred while uploading hero images.',
+          icon: 'error',
+          confirmButtonColor: '#D33736',
+        });
+      });
   };
 
   // Handle removing a hero image
   const handleRemoveHeroImage = (index) => {
+    const imagePath = businessData.heroImages[index]; // Get the image path to be removed
+
     MySwal.fire({
       title: 'Are you sure?',
       text: 'This will remove the hero image.',
@@ -324,13 +370,45 @@ const BusinessProfile = () => {
       confirmButtonText: 'Yes, remove it!',
     }).then((result) => {
       if (result.isConfirmed) {
-        dispatch(updateBusinessData({ heroImages: businessData.heroImages.filter((_, i) => i !== index) }));
-        MySwal.fire({
-          title: 'Removed!',
-          text: 'The image has been removed.',
-          icon: 'success',
-          confirmButtonColor: '#0BDA51',
-        });
+        // Make DELETE request to remove the image from the backend
+        fetch(`http://localhost:5000/businessCoverPhoto/${businessData.business_id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ imagePath }), // Pass the image path to be deleted
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              // Remove the image from Redux store after successful deletion
+              dispatch(updateBusinessData({ heroImages: businessData.heroImages.filter((_, i) => i !== index) }));
+
+              MySwal.fire({
+                title: 'Removed!',
+                text: 'The image has been removed successfully.',
+                icon: 'success',
+                confirmButtonColor: '#0BDA51',
+              });
+            } else {
+              console.error('Error removing image:', data.message);
+              MySwal.fire({
+                title: 'Error',
+                text: 'Failed to remove the image.',
+                icon: 'error',
+                confirmButtonColor: '#D33736',
+              });
+            }
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+            MySwal.fire({
+              title: 'Error',
+              text: 'An error occurred while removing the image.',
+              icon: 'error',
+              confirmButtonColor: '#D33736',
+            });
+          });
       }
     });
   };
@@ -631,6 +709,7 @@ const BusinessProfile = () => {
               <CardBody>
                 <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">Cover Photo</h2>
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4'>
+                {/* Rendering the hero images with delete button */}
                 {businessData.heroImages && Array.isArray(businessData.heroImages) && businessData.heroImages.map((image, index) => (
                   <div key={index} className="relative">
                     <img 
