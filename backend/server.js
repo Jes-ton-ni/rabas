@@ -752,6 +752,29 @@ app.put('/updateBusinessLogo/:id', upload.single('businessLogo'), (req, res) => 
   });
 });
 
+// Endpoint for updating business logo
+app.put('/updateBusinessName/:id', (req, res) => {
+  const businessId = req.params.id;
+  const {businessName} = req.body;
+
+  // Update the businessName field in the businesses table
+  connection.query('UPDATE businesses SET businessName = ? WHERE business_id = ?', [businessName, businessId], (err, results) => {
+    if (err) {
+      console.error('Error updating business name:', err);
+      return res.status(500).json({ success: false, message: 'Failed to update business name' });
+    }
+
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Business not found' });
+    }
+
+    return res.json({
+      success: true,
+      message: 'Business name updated successfully'
+    });
+  });
+});
+
 // Endpoint for updating business card image
 app.put('/updateBusinessCardImage/:id', upload.single('businessCardImage'), (req, res) => {
   const businessId = req.params.id;

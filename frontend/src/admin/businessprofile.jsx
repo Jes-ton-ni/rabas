@@ -7,6 +7,7 @@ import { Tabs, Tab, Card, CardBody, Input, Button, Modal, ModalContent, ModalHea
 import { businessIcons } from '../businesspage/BusinessComponents/businessIcons';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
+import { AiOutlineEdit, AiOutlineCheck, AiOutlineClose } from "react-icons/ai";
 import {
   updateBusinessData,
   addFacility,
@@ -42,11 +43,14 @@ const BusinessProfile = () => {
 
   //logo preview
   const [logoPreview, setLogoPreview] = useState('');
-  
+
   //card preview
   const [previewImage, setPreviewImage] = useState(null);
   const [confirmUpload, setConfirmUpload] = useState(false);
   const [fileToUpload, setFileToUpload] = useState(null);
+
+  const [isEditingName, setIsEditingName] = useState(false); // Edit mode state
+  const [tempBusinessName, setTempBusinessName] = useState(businessData.businessName); // Temporary name for editing
 
   const MySwal = withReactContent(Swal);
   const fileInputRef = useRef(null);
@@ -71,6 +75,68 @@ const BusinessProfile = () => {
   useEffect(() => {
     fetchBusinessData(); // Fetch business data on component mount
   }, []);
+
+  // Fetch business data and set initial state
+  useEffect(() => {
+    setTempBusinessName(businessData.businessName);
+  }, [businessData]);
+
+  // Handle editing business name
+  const handleEditName = () => setIsEditingName(true);
+
+  // Handle saving the edited name
+  const handleSaveName = async () => {
+    if (!tempBusinessName) {
+      MySwal.fire({
+        title: 'Error',
+        text: 'Business name cannot be empty.',
+        icon: 'error',
+        confirmButtonColor: '#0BDA51',
+      });
+      return;
+    }
+
+    try {
+      // Send PUT request to update business name
+      const response = await fetch(`http://localhost:5000/updateBusinessName/${businessData.business_id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ businessName: tempBusinessName }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        dispatch(updateBusinessData({ businessName: tempBusinessName })); // Update Redux state with the new name
+        setIsEditingName(false); // Exit editing mode
+
+        MySwal.fire({
+          title: 'Success',
+          text: 'Business name updated successfully!',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51',
+        });
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      console.error('Error updating business name:', error);
+      MySwal.fire({
+        title: 'Error',
+        text: 'Failed to update business name.',
+        icon: 'error',
+        confirmButtonColor: '#0BDA51',
+      });
+    }
+  };
+
+  // Handle canceling the edit
+  const handleCancelEdit = () => {
+    setTempBusinessName(businessData.businessName); // Revert changes
+    setIsEditingName(false);
+  };
 
    // Synchronize local state with Redux state
    useEffect(() => {
@@ -409,13 +475,37 @@ const BusinessProfile = () => {
                       <FaUpload />
                     </button>
                   </div>
-                  <Input
-                    type="text"
-                    value={businessData.businessName}
-                    onChange={(e) => dispatch(updateBusinessData({ businessName: e.target.value }))}
-                    placeholder="Enter Business Name"
-                    className='text-xl lg:text-2xl font-semibold w-full'
-                  />
+                  {isEditingName ? (
+                    // Editing mode
+                    <>
+                      <Input
+                        type="text"
+                        value={tempBusinessName}
+                        onChange={(e) => setTempBusinessName(e.target.value)}
+                        placeholder="Enter Business Name"
+                        className="text-xl lg:text-2xl font-semibold w-full"
+                      />
+                      <AiOutlineCheck
+                        onClick={handleSaveName}
+                        className="cursor-pointer text-green-600 ml-2"
+                      />
+                      <AiOutlineClose
+                        onClick={handleCancelEdit}
+                        className="cursor-pointer text-red-600 ml-2"
+                      />
+                    </>
+                  ) : (
+                    // Viewing mode
+                    <>
+                      <p className="text-xl lg:text-2xl font-semibold w-full">
+                        {businessData.businessName || 'No Business Name'}
+                      </p>
+                      <AiOutlineEdit
+                        onClick={handleEditName}
+                        className="cursor-pointer text-gray-600 ml-2"
+                      />
+                    </>
+                  )}
                 </div>
 
                 <div className="mb-6 shadow-md rounded-md p-6 shadow-slate-400 ">
