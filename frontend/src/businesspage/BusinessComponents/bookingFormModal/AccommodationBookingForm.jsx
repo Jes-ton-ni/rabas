@@ -7,11 +7,10 @@ import {
   ModalFooter,
   Button,
   Input,
-  Checkbox
+  Checkbox,
+  RangeCalendar
 } from '@nextui-org/react';
-import { TimeInput } from '@nextui-org/date-input';
 import Swal from 'sweetalert2';
-import { Time } from '@internationalized/date';
 
 const AccommodationBookingForm = ({ isOpen, onClose, product }) => {
   const [formData, setFormData] = useState({
@@ -19,11 +18,11 @@ const AccommodationBookingForm = ({ isOpen, onClose, product }) => {
     lastName: '',
     email: '',
     phone: '',
-    checkInDate: '',
-    checkInTime: new Time(14, 0), // Default to 2:00 PM
-    checkOutTime: new Time(11, 0), // Default to 11:00 AM
+    checkInOutDates: null, // Storing date range
     amount: product.price,
-    agreeToTerms: false
+    agreeToTerms: false,
+    specialRequests: '',
+    numberOfGuests: 1, // Default to 1 guest
   });
   const [isPolicyModalOpen, setPolicyModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -62,22 +61,33 @@ const AccommodationBookingForm = ({ isOpen, onClose, product }) => {
     <div key="step1" className="space-y-4">
       <Input label="First Name" required fullWidth placeholder="Enter your first name" value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} />
       <Input label="Last Name" required fullWidth placeholder="Enter your last name" value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} />
+      <Input type="tel" label="Phone Number" required fullWidth placeholder="Enter your phone number" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
       <Input type="email" label="Email Address" required fullWidth placeholder="Enter your email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
     </div>,
     <div key="step2" className="space-y-4">
-      <Input type="tel" label="Phone Number" required fullWidth placeholder="Enter your phone number" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
-      <Input type="date" label="Check-in Date" required fullWidth value={formData.checkInDate} onChange={(e) => setFormData({ ...formData, checkInDate: e.target.value })} />
-      <TimeInput
-        label="Check-in Time"
-        value={formData.checkInTime}
-        onChange={(time) => setFormData({ ...formData, checkInTime: time })}
-        className="mb-4"
+      <h1 className='text-center font-medium'>Availability: Select Check-in and Check-out Dates  </h1>
+      <div className='flex justify-center'>
+      <RangeCalendar
+        aria-label="Select Check-in and Check-out Dates"
+        visibleMonths={2}
+        onChange={(dates) => setFormData({ ...formData, checkInOutDates: dates })}
       />
-      <TimeInput
-        label="Check-out Time"
-        value={formData.checkOutTime}
-        onChange={(time) => setFormData({ ...formData, checkOutTime: time })}
-        className="mb-4"
+      </div>
+        <Input
+        type="number"
+        label="Number of Guests"
+        required
+        fullWidth
+        min={1}
+        value={formData.numberOfGuests}
+        onChange={(e) => setFormData({ ...formData, numberOfGuests: e.target.value })}
+      />
+      <Input
+        label="Special Requests"
+        fullWidth
+        placeholder="Enter any special requests"
+        value={formData.specialRequests || ''}
+        onChange={(e) => setFormData({ ...formData, specialRequests: e.target.value })}
       />
     </div>,
     <div key="step3" className="space-y-4">
@@ -91,9 +101,18 @@ const AccommodationBookingForm = ({ isOpen, onClose, product }) => {
       </Checkbox>
       <div className="mt-4">
         <h3 className="text-lg font-bold">Booking Summary</h3>
-        <p><strong>Check-in Date:</strong> {formData.checkInDate}</p>
-        <p><strong>Check-in Time:</strong> {formData.checkInTime.toString()}</p>
-        <p><strong>Check-out Time:</strong> {formData.checkOutTime.toString()}</p>
+        <p><strong>First Name:</strong> {formData.firstName}</p>
+        <p><strong>Last Name:</strong> {formData.lastName}</p>
+        <p><strong>Phone Number:</strong> {formData.phone}</p>
+        <p><strong>Email Address:</strong> {formData.email}</p>
+        {formData.checkInOutDates && (
+          <>
+            <p><strong>Check-in Date:</strong> {formData.checkInOutDates.start.toString()}</p>
+            <p><strong>Check-out Date:</strong> {formData.checkInOutDates.end.toString()}</p>
+          </>
+        )}
+        <p><strong>Number of Guests:</strong> {formData.numberOfGuests}</p>
+        <p><strong>Special Requests:</strong> {formData.specialRequests || 'None'}</p>
         <p><strong>Total Amount:</strong> ₱{formData.amount}</p>
       </div>
     </div>
@@ -109,19 +128,18 @@ const AccommodationBookingForm = ({ isOpen, onClose, product }) => {
           <ModalBody className="space-y-6">
             {steps[currentStep]}
             <div className="flex justify-between mt-4">
-            <div>
-            <Button auto flat color="danger" onClick={onClose} className="mr-2">
-              Cancel
-            </Button>
-              {currentStep > 0 && <Button auto flat color='primary' onClick={prevStep}>Back</Button>}
-            </div>
+              <div>
+                <Button auto flat color="danger" onClick={onClose} className="mr-2">
+                  Cancel
+                </Button>
+                {currentStep > 0 && <Button auto flat color='primary' onClick={prevStep}>Back</Button>}
+              </div>
               {currentStep < steps.length - 1 ? (
                 <Button auto color='success' className='text-white' onClick={nextStep}>Next</Button>
               ) : (
                 <Button auto color="success" className='text-white' onClick={handleSubmit}>Submit</Button>
               )}
             </div>
-            
           </ModalBody>
         </ModalContent>
       </Modal>

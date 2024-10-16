@@ -34,7 +34,7 @@ function App() {
           <Route path='/food' element={<Food />} />
           <Route path='/shop' element={<Shop />} />
           <Route path='/business' element={<Business />} />
-          <Route path='/businessadmindashboard' element={<Dashboard />} />
+          <Route path='/businessdashboardadmin' element={<Dashboard />} />
           <Route path='/businessprofileadmin' element={<Profile />} />
           <Route path='/businessproductsadmin' element={<Product />} />
           <Route path='/businessdealsadmin' element={<Deals />} />

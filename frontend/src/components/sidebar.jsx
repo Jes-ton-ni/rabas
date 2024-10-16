@@ -15,7 +15,7 @@ const Sidebar = () => {
   const location = useLocation();
 
   const navItems = [
-    { icon: <MdDashboard className="text-2xl" />, label: 'Dashboard', path: '/businessadmindashboard' },
+    { icon: <MdDashboard className="text-2xl" />, label: 'Dashboard', path: '/businessdashboardadmin' },
     { icon: <RiProfileFill className="text-2xl" />, label: 'Business Profile', path: '/businessprofileadmin' },
     { icon: <CiBoxes className="text-2xl" />, label: 'Business Products', path: '/businessproductsadmin' },
     { icon: <IoPricetagsOutline className="text-2xl" />, label: 'Business Deals', path: '/businessdealsadmin' },
