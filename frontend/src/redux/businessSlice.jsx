@@ -1,24 +1,35 @@
 // businessSlice.js
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
 
-import { createSlice } from '@reduxjs/toolkit';
+// Async thunk to fetch initial business data
+export const fetchBusinessData = createAsyncThunk(
+  'business/fetchBusinessData',
+  async () => {
+    const response = await axios.get('http://localhost:5000/get-businessData', {
+      withCredentials: true, // Ensure cookies are sent with the request if needed
+    });
+    return response.data; // Assuming response.data contains the business data
+  }
+);
 
 const initialState = {
-  businessName: '',
-  businessLogo: null,
-  coverPhoto: null,
-  businessCard: {
-    cardImage: null,
-    category: '', 
-    location: '',
-    description: '',
-    priceRange: '',
+  businessName: '',           //updateBusinessData
+  businessLogo: null,         //updateBusinessData
+  coverPhoto: null,           //updateBusinessData
+  businessCard: {             //updateBusinessData
+    cardImage: null,          //updateBusinessData 
+    category: '',             //updateBusinessData
+    location: '',             //updateBusinessData
+    description: '',          //updateBusinessData
+    priceRange: '',           //updateBusinessData
   },
-  heroImages: [],
-  aboutUs: '',
-  facilities: [],
-  policies: [],
-  contactInfo: [],
-  openingHours: [],
+  heroImages: [],             //updateBusinessData
+  aboutUs: '',                //updateBusinessData
+  facilities: [],             //updateFacility
+  policies: [],               //updatePolicy
+  contactInfo: [],            //updateContactInfo
+  openingHours: [],           //updateBusinessData
 };
 
 const businessSlice = createSlice({

@@ -776,7 +776,7 @@ app.put('/updateBusinessLogo/:id', upload.single('businessLogo'), (req, res) => 
   });
 });
 
-// Endpoint for updating business logo
+// Endpoint for updating business name
 app.put('/updateBusinessName/:id', (req, res) => {
   const businessId = req.params.id;
   const {businessName} = req.body;
@@ -796,6 +796,87 @@ app.put('/updateBusinessName/:id', (req, res) => {
       success: true,
       message: 'Business name updated successfully'
     });
+  });
+});
+
+// Endpoint for updating business about us
+app.put('/updateBusinessAboutUs/:id', (req, res) => {
+  const businessId = req.params.id;
+  const {aboutUs} = req.body;
+
+  // Update the aboutUs field in the businesses table
+  connection.query('UPDATE businesses SET aboutUs = ? WHERE business_id = ?', [aboutUs, businessId], (err, results) => {
+    if (err) {
+      console.error('Error updating business about us:', err);
+      return res.status(500).json({ success: false, message: 'Failed to update business about us' });
+    }
+
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Business not found' });
+    }
+
+    return res.json({
+      success: true,
+      message: 'Business about us updated successfully'
+    });
+  });
+});
+
+// Assuming you already have a database connection (connection)
+app.put('/updateBusinessContactInfo/:id', (req, res) => {
+  const businessId = req.params.id;
+  const { contactInfo } = req.body; // Expecting the updated contactInfo array
+
+  if (!contactInfo || !Array.isArray(contactInfo)) {
+    return res.status(400).json({ success: false, message: 'Invalid contact information format' });
+  }
+
+  // Update the contactInfo JSON in the database
+  connection.query(
+    'UPDATE businesses SET contactInfo = ? WHERE business_id = ?',
+    [JSON.stringify(contactInfo), businessId],
+    (err, results) => {
+      if (err) {
+        console.error('Error updating contact info:', err);
+        return res.status(500).json({ success: false, message: 'Failed to update contact information' });
+      }
+
+      return res.json({
+        success: true,
+        message: 'Contact information updated successfully',
+        updatedContactInfo: contactInfo, // Return the updated contact info
+      });
+    }
+  );
+});
+
+// Endpoint for updating business openingHours
+app.put('/update-opening-hours', (req, res) => {
+  const userId = req.session?.user?.user_id;
+  const openingHours = req.body.openingHours; // Expecting an array of opening hours
+
+  if (!userId) {
+    return res.status(400).json({ success: false, message: 'User not logged in or user ID missing' });
+  }
+
+  if (!Array.isArray(openingHours)) {
+    return res.status(400).json({ success: false, message: 'Invalid opening hours format' });
+  }
+
+  // Update opening hours in the database (Assuming you have a business ID to update)
+  const sql = `UPDATE businesses SET openingHours = ? WHERE user_id = ?`; // Adjust this to your actual column name
+
+  connection.query(sql, [JSON.stringify(openingHours), userId], (err, results) => {
+    if (err) {
+      console.error('Error executing SQL query:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    if (results.affectedRows > 0) {
+      return res.json({ success: true, message: 'Opening hours updated successfully' });
+    } else {
+      return res.status(404).json({ success: false, message: 'Business not found or no changes made' });
+    }
   });
 });
 

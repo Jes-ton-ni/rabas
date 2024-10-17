@@ -24,7 +24,8 @@ import {
   updateContactInfo,
   removeContactInfo,
   updateContactIcon,
-  updateBusinessCard 
+  updateBusinessCard, 
+  fetchBusinessData
 } from '../redux/businessSlice';
 
 const BusinessProfile = () => {
@@ -41,14 +42,14 @@ const BusinessProfile = () => {
   const [location, setLocation] = useState(businessCard.location);
   const [priceRange, setPriceRange] = useState(businessCard.priceRange);
 
-  //card preview
-  const [previewImage, setPreviewImage] = useState(null);
-  const [confirmUpload, setConfirmUpload] = useState(false);
-
-  const [fileToUpload, setFileToUpload] = useState(null);
-
   const [isEditingName, setIsEditingName] = useState(false); // Edit mode state
   const [tempBusinessName, setTempBusinessName] = useState(businessData.businessName); // Temporary name for editing
+
+  const [isEditingAboutUs, setIsEditingAboutUs] = useState(false);
+  const [tempAboutUs, setTempAboutUs] = useState(businessData.aboutUs);
+
+  const [isEditingHours, setIsEditingHours] = useState(false);
+  const [tempOpeningHours, setTempOpeningHours] = useState(businessData.openingHours);
 
   const MySwal = withReactContent(Swal);
   const fileInputRef = useRef(null);
@@ -134,6 +135,62 @@ const BusinessProfile = () => {
   const handleCancelEdit = () => {
     setTempBusinessName(businessData.businessName); // Revert changes
     setIsEditingName(false);
+  };
+
+  // Handle editing business name
+  const handleEditAboutUs = () => setIsEditingAboutUs(true);
+
+  // Handle saving the edited about us
+  const handleSaveAboutUs = async () => {
+    if (!tempAboutUs) {
+      MySwal.fire({
+        title: 'Error',
+        text: 'Field cannot be empty.',
+        icon: 'error',
+        confirmButtonColor: '#0BDA51',
+      });
+      return;
+    }
+
+    try {
+      // Send PUT request to update business name
+      const response = await fetch(`http://localhost:5000/updateBusinessAboutUs/${businessData.business_id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ aboutUs: tempAboutUs }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        dispatch(updateBusinessData({ aboutUs: tempAboutUs })); // Update Redux state with the new about us
+        setIsEditingAboutUs(false); // Exit editing mode
+
+        MySwal.fire({
+          title: 'Success',
+          text: 'About Us updated successfully!',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51',
+        });
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      console.error('Error updating about us:', error);
+      MySwal.fire({
+        title: 'Error',
+        text: 'Failed to update about us.',
+        icon: 'error',
+        confirmButtonColor: '#0BDA51',
+      });
+    }
+  };
+
+  const handleCancelEditAboutUs = () => {
+    setTempAboutUs(businessData.aboutUs);
+    setIsEditingAboutUs(false);
   };
 
    // Synchronize local state with Redux state
@@ -461,6 +518,40 @@ const BusinessProfile = () => {
     });
   };
 
+  const handleSaveContact = async () => {
+    try {
+      // Send PUT request to update contact info in the backend
+      const response = await fetch(`http://localhost:5000/updateBusinessContactInfo/${businessData.business_id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ contactInfo: businessData.contactInfo }), // Pass the updated contact info array
+      });
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        MySwal.fire({
+          title: 'Success',
+          text: 'Contact information updated successfully!',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51',
+        });
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      console.error('Error updating contact info:', error);
+      MySwal.fire({
+        title: 'Error',
+        text: 'Failed to update contact information.',
+        icon: 'error',
+        confirmButtonColor: '#0BDA51',
+      });
+    }
+  };  
+
   // Handle removing a contact info
   const handleRemoveContactInfo = (id) => {
     MySwal.fire({
@@ -482,6 +573,71 @@ const BusinessProfile = () => {
         });
       }
     });
+  };
+
+  const handleEditHours = () => {
+    setIsEditingHours(true);
+    setTempOpeningHours(businessData.openingHours.map(hours => ({ ...hours }))); // Create a copy of the hours
+  };
+  
+  const handleSaveHours = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/update-opening-hours', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ openingHours: tempOpeningHours }), // Send updated hours
+      });
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        // Optionally update your Redux state here with new data
+        dispatch(updateBusinessData({ openingHours: tempOpeningHours }));
+  
+        // Show success alert
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'Opening hours saved successfully.',
+          confirmButtonText: 'Okay',
+        });
+  
+        // Exit editing mode
+        setIsEditingHours(false);
+      } else {
+        console.error('Error saving opening hours:', data.message);
+        // Show error alert
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: data.message || 'Failed to save opening hours.',
+          confirmButtonText: 'Okay',
+        });
+      }
+    } catch (error) {
+      console.error('Error while saving opening hours:', error);
+      // Show error alert
+      Swal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: 'An error occurred while saving opening hours.',
+        confirmButtonText: 'Okay',
+      });
+    }
+  };
+  
+  const handleCancelEditHours = () => {
+    setIsEditingHours(false);
+    setTempOpeningHours(businessData.openingHours); // Reset to original
+  };
+
+  const handleTimeChange = (index, field, value) => {
+    setTempOpeningHours(prevHours => 
+      prevHours.map((hours, i) => i === index ? { ...hours, [field]: value } : hours)
+    );
   };
 
   // Handle removing a facility
@@ -782,15 +938,46 @@ const BusinessProfile = () => {
             <Card>
               <CardBody className='overflow-x-auto'>
                 <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">About Us</h2>
-                <textarea
-                  value={businessData.aboutUs}
-                  onChange={(e) => dispatch(updateBusinessData({ aboutUs: e.target.value }))}
-                  placeholder="Enter information about your business"
-                  className="w-full p-2 border border-gray-300 rounded-lg mb-4"
-                />
-
-                <h3 className="text-md lg:text-lg font-semibold mt-4 mb-2">Contact Information</h3>
-                {businessData.contactInfo && Array.isArray(businessData.contactInfo) && businessData.contactInfo.map((info) => (
+                <div className='flex flex-col lg:flex-row items-center mb-6 shadow-lg p-3 rounded-sm shadow-slate-400'>
+                  {isEditingAboutUs ? (
+                    <>
+                      <textarea
+                        value={tempAboutUs}
+                        onChange={(e) => setTempAboutUs(e.target.value)}
+                        placeholder="Enter information about your business"
+                        className="w-full p-2 border border-gray-300 rounded-lg mb-4"
+                      />
+                      <AiOutlineCheck
+                        onClick={handleSaveAboutUs}
+                        className="cursor-pointer text-green-600 ml-2 text-md text-2xl"
+                      />
+                      <AiOutlineClose
+                        onClick={handleCancelEditAboutUs}
+                        className="cursor-pointer text-red-600 ml-2 text-2xl"
+                      />
+                    </>
+                  ) : (
+                    // Viewing mode
+                    <>
+                      <p className="w-full p-2 border border-gray-300 rounded-lg mb-4">
+                        {businessData.aboutUs || 'No information provided'}
+                      </p>
+                      <AiOutlineEdit
+                        onClick={handleEditAboutUs}
+                        className="cursor-pointer text-gray-600 ml-2 text-2xl"
+                      />
+                    </>
+                  )}
+                </div>
+                
+                <h3 className="text-md lg:text-lg font-semibold mt-4 mb-2 flex items-center justify-between">
+                  <span>Contact Information</span>
+                  <AiOutlineCheck
+                    onClick={handleSaveContact}
+                    className="cursor-pointer text-green-600 mr-2 text-2xl"
+                  />
+                </h3>
+                  {businessData.contactInfo && Array.isArray(businessData.contactInfo) && businessData.contactInfo.map((info) => (
                   <div key={info.id} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
                     <Button onClick={() => openIconModal(`contact-${info.id}`)} className="min-w-[40px] h-[40px] p-0">
                       {React.createElement(businessIcons.find(icon => icon.name === info.icon)?.icon || FaPlus, { size: 20 })}
@@ -798,14 +985,14 @@ const BusinessProfile = () => {
                     <Input
                       type="text"
                       value={info.label}
-                      onChange={(e) => dispatch(updateContactInfo({ id: info.id, field: 'label', value: e.target.value }))}
+                      onChange={(e) => dispatch(updateContactInfo({ id: info.id, field: 'label', value: e.target.value }))} // Update label
                       placeholder="Label (e.g. Email, Phone, Facebook)"
                       className='flex-grow'
                     />
                     <Input
                       type="text"
                       value={info.value}
-                      onChange={(e) => dispatch(updateContactInfo({ id: info.id, field: 'value', value: e.target.value }))}
+                      onChange={(e) => dispatch(updateContactInfo({ id: info.id, field: 'value', value: e.target.value }))} // Update value
                       placeholder="Url if needed"
                       className='flex-grow'
                     />
@@ -814,54 +1001,103 @@ const BusinessProfile = () => {
                     </Button>
                   </div>
                 ))}
-
-                <Button onClick={() => dispatch(addContactInfo())} className="mt-2 bg-color1 text-white hover:bg-color2 transition">Add Contact Info</Button>
-
-                <h3 className="text-md lg:text-lg font-semibold mt-4 mb-2">Opening Hours</h3>
-                {businessData.openingHours && Array.isArray(businessData.openingHours) && businessData.openingHours.map((hours, index) => (
-                  <div key={index} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
-                    <Input
-                      type="text"
-                      value={hours.day}
-                      readOnly
-                      className='w-full lg:w-1/4'
+               
+                <Button onClick={() => dispatch(addContactInfo())} className="mt-2 bg-color1 text-white hover:bg-color2 transition">
+                  Add Contact Info
+                </Button>
+                
+                <h3 className="text-md lg:text-lg font-semibold mt-4 mb-2 flex items-center justify-between">
+                  <span>Opening Hours</span>
+                  {!isEditingHours && (
+                    <AiOutlineEdit
+                      onClick={handleEditHours}
+                      className="cursor-pointer text-gray-600 ml-2 text-2xl"
                     />
+                  )}
+                  {isEditingHours && (
+                    <div className="flex items-center">
+                      <AiOutlineCheck
+                        onClick={handleSaveHours}
+                        className="cursor-pointer text-green-600 mr-2 text-2xl"
+                      />
+                      <AiOutlineClose
+                        onClick={handleCancelEditHours}
+                        className="cursor-pointer text-red-600 text-2xl"
+                      />
+                    </div>
+                  )}
+                </h3>
 
-                    {/* Time inputs are enabled/disabled based on switch */}
-                    <Input
-                      type="time"
-                      value={hours.open}
-                      onChange={(e) => dispatch(updateBusinessData({
-                        openingHours: businessData.openingHours.map((h, i) => i === index ? { ...h, open: e.target.value } : h)
-                      }))}
-                      disabled={hours.open === "Closed"}
-                      className='w-full lg:w-1/4'
-                    />
+                {isEditingHours ? (
+                  tempOpeningHours.map((hours, index) => (
+                    <div key={index} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
+                      <Input
+                        type="text"
+                        value={hours.day}
+                        readOnly
+                        className='w-full lg:w-1/4'
+                      />
 
-                    <Input
-                      type="time"
-                      value={hours.close}
-                      onChange={(e) => dispatch(updateBusinessData({
-                        openingHours: businessData.openingHours.map((h, i) => i === index ? { ...h, close: e.target.value } : h)
-                      }))}
-                      disabled={hours.close === "Closed"}
-                      className='w-full lg:w-1/4'
-                    />
+                      <Input
+                        type="time"
+                        value={hours.open}
+                        onChange={(e) => handleTimeChange(index, 'open', e.target.value)}
+                        disabled={hours.open === "Closed"}
+                        className='w-full lg:w-1/4'
+                      />
 
-                    {/* Toggle switch to set day open or closed */}
-                    <Switch
-                      color='success'
-                      isSelected={hours.open !== "Closed"}
-                      onChange={(e) => dispatch(updateBusinessData({
-                        openingHours: businessData.openingHours.map((h, i) => 
-                          i === index ? { ...h, open: e.target.checked ? "08:00" : "Closed", close: e.target.checked ? "17:00" : "Closed" } : h
-                        )
-                      }))}
-                    >
-                      <span className='font-semibold text-md'>{hours.open === "Closed" ? "Closed" : "Open"}</span>
-                    </Switch>
-                  </div>
-                ))}
+                      <Input
+                        type="time"
+                        value={hours.close}
+                        onChange={(e) => handleTimeChange(index, 'close', e.target.value)}
+                        disabled={hours.close === "Closed"}
+                        className='w-full lg:w-1/4'
+                      />
+
+                      <Switch
+                        color='success'
+                        isSelected={hours.open !== "Closed"}
+                        onChange={(e) => {
+                          const newOpenTime = e.target.checked ? "08:00" : "Closed";
+                          const newCloseTime = e.target.checked ? "17:00" : "Closed";
+                          handleTimeChange(index, 'open', newOpenTime);
+                          handleTimeChange(index, 'close', newCloseTime);
+                        }}
+                      >
+                        <span className='font-semibold text-md'>{hours.open === "Closed" ? "Closed" : "Open"}</span>
+                      </Switch>
+                    </div>
+                  ))
+                ) : (
+                  <>
+                    {businessData.openingHours && Array.isArray(businessData.openingHours) && businessData.openingHours.map((hours, index) => (
+                      <div key={index} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
+                        <Input
+                          type="text"
+                          value={hours.day}
+                          readOnly
+                          className='w-full lg:w-1/4'
+                        />
+
+                        <Input
+                          type="time"
+                          value={hours.open}
+                          readOnly
+                          className='w-full lg:w-1/4'
+                        />
+
+                        <Input
+                          type="time"
+                          value={hours.close}
+                          readOnly
+                          className='w-full lg:w-1/4'
+                        />
+
+                        <span className='font-semibold text-md'>{hours.open === "Closed" ? "Closed" : "Open"}</span>
+                      </div>
+                    ))}
+                  </>
+                )}
               </CardBody>
             </Card>
           </Tab>
