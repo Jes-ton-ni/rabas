@@ -113,8 +113,13 @@ const businessSlice = createSlice({
     },
     removePolicyItem: (state, action) => {
       const { policyIndex, itemIndex } = action.payload || {};
-      if (policyIndex === undefined || itemIndex === undefined) {
-        console.error('Invalid payload for removePolicyItem:', action.payload);
+      if (
+        policyIndex === undefined || 
+        itemIndex === undefined || 
+        !state.policies[policyIndex] || 
+        !state.policies[policyIndex].items[itemIndex]
+      ) {
+        console.error('Invalid payload or indices for removePolicyItem:', action.payload);
         return;
       }
       state.policies[policyIndex].items.splice(itemIndex, 1);
