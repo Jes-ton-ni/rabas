@@ -773,6 +773,16 @@ const BusinessProfile = () => {
     });
   };
 
+  // Example of dispatching removePolicy
+  const handleRemovePolicy = (policyIndex) => {
+    dispatch(removePolicy({ policyIndex }));
+  };
+
+  // Example of dispatching removePolicyItem
+  const handleRemovePolicyItem = (policyIndex, itemIndex) => {
+    dispatch(removePolicyItem({ policyIndex, itemIndex }));
+  };
+
   return (
     <div className="flex flex-col lg:flex-row min-h-screen mx-auto bg-gray-100 font-sans">
       <Sidebar />
@@ -1223,13 +1233,13 @@ const BusinessProfile = () => {
                           placeholder="Policy item"
                           className='flex-grow'
                         />
-                        <Button onClick={() => dispatch(removePolicyItem({ policyIndex, itemIndex }))} className="bg-red-500 text-white p-2">
+                        <Button onClick={() => handleRemovePolicyItem(policyIndex, itemIndex)} className="bg-red-500 text-white p-2">
                           <FaTrash size={16} />
                         </Button>
                       </div>
                     ))}
                     <Button onClick={() => dispatch(addPolicyItem({ policyIndex }))} className="mr-2">Add Item</Button>
-                    <Button onClick={() => dispatch(removePolicy({ policyIndex }))} className="bg-red-500 text-white">Remove Policy</Button>
+                    <Button onClick={() => handleRemovePolicy(policyIndex)} className="bg-red-500 text-white">Remove Policy</Button>
                   </div>
                 ))}
                 <Button onClick={() => dispatch(addPolicy())} className="mt-2 bg-color1 text-white hover:bg-color2 transition">Add Policy</Button>
