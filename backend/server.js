@@ -822,7 +822,7 @@ app.put('/updateBusinessAboutUs/:id', (req, res) => {
   });
 });
 
-// Assuming you already have a database connection (connection)
+// Endpoint for updating Contacts
 app.put('/updateBusinessContactInfo/:id', (req, res) => {
   const businessId = req.params.id;
   const { contactInfo } = req.body; // Expecting the updated contactInfo array
@@ -845,6 +845,62 @@ app.put('/updateBusinessContactInfo/:id', (req, res) => {
         success: true,
         message: 'Contact information updated successfully',
         updatedContactInfo: contactInfo, // Return the updated contact info
+      });
+    }
+  );
+});
+
+// Endpoint for updating Facilities
+app.put('/updateBusinessFacilities/:id', (req, res) => {
+  const businessId = req.params.id;
+  const { facilities } = req.body; // Expecting an array of facilities
+
+  if (!facilities ||!Array.isArray(facilities)) {
+    return res.status(400).json({ success: false, message: 'Invalid facilities format' });
+  }
+
+  // Update the facilities JSON in the database
+  connection.query(
+    'UPDATE businesses SET facilities = ? WHERE business_id = ?',
+    [JSON.stringify(facilities), businessId],
+    (err, results) => {
+      if (err) {
+        console.error('Error updating facilities:', err);
+        return res.status(500).json({ success: false, message: 'Failed to update facilities' });
+      }
+
+      return res.json({
+        success: true,
+        message: 'Facilities updated successfully',
+        updatedFacilities: facilities, // Return the updated facilities
+      });
+    }
+  );
+});
+
+// Endpoint for updating business policies
+app.put('/updateBusinessPolicies/:id', (req, res) => {
+  const businessId = req.params.id;
+  const { policies } = req.body; // Expecting an array of policies
+
+  if (!policies || !Array.isArray(policies)) {
+    return res.status(400).json({ success: false, message: 'Invalid policies format' });
+  }
+
+  // Update the policies JSON in the database
+  connection.query(
+    'UPDATE businesses SET policies = ? WHERE business_id = ?',
+    [JSON.stringify(policies), businessId],
+    (err, results) => {
+      if (err) {
+        console.error('Error updating policies:', err);
+        return res.status(500).json({ success: false, message: 'Failed to update policies' });
+      }
+
+      return res.json({
+        success: true,
+        message: 'Policies updated successfully',
+        updatedPolicies: policies, // Return the updated policies
       });
     }
   );

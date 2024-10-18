@@ -1,4 +1,3 @@
-// businessSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
@@ -9,27 +8,27 @@ export const fetchBusinessData = createAsyncThunk(
     const response = await axios.get('http://localhost:5000/get-businessData', {
       withCredentials: true, // Ensure cookies are sent with the request if needed
     });
-    return response.data; // Assuming response.data contains the business data
+    return response.data.businessData[0]; // Return the first business object
   }
 );
 
 const initialState = {
-  businessName: '',           //updateBusinessData
-  businessLogo: null,         //updateBusinessData
-  coverPhoto: null,           //updateBusinessData
-  businessCard: {             //updateBusinessData
-    cardImage: null,          //updateBusinessData 
-    category: '',             //updateBusinessData
-    location: '',             //updateBusinessData
-    description: '',          //updateBusinessData
-    priceRange: '',           //updateBusinessData
+  businessName: '',           // Update business name
+  businessLogo: null,         // Update business logo
+  coverPhoto: null,           // Update cover photo
+  businessCard: {             // Update business card details
+    cardImage: null,          // Update card image 
+    category: '',             // Update category
+    location: '',             // Update location
+    description: '',          // Update description
+    priceRange: '',           // Update price range
   },
-  heroImages: [],             //updateBusinessData
-  aboutUs: '',                //updateBusinessData
-  facilities: [],             //updateFacility
-  policies: [],               //updatePolicy
-  contactInfo: [],            //updateContactInfo
-  openingHours: [],           //updateBusinessData
+  heroImages: [],             // Update hero images
+  aboutUs: '',                // Update about us section
+  facilities: [],             // Update facilities
+  policies: [],               // Update policies
+  contactInfo: [],            // Update contact info
+  openingHours: [],           // Update opening hours
 };
 
 const businessSlice = createSlice({
@@ -39,12 +38,10 @@ const businessSlice = createSlice({
     // General business data update
     updateBusinessData: (state, action) => {
       Object.assign(state, action.payload);
-      // console.log("Opening Hours:", state.openingHours);
     },
 
     // Facilities-related reducers
     addFacility: (state) => {
-      // ENsure falities is an array before pushing new data
       if (!state.facilities) {
         state.facilities = [];
       }
@@ -77,7 +74,6 @@ const businessSlice = createSlice({
 
     // Policies-related reducers
     addPolicy: (state) => {
-      // Ensure policies is an array before pushing new data
       if (!state.policies) {
         state.policies = [];
       }
@@ -126,7 +122,6 @@ const businessSlice = createSlice({
 
     // Contact Info reducers
     addContactInfo: (state) => {
-      // Ensure contactInfo is an array before pushing new data
       if (!state.contactInfo) {
         state.contactInfo = [];
       }
@@ -150,6 +145,10 @@ const businessSlice = createSlice({
       }
       state.contactInfo = state.contactInfo.filter(info => info.id !== id);
     },
+    cancelContactInfo: (state) => {
+      // Reset the contactInfo to the initial state
+      state.contactInfo = initialState.contactInfo;
+    },
     updateContactIcon: (state, action) => {
       const { id, icon } = action.payload || {};
       if (!id || !icon) {
@@ -168,8 +167,39 @@ const businessSlice = createSlice({
       if (priceRange !== undefined) state.businessCard.priceRange = priceRange;
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchBusinessData.fulfilled, (state, action) => {
+        const fetchedData = action.payload; // This is the single business object
+
+        // Log the fetched data
+        console.log('Fetched Business Data:', fetchedData);
+
+        // Update the state with fetched data
+        state.businessName = fetchedData.businessName;
+        state.businessLogo = fetchedData.businessLogo;
+        state.coverPhoto = fetchedData.coverPhoto || null;
+        state.businessCard = {
+          cardImage: fetchedData.businessCard.cardImage,
+          category: fetchedData.businessCard.category,
+          location: fetchedData.businessCard.location,
+          description: fetchedData.businessCard.description,
+          priceRange: fetchedData.businessCard.priceRange,
+        };
+        state.heroImages = fetchedData.heroImages || [];
+        state.aboutUs = fetchedData.aboutUs;
+        state.facilities = fetchedData.facilities || [];
+        state.policies = fetchedData.policies || [];
+        state.contactInfo = fetchedData.contactInfo || [];
+        state.openingHours = fetchedData.openingHours || [];
+      })
+      .addCase(fetchBusinessData.rejected, (state, action) => {
+        console.error('Failed to fetch business data:', action.error.message);
+      });
+  },
 });
 
+// Export actions and reducer
 export const {
   updateBusinessData,
   addFacility,
@@ -185,6 +215,7 @@ export const {
   addContactInfo,
   updateContactInfo,
   removeContactInfo,
+  cancelContactInfo,
   updateContactIcon,
   updateBusinessCard,
 } = businessSlice.actions;

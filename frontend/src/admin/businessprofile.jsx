@@ -640,6 +640,39 @@ const BusinessProfile = () => {
     );
   };
 
+  const handleSaveFacilities = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/updateBusinessFacilities/${businessData.business_id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ facilities: businessData.facilities }), // Pass the updated facilities array
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        MySwal.fire({
+          title: 'Success',
+          text: 'Facilities updated successfully!',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51',
+        });
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      console.error('Error updating facilities:', error);
+      MySwal.fire({
+        title: 'Error',
+        text: 'Failed to update facilities.',
+        icon: 'error',
+        confirmButtonColor: '#0BDA51',
+      });
+    }
+  };
+
   // Handle removing a facility
   const handleRemoveFacility = (index) => {
     MySwal.fire({
@@ -662,6 +695,41 @@ const BusinessProfile = () => {
       }
     });
   };
+
+  // Function to handle saving policies
+  const handleSavePolicies = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/updateBusinessPolicies/${businessData.business_id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ policies: businessData.policies }), // Pass the updated policies array
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        MySwal.fire({
+          title: 'Success',
+          text: 'Policies updated successfully!',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51',
+        });
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      console.error('Error updating policies:', error);
+      MySwal.fire({
+        title: 'Error',
+        text: 'Failed to update policies.',
+        icon: 'error',
+        confirmButtonColor: '#0BDA51',
+      });
+    }
+  };
+
 
   // Handle opening the icon picker modal
   const openIconModal = (field) => {
@@ -1128,6 +1196,9 @@ const BusinessProfile = () => {
               </CardBody>
             </Card>
             <Button onClick={() => dispatch(addFacility())} className="mt-2 bg-color1 text-white hover:bg-color2 transition">Add Facility</Button>
+            <Button onClick={() => handleSaveFacilities()} className="mt-2 bg-color1 text-white hover:bg-color2 transition">
+              Save
+            </Button>
           </Tab>
 
           <Tab key="policies" title="Policies">
@@ -1162,6 +1233,9 @@ const BusinessProfile = () => {
                   </div>
                 ))}
                 <Button onClick={() => dispatch(addPolicy())} className="mt-2 bg-color1 text-white hover:bg-color2 transition">Add Policy</Button>
+                <Button onClick={() => handleSavePolicies()} className="mt-2 bg-color1 text-white hover:bg-color2 transition">
+                  Save
+                </Button>
               </CardBody>
             </Card>
           </Tab>
