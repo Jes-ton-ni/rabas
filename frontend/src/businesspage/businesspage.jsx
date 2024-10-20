@@ -11,6 +11,7 @@ import { Button } from '@nextui-org/react';
 import { IoStar, IoStarHalf, IoStarOutline } from "react-icons/io5";
 import Section from './BusinessComponents/BusinessSectionDeals';
 import Allproducts from '../businesspage/BusinessComponents/BusinessAllproducts';
+import { PiChatCircleText } from "react-icons/pi";
 
 const BusinessPage = () => {
   const businessData = useSelector((state) => state.business);
@@ -78,10 +79,18 @@ const BusinessPage = () => {
       <div>
         <Info/>
       </div>
-    
+     
       <div><Section/></div>
    
       <div><Allproducts/></div>
+
+       {/* Floating chat button */}
+       <button
+          className="fixed bottom-4 right-4 bg-color1 text-white p-4 rounded-full shadow-lg hover:bg-color2 focus:outline-none z-50"
+         
+        >
+          <PiChatCircleText size={30} />
+        </button>
       
       <Footer/>
     </div>

@@ -12,14 +12,14 @@ import {
 } from '@nextui-org/react';
 import Swal from 'sweetalert2';
 
-const AccommodationBookingForm = ({ isOpen, onClose, product }) => {
+const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
     checkInOutDates: null, // Storing date range
-    amount: product.price,
+    amount: product.price || 0, // Default to 0 if product.price is undefined
     agreeToTerms: false,
     specialRequests: '',
     numberOfGuests: 1, // Default to 1 guest

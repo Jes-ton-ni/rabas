@@ -392,12 +392,12 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
 
   return (
 <Modal  
-  size="2xl"  
+  size="xl"  
   isOpen={isBusinessOpen}  
   hideCloseButton={true}  
   aria-labelledby="modal-title"  
 >  
-  <ModalContent className="w-full h-full sm:max-w-md md:max-w-lg lg:max-w-2xl max-h-screen overflow-auto flex justify-centere">  
+  <ModalContent className=" sm:max-w-md md:max-w-lg lg:max-w-2xl overflow-auto flex justify-center">  
     <ModalHeader className="flex justify-between items-center">  
       <h2 id="modal-title" className="text-2xl font-bold">  
         Apply for Business Account  

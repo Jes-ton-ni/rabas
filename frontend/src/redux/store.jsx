@@ -8,6 +8,9 @@ import activityDealsReducer from './activityDealsSlice';
 import accommodationDealsReducer from './accommodationDealsSlice'
 import restaurantDealsReducer from './restaurantDealsSlice'
 import shopDealsReducer from './shopDealsSlice'
+import bookingsReducer from './bookingSlice';
+
+
 
 
 
@@ -23,10 +26,10 @@ const store = configureStore({
     accommodationDeals: accommodationDealsReducer,
     restaurantDeals: restaurantDealsReducer, 
     shopDeals: shopDealsReducer,
-
-
+    bookings: bookingsReducer,
   
   },
+
 });
 
 export default store;

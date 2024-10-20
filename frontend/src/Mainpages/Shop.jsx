@@ -9,6 +9,7 @@ import { Button } from "@nextui-org/react";
 import { Checkbox, CheckboxGroup, Select, SelectItem, Slider } from "@nextui-org/react";
 import { GiPositionMarker } from "react-icons/gi";
 import { Link } from 'react-router-dom';
+import { PiChatCircleText } from 'react-icons/pi';
 
 
 const Shop = () => {
@@ -324,6 +325,13 @@ const Shop = () => {
                     </div>
                 </div>
             </div>
+                   {/* Floating chat button */}
+       <button
+          className="fixed bottom-4 right-4 bg-color1 text-white p-4 rounded-full shadow-lg hover:bg-color2 focus:outline-none z-50"
+         
+        >
+          <PiChatCircleText size={30} />
+        </button>
 
             <Footer />
 

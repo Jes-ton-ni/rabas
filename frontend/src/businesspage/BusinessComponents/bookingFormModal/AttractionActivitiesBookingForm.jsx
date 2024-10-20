@@ -14,7 +14,7 @@ import Swal from 'sweetalert2';
 import { today, isWeekend, getLocalTimeZone } from '@internationalized/date';
 import { useLocale } from '@react-aria/i18n';
 
-const AttractionActivitiesBookingForm = ({ isOpen, onClose, product }) => {
+const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -22,7 +22,7 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product }) => {
     phone: '',
     visitDate: null, // Change to store a single date
     activityTime: '10:00', // Default to 10:00 AM
-    amount: product.price,
+    amount: product.price || 0, // Default to 0 if product.price is undefined
     agreeToTerms: false,
     specialRequests: '',
     numberOfGuests: 1, // Default to 1 guest

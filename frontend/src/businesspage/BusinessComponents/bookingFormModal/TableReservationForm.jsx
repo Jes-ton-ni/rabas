@@ -14,7 +14,7 @@ import Swal from 'sweetalert2';
 import { today, isWeekend, getLocalTimeZone } from '@internationalized/date';
 import { useLocale } from '@react-aria/i18n';
 
-const TableReservationForm = ({ isOpen, onClose, product }) => {
+const TableReservationForm = ({ isOpen, onClose, product = {} }) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -22,7 +22,7 @@ const TableReservationForm = ({ isOpen, onClose, product }) => {
     phone: '',
     reservationDate: null, // Change to store a single date
     reservationTime: '18:00', // Default to 6:00 PM
-    amount: product.price,
+    amount: product.price || 0, // Default to 0 if product.price is undefined
     agreeToTerms: false,
     specialRequests: '',
     numberOfGuests: 1, // Default to 1 guest
