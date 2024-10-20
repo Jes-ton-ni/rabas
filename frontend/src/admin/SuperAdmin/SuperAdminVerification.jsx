@@ -44,6 +44,33 @@ const VerificationTable = ({ data, title, onUpdateStatus }) => {
     onOpen();
   };
 
+  const updateStatus = async (item, newStatus) => {
+    try {
+      const response = await fetch(`http://localhost:5000/updateStatus-businessApplications/${item.application_id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }), // Send status as 1 for Approved
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        // Handle success, maybe update the UI or state
+        console.log('Status updated:', data.message);
+        return true; // Signal that the update was successful
+      } else {
+        // Handle error from the server
+        console.error('Error updating status:', data.message);
+        return false;
+      }
+    } catch (error) {
+      console.error('Error sending request:', error);
+      return false;
+    }
+  };
+
   const handleApprove = (item) => {
     Swal.fire({
       title: 'Are you sure?',
@@ -53,15 +80,25 @@ const VerificationTable = ({ data, title, onUpdateStatus }) => {
       confirmButtonColor: '#28a745',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, approve it!',
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        Swal.fire({
-          title: 'Approved!',
-          text: 'The application has been approved.',
-          icon: 'success',
-          confirmButtonColor: '#0BDA51',
-        });
-        onUpdateStatus(item, 'Approved');
+        const updateSuccessful = await updateStatus(item, 1); // Send to API server
+        if (updateSuccessful) {
+          Swal.fire({
+            title: 'Approved!',
+            text: 'The application has been approved.',
+            icon: 'success',
+            confirmButtonColor: '#0BDA51',
+          });
+          onUpdateStatus(item, 'Approved'); // Update the UI or state
+        } else {
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to update the status. Please try again later.',
+            icon: 'error',
+            confirmButtonColor: '#d33',
+          });
+        }
       }
     });
   };
@@ -75,20 +112,28 @@ const VerificationTable = ({ data, title, onUpdateStatus }) => {
       confirmButtonColor: '#28a745',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, reject it!',
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        Swal.fire({
-    title: 'Rejected!',
-    text: 'The application has been rejected.',
-    icon: 'success',
-    confirmButtonColor: '#0BDA51',
-  });
-
-        
-        onUpdateStatus(item, 'Rejected');
+        const updateSuccessful = await updateStatus(item, -1); // Send to API server
+        if (updateSuccessful) {
+          Swal.fire({
+            title: 'Rejected!',
+            text: 'The application has been rejected.',
+            icon: 'success',
+            confirmButtonColor: '#0BDA51',
+          });
+          onUpdateStatus(item, 'Rejected'); // Update the UI or state
+        } else {
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to update the status. Please try again later.',
+            icon: 'error',
+            confirmButtonColor: '#d33',
+          });
+        }
       }
     });
-  };
+  };  
 
   return (
     <div className="overflow-x-auto mb-8">
@@ -114,16 +159,45 @@ const VerificationTable = ({ data, title, onUpdateStatus }) => {
               <td className="py-3 px-6">{`${item.firstName} ${item.lastName}`}</td>
               <td className="py-3 px-6">{item.businessType}</td>
               <td className="py-3 px-6">{item.category}</td>
-              <td className="py-3 px-6">{item.certificateNo}</td>
+              <td className="py-3 px-6">{item.certNumber}</td>
               <td className="py-3 px-6">{item.location}</td>
-              <td className="py-3 px-6">{item.submissionDate}</td>
               <td className="py-3 px-6">
-                <StatusBadge status={item.status} />
+                {new Date(item.application_date).toISOString().split('T')[0]}
               </td>
-              <td className="">
-                <ActionButton icon={<FaEye />} tooltip="View Details" onClick={() => handleViewClick(item)} color="blue" />
-                <ActionButton icon={<FaCheck />} tooltip="Approve" onClick={() => handleApprove(item)} color="green" />
-                <ActionButton icon={<FaTimes />} tooltip="Reject" onClick={() => handleReject(item)} color="red" />
+              <td className="py-3 px-6">
+              <StatusBadge 
+                status={
+                  item.status === 1 
+                    ? 'Approved' 
+                    : item.status === -1 
+                    ? 'Rejected' 
+                    : 'Pending'
+                } 
+              />
+              </td>
+              <td className="py-3 px-6 flex gap-2">
+                <ActionButton 
+                  icon={<FaEye />} 
+                  tooltip="View Details" 
+                  onClick={() => handleViewClick(item)} 
+                  color="blue" 
+                />
+                {item.status === 0 && (
+                  <>
+                    <ActionButton 
+                      icon={<FaCheck />} 
+                      tooltip="Approve" 
+                      onClick={() => handleApprove(item)} 
+                      color="green" 
+                    />
+                    <ActionButton 
+                      icon={<FaTimes />} 
+                      tooltip="Reject" 
+                      onClick={() => handleReject(item)} 
+                      color="red" 
+                    />
+                  </>
+                )}
               </td>
             </tr>
           ))}
@@ -142,10 +216,22 @@ const VerificationTable = ({ data, title, onUpdateStatus }) => {
                     <p><strong>Owner:</strong> {`${selectedItem.firstName} ${selectedItem.lastName}`}</p>
                     <p><strong>Business Type:</strong> {selectedItem.businessType}</p>
                     <p><strong>Category:</strong> {selectedItem.category}</p>
-                    <p><strong>Certificate No:</strong> {selectedItem.certificateNo}</p>
+                    <p><strong>Certificate No:</strong> {selectedItem.certNumber}</p>
                     <p><strong>Location:</strong> {selectedItem.location}</p>
-                    <p><strong>Submission Date:</strong> {selectedItem.submissionDate}</p>
-                    <p><strong>Status:</strong> <StatusBadge status={selectedItem.status} /></p>
+                    <p><strong>Submission Date:</strong> 
+                      {selectedItem.application_date 
+                      ? new Date(selectedItem.application_date).toISOString().split('T')[0] 
+                      : 'N/A'}
+                    </p>
+                    <p><strong>Status:</strong> <StatusBadge 
+                      status={
+                        selectedItem.status === 1 
+                          ? 'Approved' 
+                          : selectedItem.status === -1 
+                          ? 'Rejected' 
+                          : 'Pending'
+                      } 
+                    /></p>
                   </div>
                 )}
               </ModalBody>
@@ -169,21 +255,28 @@ const SuperAdminVerification = () => {
   const [searchTermApproved, setSearchTermApproved] = useState('');
   const [searchTermRejected, setSearchTermRejected] = useState('');
 
-  useEffect(() => {
+  
     // Simulate data fetching
-    const fetchData = async () => {
-      // Replace with actual API call
-      const data = [
-        { firstName: 'John', lastName: 'Doe', businessName: 'Adventure Tours', businessType: 'Attraction', category: 'Tour', certificateNo: '12345', location: 'Gubat Sorsogon', submissionDate: '2023-10-01', status: 'Pending' },
-        { firstName: 'Jane', lastName: 'Smith', businessName: 'Ocean Resort', businessType: 'Accommodation', category: 'Resort', certificateNo: '54321', location: 'Gubat Sorsogon', submissionDate: '2023-10-02', status: 'Approved' },
-        { firstName: 'Alice', lastName: 'Brown', businessName: 'Mountain Lodge', businessType: 'Accommodation', category: 'Lodge', certificateNo: '67890', location: 'Gubat Sorsogon', submissionDate: '2023-10-03', status: 'Pending' },
-        { firstName: 'Bob', lastName: 'White', businessName: 'Café Delight', businessType: 'Food', category: 'Café', certificateNo: '98765', location: 'Gubat Sorsogon', submissionDate: '2023-10-04', status: 'Rejected' },
-      ];
-      setVerificationData(data);
-    };
+  const fetchData = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/superAdmin-businessApplications', {
+        method: 'GET',
+        credentials: 'include'
+      });
+      const data = await response.json();
 
+      if (response.ok) {
+        setVerificationData(data.businessApplications);
+      } else {
+        console.error('Error fetching business applications:', error);
+      }
+    } catch (error) {
+        console.error('Error fetching Super Admin Business Applications: ', error);
+    }
+  }
+  useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const updateStatus = (item, newStatus) => {
     setVerificationData((prevData) =>
@@ -195,11 +288,13 @@ const SuperAdminVerification = () => {
     );
   };
 
-  const appliedAttractions = verificationData.filter(item => item.businessType === 'Attraction').length;
-  const appliedAccommodations = verificationData.filter(item => item.businessType === 'Accommodation').length;
-  const appliedFoods = verificationData.filter(item => item.businessType === 'Food').length;
+  // Derived counts
+  const appliedAttractions = verificationData.filter(item => item.category === 'Attraction').length;
+  const appliedAccommodations = verificationData.filter(item => item.category === 'Accommodation').length;
+  const appliedFoods = verificationData.filter(item => item.category === 'Food').length;
   const totalPending = verificationData.filter(item => item.status === 'Pending').length;
 
+  // Filter function
   const filterData = (data, searchTerm) => {
     return data.filter(item =>
       item.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -208,10 +303,11 @@ const SuperAdminVerification = () => {
     );
   };
 
+  // Memoized filtered data
   const filteredDataAll = filterData(verificationData, searchTermAll);
-  const filteredDataPending = filterData(verificationData.filter(item => item.status === 'Pending'), searchTermPending);
-  const filteredDataApproved = filterData(verificationData.filter(item => item.status === 'Approved'), searchTermApproved);
-  const filteredDataRejected = filterData(verificationData.filter(item => item.status === 'Rejected'), searchTermRejected);
+  const filteredDataPending = filterData(verificationData.filter(item => item.status === 0), searchTermPending);
+  const filteredDataApproved = filterData(verificationData.filter(item => item.status === 1), searchTermApproved);
+  const filteredDataRejected = filterData(verificationData.filter(item => item.status === -1), searchTermRejected);
 
   return (
     <div className="flex min-h-screen bg-gray-100">

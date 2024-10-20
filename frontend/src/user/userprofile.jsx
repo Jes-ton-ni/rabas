@@ -24,6 +24,8 @@ const UserProfile = ({ activities = [] }) => {
   const [userData, setUserData] = useState(null); // State to store fetched user data
   const [likedPages, setLikedPages] = useState([]); // State for storing user's liked pages
   const [businessApplications, setBusinessApplications] = useState([]);
+  const [businessData, setBusinessData] = useState(null); // State
+  const [loading, setLoading] = useState(true);
 
   // Function to check login status
   const checkLoginStatus = useCallback(async () => {
@@ -62,6 +64,22 @@ const UserProfile = ({ activities = [] }) => {
     }
   };
 
+  // Fetching business data from the backend and updating Redux
+  const fetchBusinessData = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/get-businessData', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setBusinessData(data.businessData[0]);
+      }
+    } catch (error) {
+      console.error('Error fetching business data:', error);
+    }
+  };
+
   // Fetching business applications for the logged-in user
   const fetchBusinessApplications = async () => {
     try {
@@ -88,8 +106,9 @@ const UserProfile = ({ activities = [] }) => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      fetchUserData(); // Fetch user data if logged in
-      fetchBusinessApplications(); // Fetch business applications if logged in
+      Promise.all([fetchUserData(), fetchBusinessData(), fetchBusinessApplications()])
+        .then(() => setLoading(false)) // Set loading to false when all data is fetched
+        .catch((error) => console.error('Error fetching initial data:', error));
     }
   }, [isLoggedIn]);
 
@@ -181,6 +200,10 @@ const UserProfile = ({ activities = [] }) => {
     },
   ];
 
+  if (loading) {
+    return <div>Loading...</div>;  // dapat may design to
+  }
+
   return (
     <div className='mx-auto min-h-screen font-sans'>
       <Nav />
@@ -242,7 +265,14 @@ const UserProfile = ({ activities = [] }) => {
                   className='text-white bg-color1 hover:bg-color2'
                   onClick={() => window.location.href = '/businessprofileadmin'}
                   key={application.application_id}>
-                    <p>{application.businessName}</p>
+                    <p>{businessData.businessName}</p>
+                  </Button>
+                );
+              } else if (application.status === -1) {
+                // Show 'Denied' message if status is -1
+                return (
+                  <Button key={application.application_id} className='text-white bg-red-500 hover:bg-red-600'>
+                    Denied
                   </Button>
                 );
               }

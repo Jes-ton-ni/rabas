@@ -1386,6 +1386,107 @@ app.get('/locations', (req, res) => {
   });
 });
 
+//SUPER ADMIN
+//Endpoint to fetch all business applications
+app.get('/superAdmin-businessApplications', (req, res) => {
+  const sql = `
+    SELECT * FROM business_applications
+  `;
+  // Execute the SQL query
+  connection.query(sql, (err, results) => {
+    if (err) {
+      console.error('Error executing SQL query:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+    // Send the list of business applications as the response
+    return res.json({ success: true, businessApplications: results });
+  });
+});
+
+// Endpoint to update the business application status
+app.put('/updateStatus-businessApplications/:id', async (req, res) => {
+  const { id } = req.params;  // Get the application ID from the URL
+  const { status } = req.body; // Get the new status from the request body
+
+  if (typeof status !== 'number') {
+    return res.status(400).json({ message: 'Invalid status value' });
+  }
+
+  try {
+    // Start with updating the status
+    connection.query('UPDATE business_applications SET status = ? WHERE application_id = ?', [status, id], (err, results) => {
+      if (err) {
+        console.error('Error updating business application status:', err);
+        return res.status(500).json({ success: false, message: 'Failed to update business application status' });
+      }
+
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ success: false, message: 'Business application not found' });
+      }
+
+      // If status is 1 (Approved), copy data to businesses table
+      if (status === 1) {
+        connection.query('SELECT * FROM business_applications WHERE application_id = ?', [id], (err, applicationResults) => {
+          if (err) {
+            console.error('Error fetching business application:', err);
+            return res.status(500).json({ success: false, message: 'Failed to fetch business application' });
+          }
+
+          if (applicationResults.length === 0) {
+            return res.status(404).json({ success: false, message: 'Business application not found' });
+          }
+
+          // Extract data from business application
+          const applicationData = applicationResults[0];
+          const { user_id, application_id, businessName, businessType, category, location } = applicationData;
+
+          // Prepare to insert into businesses table
+          const insertQuery = `
+            INSERT INTO businesses 
+            (user_id, application_id, businessName, businessType, businessLogo, businessCard, heroImages, aboutUs, facilities, policies, contactInfo, openingHours) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+          // Set default values for the new business entry
+          const insertValues = [
+            user_id,
+            application_id,
+            businessName,
+            businessType,
+            null, // businessLogo, you can update this later
+            JSON.stringify({ category, location, cardImage: '', priceRange: '', description: '' }), // businessCard
+            null, // heroImages, you can update later
+            null, // aboutUs, you can update later
+            null, // facilities, you can update later
+            null, // policies, you can update later
+            null, // contactInfo, you can update later
+            null, // openingHours, you can update later
+          ];
+
+          // Insert into businesses table
+          connection.query(insertQuery, insertValues, (err, insertResults) => {
+            if (err) {
+              console.error('Error inserting into businesses table:', err);
+              return res.status(500).json({ success: false, message: 'Failed to copy application to businesses' });
+            }
+
+            return res.json({
+              success: true,
+              message: 'Business application approved and data copied to businesses table successfully',
+            });
+          });
+        });
+      } else {
+        return res.json({
+          success: true,
+          message: 'Business application status updated successfully',
+        });
+      }
+    });
+  } catch (error) {
+    console.error('Error updating status:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
