@@ -171,11 +171,37 @@ const businessSlice = createSlice({
       if (location !== undefined) state.businessCard.location = location;
       if (priceRange !== undefined) state.businessCard.priceRange = priceRange;
     },
+
+    // Add a new hero image with a title
+    addHeroImage: (state, action) => {
+      const { path, title = '' } = action.payload;
+      state.heroImages.push({ path, title });
+    },
+
+    // Update the title of a specific hero image
+    updateHeroImageTitle: (state, action) => {
+      const { index, title } = action.payload;
+      if (index >= 0 && index < state.heroImages.length) {
+        state.heroImages[index].title = title;
+      } else {
+        console.error('Invalid index for updateHeroImageTitle:', action.payload);
+      }
+    },
+
+    // Remove a hero image
+    removeHeroImage: (state, action) => {
+      const { index } = action.payload;
+      if (index >= 0 && index < state.heroImages.length) {
+        state.heroImages.splice(index, 1);
+      } else {
+        console.error('Invalid index for removeHeroImage:', action.payload);
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchBusinessData.fulfilled, (state, action) => {
-        const fetchedData = action.payload; // This is the single business object
+        const fetchedData = action.payload;
 
         // Log the fetched data
         console.log('Fetched Business Data:', fetchedData);
@@ -191,7 +217,10 @@ const businessSlice = createSlice({
           description: fetchedData.businessCard.description,
           priceRange: fetchedData.businessCard.priceRange,
         };
-        state.heroImages = fetchedData.heroImages || [];
+        state.heroImages = fetchedData.heroImages.map(image => ({
+          path: image.path,
+          title: image.title || ''
+        }));
         state.aboutUs = fetchedData.aboutUs;
         state.facilities = fetchedData.facilities || [];
         state.policies = fetchedData.policies || [];
@@ -223,6 +252,9 @@ export const {
   cancelContactInfo,
   updateContactIcon,
   updateBusinessCard,
+  addHeroImage,
+  updateHeroImageTitle,
+  removeHeroImage,
 } = businessSlice.actions;
 
 export default businessSlice.reducer;

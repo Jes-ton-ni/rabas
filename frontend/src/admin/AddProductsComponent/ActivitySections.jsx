@@ -20,7 +20,7 @@ const ActivitySections = () => {
   const [hasBooking, setHasBooking] = useState(false);
   const [inclusions, setInclusions] = useState('');
   const [inclusionList, setInclusionList] = useState([]);
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState([]); // Updated to store objects with url and title
   const [selectedActivities, setSelectedActivities] = useState([]);
   const [activityType, setActivityType] = useState('');
   const [selectedType, setSelectedType] = useState('');
@@ -60,8 +60,20 @@ const ActivitySections = () => {
   // Handlers for Image Upload
   const handleImageUpload = useCallback((e) => {
     const files = Array.from(e.target.files);  
-    setImages((prevImages) => [...prevImages, ...files]);  
-  }, [images]);
+    const newImages = files.map((file) => ({
+      url: URL.createObjectURL(file),
+      title: '',
+    }));
+    setImages((prevImages) => [...prevImages, ...newImages]);
+  }, []);
+
+  const handleImageTitleChange = (index, title) => {
+    setImages((prevImages) => {
+      const updatedImages = [...prevImages];
+      updatedImages[index].title = title;
+      return updatedImages;
+    });
+  };
 
   const handleRemoveImage = useCallback((index) => {
     const updatedImages = images.filter((_, i) => i !== index);
@@ -106,9 +118,10 @@ const ActivitySections = () => {
         pricingUnit,
         hasBooking,
         inclusions: inclusionList,
-        images: images.map((file) =>
-          typeof file === 'string' ? file : URL.createObjectURL(file)
-        ),
+        images: images.map((image) => ({
+          url: image.url,
+          title: image.title,
+        })),
         activityType,
         termsAndConditions: termsList, // Include terms list
       };
@@ -279,10 +292,11 @@ const ActivitySections = () => {
                     {activity.images.map((image, index) => (
                       <div key={index}>
                         <img
-                          src={image}
-                          alt={`Activity ${index + 1}`}
+                          src={image.url}
+                          alt={image.title || `Activity ${index + 1}`}
                           className="w-full h-32 object-cover rounded-lg mt-2"
                         />
+                        <p className="text-xs text-center mt-1">{image.title}</p>
                       </div>
                     ))}
                   </Slider>
@@ -477,14 +491,20 @@ const ActivitySections = () => {
                     </p>
                   </div>
 
-                  {/* Uploaded Images Preview with Remove Option */}
+                  {/* Uploaded Images Preview with Title Input and Remove Option */}
                   <div className="mb-4 flex flex-wrap gap-3">
                     {images.map((image, index) => (
-                      <div key={index} className="flex gap-3 mb-2">
+                      <div key={index} className="flex flex-col gap-2 mb-2">
                         <img
-                          src={typeof image === 'string' ? image : URL.createObjectURL(image)}
+                          src={image.url}
                           alt={`Uploaded ${index + 1}`}
                           className="h-16 w-16 object-cover rounded-lg"
+                        />
+                        <Input
+                          placeholder="Enter image title"
+                          value={image.title}
+                          onChange={(e) => handleImageTitleChange(index, e.target.value)}
+                          fullWidth
                         />
                         <Button
                           auto

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Nav from '../components/navuser';
 import HeroAndGallery from './BusinessComponents/BusinessHero';
@@ -11,12 +11,30 @@ import { Button } from '@nextui-org/react';
 import { IoStar, IoStarHalf, IoStarOutline } from "react-icons/io5";
 import Section from './BusinessComponents/BusinessSectionDeals';
 import Allproducts from '../businesspage/BusinessComponents/BusinessAllproducts';
-import { PiChatCircleText } from "react-icons/pi";
+import { Spinner } from "@nextui-org/react";
 
 const BusinessPage = () => {
   const businessData = useSelector((state) => state.business);
   const [isLiked, setIsLiked] = useState(false);
   const averageRating = businessData.averageRating || 0;
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate data fetching
+    setTimeout(() => setLoading(false), 1000);
+  }, []);
+
+  if (loading) {
+    // Ensure the Spinner component is correctly imported and used
+    return (
+      <Spinner 
+        className='flex justify-center items-center h-screen' 
+        size='lg' 
+        label="Loading..." 
+        color="primary" 
+      />
+    );
+  }
 
   const renderStars = (rating) => {
     const stars = [];
@@ -84,14 +102,6 @@ const BusinessPage = () => {
    
       <div><Allproducts/></div>
 
-       {/* Floating chat button */}
-       <button
-          className="fixed bottom-4 right-4 bg-color1 text-white p-4 rounded-full shadow-lg hover:bg-color2 focus:outline-none z-50"
-         
-        >
-          <PiChatCircleText size={30} />
-        </button>
-      
       <Footer/>
     </div>
   );

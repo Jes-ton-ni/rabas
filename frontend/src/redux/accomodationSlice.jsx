@@ -4,14 +4,14 @@ const initialState = {
   accommodations: [
     {
       id: nanoid(),
-      accommodationName: "Family Delux",
+      accommodationName: "Family Deluxe",
       pricing: "3500",
       pricingUnit: "per person",
       hasBooking: true,
       inclusions: ["Double Deck Bed", "Freebies Towels", "Sofabed"],
       images: [
-        "https://via.placeholder.com/150",
-        "https://via.placeholder.com/150"
+        { url: "https://via.placeholder.com/150", title: "Room View" },
+        { url: "https://via.placeholder.com/150", title: "Amenities" }
       ],
       accommodationType: "Family Room",
     },

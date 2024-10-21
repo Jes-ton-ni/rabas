@@ -218,7 +218,7 @@ const LoginSignup = () => {
   );
 
   const renderEmailForm = () => (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 ">
       <button
         className="flex items-center text-gray-500 hover:text-black transition-all mb-4"
         onClick={() => setView("initial")}
@@ -227,14 +227,14 @@ const LoginSignup = () => {
       </button>
       <Tabs
         fullWidth
-        size="md"
         aria-label="Login or Signup"
         selectedKey={selected}
         onSelectionChange={setSelected}
-        className="flex justify-center items-center "
+      
+      
       >
         <Tab key="login" title="Login">
-          <form onSubmit={handleLogin} className="flex flex-col gap-4 ">
+          <form onSubmit={handleLogin} className="flex flex-col gap-4  ">
           <h1 className='font-font1 text-center text-2xl mb-2'>Welcome Back, Tara Rabas kita !</h1>
             <Input
               label="Email/username"

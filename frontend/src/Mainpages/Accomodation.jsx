@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {Link} from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Nav from '../components/navuser';
@@ -6,7 +6,7 @@ import Hero from '../components/heroaccomodation';
 import Search from '@/components/Search';
 import Footer from '@/components/Footer';
 import Antonio from '../assets/antonio.jpg';
-import {  Button, Slider } from "@nextui-org/react";
+import {  Button, Slider, Spinner } from "@nextui-org/react";
 import { Checkbox, CheckboxGroup, Select, SelectItem } from "@nextui-org/react";
 import { GiPositionMarker } from "react-icons/gi";
 import { PiChatCircleText } from 'react-icons/pi';
@@ -17,6 +17,16 @@ const Accomodation = () => {
     const [selectedRatings, setSelectedRatings] = useState([]);
     const [selectedDestination, setSelectedDestination] = useState('All');
     const [budgetRange, setBudgetRange] = useState([0, 10000]); // Budget range slider
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        // Simulate data fetching
+        setTimeout(() => setLoading(false), 1000);
+    }, []);
+
+    if (loading) {
+        return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
+    }
 
     // Accommodation details (mock data)
     const accommodationDetails = [
@@ -309,14 +319,6 @@ const Accomodation = () => {
                     </div>
                 </div>
             </div>
-
-              {/* Floating chat button */}
-       <button
-          className="fixed bottom-4 right-4 bg-color1 text-white p-4 rounded-full shadow-lg hover:bg-color2 focus:outline-none z-50"
-         
-        >
-          <PiChatCircleText size={30} />
-        </button>
 
             <Footer />
 

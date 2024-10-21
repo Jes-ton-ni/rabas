@@ -24,8 +24,11 @@ import {
   updateContactInfo,
   removeContactInfo,
   updateContactIcon,
-  updateBusinessCard, 
-  fetchBusinessData
+  updateBusinessCard,
+  fetchBusinessData,
+  addHeroImage,
+  updateHeroImageTitle,
+  removeHeroImage
 } from '../redux/businessSlice';
 
 const BusinessProfile = () => {
@@ -193,8 +196,8 @@ const BusinessProfile = () => {
     setIsEditingAboutUs(false);
   };
 
-   // Synchronize local state with Redux state
-   useEffect(() => {
+  // Synchronize local state with Redux state
+  useEffect(() => {
     setCardImage(businessCard.cardImage || '');
     setDescription(businessCard.description || '');
     setLocation(businessCard.location || '');
@@ -218,7 +221,7 @@ const BusinessProfile = () => {
     formData.append('description', description);
     formData.append('location', location);
     formData.append('priceRange', priceRange);
-  
+
     // Make an API call to update the business details
     fetch(`http://localhost:5000/updateBusinessDetails/${businessData.business_id}`, {
       method: 'PUT',
@@ -244,7 +247,7 @@ const BusinessProfile = () => {
             icon: 'success',
             confirmButtonColor: '#0BDA51',
           });
-          
+
         }
       })
       .catch(error => console.error('Error updating business details:', error));
@@ -257,11 +260,11 @@ const BusinessProfile = () => {
 
     if (file) {
       const reader = new FileReader();
-      
+
       // Read the file as Data URL for preview
       reader.onloadend = () => {
         const previewImage = reader.result; // Store the preview image
-        
+
         // SweetAlert2 confirmation
         Swal.fire({
           title: 'Confirm Upload',
@@ -357,14 +360,14 @@ const BusinessProfile = () => {
   const handleLogoUpload = (event) => {
     const file = event.target.files[0];
     const businessId = businessData.business_id; // Get the business ID from your state
-  
+
     if (file) {
       const reader = new FileReader();
-  
+
       // Read the file as a data URL to display a preview
       reader.onloadend = () => {
         const imageUrl = reader.result; // This will be the base64 image data
-  
+
         // Show confirmation dialog with image preview using SweetAlert2
         Swal.fire({
           title: 'Confirm Upload',
@@ -379,7 +382,7 @@ const BusinessProfile = () => {
           if (result.isConfirmed) {
             const formData = new FormData();
             formData.append('businessLogo', file); // Append the logo file
-  
+
             // Make an API call to upload the logo
             fetch(`http://localhost:5000/updateBusinessLogo/${businessId}`, {
               method: 'PUT',
@@ -405,15 +408,15 @@ const BusinessProfile = () => {
           }
         });
       };
-  
+
       reader.readAsDataURL(file); // Read the file as a data URL
     }
   };
-  
+
   // Handle file upload for hero images
   const handleHeroImagesUpload = (event) => {
     const files = Array.from(event.target.files);
-    
+
     if (files.length === 0) return; // Exit if no files are selected
 
     const formData = new FormData();
@@ -431,8 +434,10 @@ const BusinessProfile = () => {
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          // Update Redux store with the new hero images
-          dispatch(updateBusinessData({ heroImages: data.updatedHeroImages }));
+          // Update Redux store with the new hero images and initialize titles
+          dispatch(updateBusinessData({
+            heroImages: data.updatedHeroImages.map(image => ({ path: image, title: '' }))
+          }));
 
           MySwal.fire({
             title: 'Success',
@@ -463,7 +468,7 @@ const BusinessProfile = () => {
 
   // Handle removing a hero image
   const handleRemoveHeroImage = (index) => {
-    const imagePath = businessData.heroImages[index]; // Get the image path to be removed
+    const imagePath = businessData.heroImages[index].path; // Get the image path to be removed
 
     MySwal.fire({
       title: 'Are you sure?',
@@ -528,9 +533,9 @@ const BusinessProfile = () => {
         },
         body: JSON.stringify({ contactInfo: businessData.contactInfo }), // Pass the updated contact info array
       });
-  
+
       const data = await response.json();
-  
+
       if (data.success) {
         MySwal.fire({
           title: 'Success',
@@ -550,7 +555,7 @@ const BusinessProfile = () => {
         confirmButtonColor: '#0BDA51',
       });
     }
-  };  
+  };
 
   // Handle removing a contact info
   const handleRemoveContactInfo = (id) => {
@@ -579,7 +584,7 @@ const BusinessProfile = () => {
     setIsEditingHours(true);
     setTempOpeningHours(businessData.openingHours.map(hours => ({ ...hours }))); // Create a copy of the hours
   };
-  
+
   const handleSaveHours = async () => {
     try {
       const response = await fetch('http://localhost:5000/update-opening-hours', {
@@ -590,13 +595,13 @@ const BusinessProfile = () => {
         credentials: 'include',
         body: JSON.stringify({ openingHours: tempOpeningHours }), // Send updated hours
       });
-  
+
       const data = await response.json();
-  
+
       if (data.success) {
         // Optionally update your Redux state here with new data
         dispatch(updateBusinessData({ openingHours: tempOpeningHours }));
-  
+
         // Show success alert
         Swal.fire({
           icon: 'success',
@@ -604,7 +609,7 @@ const BusinessProfile = () => {
           text: 'Opening hours saved successfully.',
           confirmButtonText: 'Okay',
         });
-  
+
         // Exit editing mode
         setIsEditingHours(false);
       } else {
@@ -628,14 +633,14 @@ const BusinessProfile = () => {
       });
     }
   };
-  
+
   const handleCancelEditHours = () => {
     setIsEditingHours(false);
     setTempOpeningHours(businessData.openingHours); // Reset to original
   };
 
   const handleTimeChange = (index, field, value) => {
-    setTempOpeningHours(prevHours => 
+    setTempOpeningHours(prevHours =>
       prevHours.map((hours, i) => i === index ? { ...hours, [field]: value } : hours)
     );
   };
@@ -730,7 +735,6 @@ const BusinessProfile = () => {
     }
   };
 
-
   // Handle opening the icon picker modal
   const openIconModal = (field) => {
     setCurrentEditingField(field);
@@ -786,7 +790,7 @@ const BusinessProfile = () => {
   return (
     <div className="flex flex-col lg:flex-row min-h-screen mx-auto bg-gray-100 font-sans">
       <Sidebar />
-      
+
       <div className="flex-1 p-4 lg:p-8 max-h-screen overflow-y-auto">
         <div className='flex justify-between items-center mb-3'>
           <h1 className="text-2xl lg:text-3xl font-semibold text-gray-800">Business Profile</h1>
@@ -798,15 +802,15 @@ const BusinessProfile = () => {
             Save Profile
           </Button>
         </div>
-       
+
         <Tabs aria-label="Business Profile Sections" className="w-full">
           <Tab key="general" title="General Info">
             <Card>
               <CardBody>
-              <h3 className="text-lg font-bold mb-4 p-5">Update Business Logo and Name</h3>
+                <h3 className="text-lg font-bold mb-4 p-5">Update Business Logo and Name</h3>
                 <div className='flex flex-col lg:flex-row items-center mb-6 shadow-lg p-3 rounded-sm shadow-slate-400'>
                   <div className='relative w-24 h-24 lg:mr-6 mb-4 lg:mb-0'>
-                        
+
                     {businessData.businessLogo ? (
                       <img
                         src={businessData.businessLogo.startsWith('uploads')
@@ -873,7 +877,7 @@ const BusinessProfile = () => {
                   <div className="space-y-4">
                     <div className="mb-6">
                       <label className="block text-sm font-medium text-gray-700 mb-1">Card Image</label>
-                      
+
                       {/* Display the uploaded image preview if available */}
                       {cardImage ? (
                         <div className="relative w-full h-48 mb-3">
@@ -892,7 +896,7 @@ const BusinessProfile = () => {
                         </div>
                       ) : (
                         <div className="border-2 border-dashed border-gray-300 rounded-md p-4 flex justify-center items-center">
-                          <input 
+                          <input
                             type="file"
                             accept="image/*"
                             onChange={handleCardImageUpload}
@@ -912,7 +916,7 @@ const BusinessProfile = () => {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                       <textarea
-                        value={description|| ''}
+                        value={description || ''}
                         onChange={(e) => setDescription(e.target.value)}
                         placeholder="Enter description"
                         className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-color1"
@@ -953,8 +957,8 @@ const BusinessProfile = () => {
                   <div className="border border-gray-300 rounded-md p-4">
                     {cardImage && (
                       <img
-                        src={cardImage.startsWith('uploads') 
-                          ? `http://localhost:5000/${cardImage}` 
+                        src={cardImage.startsWith('uploads')
+                          ? `http://localhost:5000/${cardImage}`
                           : cardImage
                         }
                         alt="Business Card"
@@ -976,23 +980,29 @@ const BusinessProfile = () => {
               <CardBody>
                 <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">Cover Photo</h2>
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4'>
-                {/* Rendering the hero images with delete button */}
-                {businessData.heroImages && Array.isArray(businessData.heroImages) && businessData.heroImages.map((image, index) => (
-                  <div key={index} className="relative">
-                    <img 
-                      src={`http://localhost:5000/${image}`}  // Apply the base URL to the image
-                      alt={`Hero ${index + 1}`} 
-                      className="w-full h-40 object-cover rounded-lg" 
-                    />
-                    <Button
-                      onClick={() => handleRemoveHeroImage(index)}
-                      className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
-                    >
-                      <FaTrash size={12} />
-                    </Button>
-                  </div>
-                ))}
-
+                  {/* Rendering the hero images with delete button */}
+                  {businessData.heroImages && Array.isArray(businessData.heroImages) && businessData.heroImages.map((image, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={`http://localhost:5000/${image.path}`}  // Apply the base URL to the image
+                        alt={`Hero ${index + 1}`}
+                        className="w-full h-40 object-cover rounded-lg"
+                      />
+                      <Input
+                        type="text"
+                        value={image.title}
+                        onChange={(e) => dispatch(updateHeroImageTitle({ index, title: e.target.value }))}
+                        placeholder="Enter image title"
+                        className="mt-2"
+                      />
+                      <Button
+                        onClick={() => handleRemoveHeroImage(index)}
+                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
+                      >
+                        <FaTrash size={12} />
+                      </Button>
+                    </div>
+                  ))}
                 </div>
                 <input
                   type="file"
@@ -1047,7 +1057,7 @@ const BusinessProfile = () => {
                     </>
                   )}
                 </div>
-                
+
                 <h3 className="text-md lg:text-lg font-semibold mt-4 mb-2 flex items-center justify-between">
                   <span>Contact Information</span>
                   <AiOutlineCheck
@@ -1055,7 +1065,7 @@ const BusinessProfile = () => {
                     className="cursor-pointer text-green-600 mr-2 text-2xl"
                   />
                 </h3>
-                  {businessData.contactInfo && Array.isArray(businessData.contactInfo) && businessData.contactInfo.map((info) => (
+                {businessData.contactInfo && Array.isArray(businessData.contactInfo) && businessData.contactInfo.map((info) => (
                   <div key={info.id} className='flex flex-col lg:flex-row items-center gap-2 mb-2'>
                     <Button onClick={() => openIconModal(`contact-${info.id}`)} className="min-w-[40px] h-[40px] p-0">
                       {React.createElement(businessIcons.find(icon => icon.name === info.icon)?.icon || FaPlus, { size: 20 })}
@@ -1079,11 +1089,11 @@ const BusinessProfile = () => {
                     </Button>
                   </div>
                 ))}
-               
+
                 <Button onClick={() => dispatch(addContactInfo())} className="mt-2 bg-color1 text-white hover:bg-color2 transition">
                   Add Contact Info
                 </Button>
-                
+
                 <h3 className="text-md lg:text-lg font-semibold mt-4 mb-2 flex items-center justify-between">
                   <span>Opening Hours</span>
                   {!isEditingHours && (
@@ -1185,12 +1195,12 @@ const BusinessProfile = () => {
               <CardBody className='h-[300px] overflow-x-auto scrollbar-hide'>
                 <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">Facilities & Amenities</h2>
                 <div className='flex justify-start flex-wrap gap-3'>
-                {businessData.facilities && Array.isArray(businessData.facilities) && businessData.facilities && businessData.facilities.map((facility, index) => (
+                  {businessData.facilities && Array.isArray(businessData.facilities) && businessData.facilities && businessData.facilities.map((facility, index) => (
                     <div key={index} className='flex lg:flex-row items-center gap-2 mb-2'>
                       <Button onClick={() => openIconModal(`facility-${index}`)} className="min-w-[40px] h-[40px] p-0">
                         {facility.icon ? React.createElement(businessIcons.find(icon => icon.name === facility.icon)?.icon, { size: 20 }) : <FaPlus size={20} />}
                       </Button>
-                      <Input 
+                      <Input
                         type="text"
                         value={facility.name}
                         onChange={(e) => dispatch(updateFacility({ index, field: 'name', value: e.target.value }))}
@@ -1200,7 +1210,7 @@ const BusinessProfile = () => {
                       <Button onClick={() => handleRemoveFacility(index)} className="bg-red-500 text-white p-2">
                         <FaTrash size={16} />
                       </Button>
-                    </div>                
+                    </div>
                   ))}
                 </div>
               </CardBody>

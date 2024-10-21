@@ -10,8 +10,8 @@ const initialState = {
       hasBooking: true,
       inclusions: ["Violin Performance", "3 course meal"],
       images: [
-        "https://via.placeholder.com/150",
-        "https://via.placeholder.com/150"
+        { url: "https://via.placeholder.com/150", title: "Table Setup" },
+        { url: "https://via.placeholder.com/150", title: "Meal" }
       ],
       serviceType: "Fine Dining",
     },

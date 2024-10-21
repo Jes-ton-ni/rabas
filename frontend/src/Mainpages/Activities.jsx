@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Nav from '../components/nav';
 import Hero from '../components/heroactivity';
 import Search from '../components/Search';
 import Footer from '@/components/Footer';
 import pic1 from '../assets/donsol.jpg';
-import {Button, useDisclosure } from "@nextui-org/react";
+import {Button, useDisclosure, Spinner } from "@nextui-org/react";
 import { Checkbox, CheckboxGroup, Select, SelectItem, Slider } from "@nextui-org/react";
 import { GiPositionMarker } from "react-icons/gi";
 import { Link } from 'react-router-dom';  
@@ -20,7 +20,16 @@ const Activities = () => {
   const [selectedCategories, setSelectedCategories] = useState([]); // New state for categories
   const [budgetRange, setBudgetRange] = useState([0, 10000]);
   const [selectedActivity, setSelectedActivity] = useState(null); // New state for selected activity
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    // Simulate data fetching
+    setTimeout(() => setLoading(false), 1000);
+  }, []);
+
+  if (loading) {
+    return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
+  }
 
   // Handlers
   const handleActivityChange = (selected) => {
@@ -355,14 +364,6 @@ const Activities = () => {
         </div>
       </div>
 
-             {/* Floating chat button */}
-             <button
-          className="fixed bottom-4 right-4 bg-color1 text-white p-4 rounded-full shadow-lg hover:bg-color2 focus:outline-none z-50"
-         
-        >
-          <PiChatCircleText size={30} />
-        </button>
- 
       <Footer />
 
     </div>

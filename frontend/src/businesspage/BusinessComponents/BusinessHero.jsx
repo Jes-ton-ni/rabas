@@ -1,7 +1,6 @@
-import  { useState, useRef, useCallback } from 'react'
+import  { useState, useRef } from 'react'
 import Slider from 'react-slick'
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react"
-import EnlargedImage from '../../components/EnlargedImage'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
 
@@ -10,17 +9,18 @@ const BusinessHero = () => {
   const [imageLoadError, setImageLoadError] = useState(false)
   const [, setCurrentSlide] = useState(0)
   const {isOpen, onOpen, onOpenChange} = useDisclosure()
+  const [previewImage, setPreviewImage] = useState(null) // New state for image preview
+  const [previewIndex, setPreviewIndex] = useState(0) // Track the index of the previewed image
   const sliderRef = useRef(null)
-  const [hoveredImage, setHoveredImage] = useState(null)
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false) // New state for preview visibility
 
   const images = [
-    'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80',
-    'https://images.unsplash.com/photo-1497366811353-6870744d04b2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80',
-    'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80',
-    'https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80',
-    'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80',
-    'https://images.unsplash.com/photo-1497215842964-222b430dc094?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80',
+    { url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Sunset Over the Hills' },
+    { url: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Mountain Range' },
+    { url: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'City Skyline' },
+    { url: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Forest Path' },
+    { url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Ocean Waves' },
+    { url: 'https://images.unsplash.com/photo-1497215842964-222b430dc094?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Desert Dunes' },
   ]
 
   const settings = {
@@ -51,23 +51,31 @@ const BusinessHero = () => {
     sliderRef.current.slickPrev()
   }
 
-  const handleMouseMove = useCallback((event) => {
-    if (hoveredImage) {
-      setMousePosition({ x: event.clientX + 20, y: event.clientY + 20 })
-    }
-  }, [hoveredImage])
-
-  const handleMouseEnter = (image, event) => {
-    setHoveredImage(image)
-    setMousePosition({ x: event.clientX + 20, y: event.clientY + 20 })
+  const handleThumbnailClick = (index) => {
+    setPreviewImage(images[index].url)
+    setPreviewIndex(index)
+    setIsPreviewOpen(true) // Open the preview
   }
 
-  const handleMouseLeave = () => {
-    setHoveredImage(null)
+  const closePreview = () => {
+    setPreviewImage(null)
+    setIsPreviewOpen(false) // Close the preview
+  }
+
+  const goToNextImage = () => {
+    const nextIndex = (previewIndex + 1) % images.length
+    setPreviewImage(images[nextIndex].url)
+    setPreviewIndex(nextIndex)
+  }
+
+  const goToPrevImage = () => {
+    const prevIndex = (previewIndex - 1 + images.length) % images.length
+    setPreviewImage(images[prevIndex].url)
+    setPreviewIndex(prevIndex)
   }
 
   return (
-    <div onMouseMove={handleMouseMove} className="mx-auto container px-4 mt-3  sm:px-6 lg:px-8">
+    <div className="mx-auto container px-4 mt-3 sm:px-6 lg:px-8">
       <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
         {/* Hero Carousel */}
         <div className="w-full lg:w-2/3 relative">
@@ -81,7 +89,7 @@ const BusinessHero = () => {
                 {images.map((image, index) => (
                   <div key={index} className="relative">
                     <img 
-                      src={image} 
+                      src={image.url} 
                       alt={`Gallery image ${index + 1}`} 
                       className="w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] object-cover" 
                       onError={handleImageError}
@@ -129,14 +137,12 @@ const BusinessHero = () => {
               <div 
                 key={index} 
                 className="relative group overflow-hidden rounded-lg shadow-md aspect-square"
-                onMouseEnter={(e) => handleMouseEnter(image, e)}
-                onMouseLeave={handleMouseLeave}
+                onClick={() => handleThumbnailClick(index)} // Update to handle click
               >
                 <img
-                  src={image}
+                  src={image.url}
                   alt={`Thumbnail ${index + 1}`}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                  onClick={() => goToSlide(index)}
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity duration-300"></div>
               </div>
@@ -156,45 +162,73 @@ const BusinessHero = () => {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">All Images</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">Image Gallery</ModalHeader>
               <ModalBody>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {images.map((image, index) => (
                     <div 
                       key={index} 
-                      className="relative group overflow-hidden rounded-lg aspect-square"
-                      onMouseEnter={(e) => handleMouseEnter(image, e)}
-                      onMouseLeave={handleMouseLeave}
+                      className="relative group overflow-hidden rounded-lg shadow-md"
+                      onClick={() => handleThumbnailClick(index)} // Set preview image on click
                     >
                       <img
-                        src={image}
+                        src={image.url}
                         alt={`Gallery image ${index + 1}`}
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                        onClick={() => {
-                          goToSlide(index)
-                          onClose()
-                        }}
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity duration-300"></div>
                     </div>
                   ))}
                 </div>
+                {isPreviewOpen && previewImage && ( // Check if preview is open
+                  <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+                    <div className="relative max-w-full max-h-full">
+                      <img
+                        src={previewImage}
+                        alt="Preview"
+                        className="w-auto h-auto max-w-full max-h-full object-contain"
+                      />
+                      <div className="absolute bottom-4 left-0 right-0 text-center text-white text-lg font-semibold bg-black bg-opacity-50 py-2">
+                        {images[previewIndex].title}
+                      </div>
+                      <button
+                        className="absolute top-2 right-2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full p-2 transition-all duration-300"
+                        onClick={closePreview}
+                        aria-label="Close preview"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                      <button
+                        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full p-2 transition-all duration-300"
+                        onClick={goToPrevImage}
+                        aria-label="Previous image"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </button>
+                      <button
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full p-2 transition-all duration-300"
+                        onClick={goToNextImage}
+                        aria-label="Next image"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </ModalBody>
               <ModalFooter>
-             
+                <Button color='danger' onPress={onClose}>Close</Button>
               </ModalFooter>
             </>
           )}
         </ModalContent>
       </Modal>
-
-      {hoveredImage && (
-        <EnlargedImage
-          src={hoveredImage}
-          alt="Enlarged gallery image"
-          position={mousePosition}
-        />
-      )}
     </div>
   )
 }

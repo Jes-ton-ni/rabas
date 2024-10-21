@@ -20,7 +20,7 @@ const AccommodationSection = () => {
   const [hasBooking, setHasBooking] = useState(false);
   const [inclusions, setInclusions] = useState('');
   const [inclusionList, setInclusionList] = useState([]);
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState([]); // Updated to store objects with url and title
   const [selectedAccommodations, setSelectedAccommodations] = useState([]);
   const [accommodationType, setAccommodationType] = useState('');
   const [selectedType, setSelectedType] = useState('');
@@ -58,10 +58,22 @@ const AccommodationSection = () => {
   };
 
   // Handlers for Image Upload
-  const handleImageUpload = (e) => {  
-    const files = Array.from(e.target.files);  
-    setImages((prevImages) => [...prevImages, ...files]);  
-  };  
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    const newImages = files.map((file) => ({
+      url: URL.createObjectURL(file),
+      title: '',
+    }));
+    setImages((prevImages) => [...prevImages, ...newImages]);
+  };
+
+  const handleImageTitleChange = (index, title) => {
+    setImages((prevImages) => {
+      const updatedImages = [...prevImages];
+      updatedImages[index].title = title;
+      return updatedImages;
+    });
+  };
 
   const handleRemoveImage = (index) => {
     const updatedImages = images.filter((_, i) => i !== index);
@@ -96,9 +108,10 @@ const AccommodationSection = () => {
         pricingUnit,
         hasBooking,
         inclusions: inclusionList,
-        images: images.map((file) =>
-          typeof file === 'string' ? file : URL.createObjectURL(file)
-        ),
+        images: images.map((image) => ({
+          url: image.url,
+          title: image.title,
+        })),
         accommodationType,
         termsAndConditions: termsList, // Include terms list
       };
@@ -148,12 +161,13 @@ const AccommodationSection = () => {
   };
 
   // Slider Settings for Image Carousel
-  const sliderSettings = {
-    infinite: true,
-    speed: 500,
+  const getSliderSettings = (numImages) => ({
+    infinite: numImages > 1,
     slidesToShow: 1,
     slidesToScroll: 1,
-  };
+    speed: 500,
+    arrows: numImages > 1,
+  });
 
   // Get Unique Accommodation Types for Tabs
   const uniqueAccommodationTypes = [...new Set(accommodations.map((accommodation) => accommodation.accommodationType))];
@@ -254,7 +268,6 @@ const AccommodationSection = () => {
               <h1 className='text-sm font-semibold'>Inclusions or Details:</h1>
               <ul className="list-disc overflow-auto h-24 pl-4 text-xs">
                 {accommodation.inclusions.map((inclusion, i) => (
-               
                   <li key={i}>{inclusion}</li>
                 ))}
               </ul>
@@ -270,27 +283,31 @@ const AccommodationSection = () => {
               {/* Image Carousel */}
               {accommodation.images.length > 0 && (
                 <div className="relative mt-4">
-                  <Slider ref={(slider) => (sliderRefs.current[accommodation.id] = slider)} {...sliderSettings}>
+                  <Slider
+                    ref={(slider) => (sliderRefs.current[accommodation.id] = slider)}
+                    {...getSliderSettings(accommodation.images.length)}
+                  >
                     {accommodation.images.map((image, index) => (
                       <div key={index}>
                         <img
-                          src={image}
-                          alt={`Accommodation ${index + 1}`}
+                          src={image.url}
+                          alt={image.title || `Accommodation ${index + 1}`}
                           className="w-full h-32 object-cover rounded-lg mt-2"
                         />
+                        <p className="text-xs text-center mt-1">{image.title}</p>
                       </div>
                     ))}
                   </Slider>
                   {/* Next and Previous buttons */}
                   <button
                     className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow"
-                    onClick={() => sliderRefs.current[accommodation.id].slickPrev()}
+                    onClick={() => sliderRefs.current[accommodation.id]?.slickPrev()}
                   >
                     <FaChevronLeft />
                   </button>
                   <button
                     className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow"
-                    onClick={() => sliderRefs.current[accommodation.id].slickNext()}
+                    onClick={() => sliderRefs.current[accommodation.id]?.slickNext()}
                   >
                     <FaChevronRight />
                   </button>
@@ -352,7 +369,7 @@ const AccommodationSection = () => {
                     <div className="w-1/2">
                       <Input
                         label="Pricing Unit"
-                        placeholder="per night, per stay, etc."
+                        placeholder="per pax, per person, etc."
                         value={pricingUnit}
                         onChange={(e) => setPricingUnit(e.target.value)}
                         fullWidth
@@ -465,16 +482,27 @@ const AccommodationSection = () => {
                       <FaImage className="text-2xl text-gray-600" />
                       <span className="text-sm font-semibold text-gray-600">Upload Images</span>
                     </label>
+
+                    {/* Text below the input */}
+                    <p className="text-sm font-semibold mt-2 text-gray-500">
+                      You can upload up to 5 images.
+                    </p>
                   </div>
 
-                  {/* Uploaded Images Preview with Remove Option */}
+                  {/* Uploaded Images Preview with Title Input and Remove Option */}
                   <div className="mb-4 flex flex-wrap gap-3">
                     {images.map((image, index) => (
-                      <div key={index} className="flex gap-3 mb-2">
+                      <div key={index} className="flex flex-col gap-2 mb-2">
                         <img
-                          src={typeof image === 'string' ? image : URL.createObjectURL(image)}
+                          src={image.url}
                           alt={`Uploaded ${index + 1}`}
                           className="h-16 w-16 object-cover rounded-lg"
+                        />
+                        <Input
+                          placeholder="Enter image title"
+                          value={image.title}
+                          onChange={(e) => handleImageTitleChange(index, e.target.value)}
+                          fullWidth
                         />
                         <Button
                           auto

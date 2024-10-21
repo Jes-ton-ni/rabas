@@ -1,13 +1,24 @@
-import React from 'react';  
+import React, { useState, useEffect } from 'react';  
 import Nav from '../components/nav';
 import Hero from '../components/hero';
 import Footer from '../components/Footer';
 import Search from '../components/Search';
-import { PiChatCircleText } from 'react-icons/pi';
+import { Spinner } from '@nextui-org/react';
 
 
 
-const Home = () => {  
+const Home = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate data fetching
+    setTimeout(() => setLoading(false), 1000);
+  }, []);
+
+  if (loading) {
+    return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
+  }
+
   return (  
     <div className='mx-auto min-h-screen bg-light font-sans '>
       {/** NAVBAR */}
@@ -28,14 +39,7 @@ const Home = () => {
 
       <div className='h-[900px]'></div>
 
-        {/* Floating chat button */}
-        <button
-          className="fixed bottom-4 right-4 bg-color1 text-white p-4 rounded-full shadow-lg hover:bg-color2 focus:outline-none z-50"
-         
-        >
-          <PiChatCircleText size={30} />
-        </button>
-
+      
       {/** Footer */}
       <Footer />
     </div>  

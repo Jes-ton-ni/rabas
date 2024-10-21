@@ -29,8 +29,19 @@ const ShopSections = () => {
   // Handlers for Image Upload
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);  
-    // Update the state with the newly selected files without a limit  
-    setImageList((prevImages) => [...prevImages, ...files]);  
+    const newImages = files.map((file) => ({
+      url: URL.createObjectURL(file),
+      title: '',
+    }));
+    setImageList((prevImages) => [...prevImages, ...newImages]);
+  };
+
+  const handleImageTitleChange = (index, title) => {
+    setImageList((prevImages) => {
+      const updatedImages = [...prevImages];
+      updatedImages[index].title = title;
+      return updatedImages;
+    });
   };
 
   const handleRemoveImage = (index) => {
@@ -65,9 +76,10 @@ const ShopSections = () => {
         price,
         category,
         description,
-        images: imageList.map((file) =>
-          typeof file === 'string' ? file : URL.createObjectURL(file)
-        ),
+        images: imageList.map((image) => ({
+          url: image.url,
+          title: image.title,
+        })),
       };
 
       if (isEditing) {
@@ -222,10 +234,11 @@ const ShopSections = () => {
                     {product.images.map((image, index) => (
                       <div key={index}>
                         <img
-                          src={image}
-                          alt={`Product ${index + 1}`}
+                          src={image.url}
+                          alt={image.title || `Product ${index + 1}`}
                           className="w-full h-32 object-cover rounded-lg mt-2"
                         />
+                        <p className="text-xs text-center mt-1">{image.title}</p>
                       </div>
                     ))}
                   </Slider>
@@ -339,14 +352,20 @@ const ShopSections = () => {
                         You can upload up to 5 images.
                       </p>
                     </div>
-                  {/* Uploaded Images Preview with Remove Option */}
+                  {/* Uploaded Images Preview with Title Input and Remove Option */}
                   <div className="mb-4 flex flex-wrap gap-3">
                     {imageList.map((image, index) => (
-                      <div key={index} className="flex gap-3 mb-2">
+                      <div key={index} className="flex flex-col gap-2 mb-2">
                         <img
-                          src={typeof image === 'string' ? image : URL.createObjectURL(image)}
+                          src={image.url}
                           alt={`Uploaded ${index + 1}`}
                           className="h-16 w-16 object-cover rounded-lg"
+                        />
+                        <Input
+                          placeholder="Enter image title"
+                          value={image.title}
+                          onChange={(e) => handleImageTitleChange(index, e.target.value)}
+                          fullWidth
                         />
                         <Button
                           auto

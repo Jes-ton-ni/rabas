@@ -10,8 +10,8 @@ const initialState = {
       hasBooking: true,
       inclusions: ["Guide", "Lunch", "Transportation"],
       images: [
-        "https://via.placeholder.com/150",
-        "https://via.placeholder.com/150"
+        { url: "https://via.placeholder.com/150", title: "Mountain View" },
+        { url: "https://via.placeholder.com/150", title: "Trail" }
       ],
       activityType: "Outdoor",
     },
