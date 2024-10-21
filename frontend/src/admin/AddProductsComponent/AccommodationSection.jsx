@@ -1,13 +1,12 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Modal, ModalContent, ModalHeader, ModalBody } from '@nextui-org/react';
 import { Input, Button, Checkbox } from '@nextui-org/react';
 import Slider from 'react-slick';
-import { addAccommodation, updateAccommodation, deleteAccommodations } from '@/redux/accomodationSlice';
+import { addProduct, handleUpdateAccommodation, deleteAccommodations, fetchBusinessProducts } from '@/redux/accomodationSlice';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaSearch, FaChevronLeft, FaChevronRight, FaImage } from 'react-icons/fa';
-import { nanoid } from '@reduxjs/toolkit';
 
 const AccommodationSection = () => {
   // State Management
@@ -29,12 +28,33 @@ const AccommodationSection = () => {
 
   const dispatch = useDispatch();
   const accommodations = useSelector((state) => state.accommodations.accommodations);
+  const status = useSelector((state) => state.accommodations.status);
+  const error = useSelector((state) => state.accommodations.error);
   const sliderRefs = useRef({});
+
+  useEffect(() => {
+    // console.log('Fetching business products...');
+    dispatch(fetchBusinessProducts());
+  }, [dispatch]);
+
+  // useEffect(() => {
+    // console.log('Accommodations from Redux state:', accommodations);
+  // }, [accommodations]);
+
+  if (status === 'loading') {
+    return <div>Loading accommodations...</div>;
+  }
+
+  if (status === 'failed') {
+    return <div>Error: {error}</div>;
+  }
 
   // Handlers for Inclusions
   const handleAddInclusion = () => {
-    if (inclusions.trim()) {
+    if (typeof inclusions === 'string' && inclusions.trim()) {
+      // Add the trimmed inclusion to the inclusion list
       setInclusionList([...inclusionList, inclusions.trim()]);
+      // Clear the input
       setInclusions('');
     }
   };
@@ -46,11 +66,16 @@ const AccommodationSection = () => {
 
   // Handlers for Terms and Conditions
   const handleAddTerm = () => {
-    if (termsAndConditions.trim()) {
+    // Check if termsAndConditions is a string and not empty after trimming
+    if (typeof termsAndConditions === 'string' && termsAndConditions.trim()) {
+      // Add the trimmed term to the terms list
       setTermsList([...termsList, termsAndConditions.trim()]);
+      // Clear the input
       setTermsAndConditions('');
+    } else {
+      console.error("termsAndConditions is not a valid string:", termsAndConditions);
     }
-  };
+  };  
 
   const handleRemoveTerm = (index) => {
     const updatedTermsList = termsList.filter((_, i) => i !== index);
@@ -60,8 +85,8 @@ const AccommodationSection = () => {
   // Handlers for Image Upload
   const handleImageUpload = (e) => {  
     const files = Array.from(e.target.files);  
-    setImages((prevImages) => [...prevImages, ...files]);  
-  };  
+    setImages((prevImages) => Array.isArray(prevImages) ? [...prevImages, ...files] : [...files]);  
+  };
 
   const handleRemoveImage = (index) => {
     const updatedImages = images.filter((_, i) => i !== index);
@@ -86,34 +111,82 @@ const AccommodationSection = () => {
   };
 
   // Handler for Form Submission (Add/Edit Accommodation)
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent default form submission behavior
+
+    // Check that all required fields are filled
     if (accommodationName && pricing && pricingUnit && accommodationType) {
+      // Construct the new accommodation object
       const newAccommodation = {
-        id: isEditing ? editingAccommodationId : nanoid(),
-        accommodationName,
-        pricing,
-        pricingUnit,
-        hasBooking,
-        inclusions: inclusionList,
-        images: images.map((file) =>
-          typeof file === 'string' ? file : URL.createObjectURL(file)
-        ),
-        accommodationType,
-        termsAndConditions: termsList, // Include terms list
+        type: accommodationType,
+        name: accommodationName,
+        price: pricing,
+        pricing_unit: pricingUnit,
+        booking_operation: hasBooking ? 1 : 0,
+        inclusions: inclusionList, // Should be an array
+        termsAndConditions: termsList, // Should be an array
+        images: Array.isArray(images) 
+          ? images.map((file) => 
+              typeof file === 'string' ? file : URL.createObjectURL(file)
+            ) 
+          : [], // Fallback to empty array if images is not an array
       };
 
+      // Create FormData for the accommodation and image upload
+      const formData = new FormData();
+      // Append product_id if editing
       if (isEditing) {
-        dispatch(updateAccommodation({ id: editingAccommodationId, updatedData: newAccommodation }));
-      } else {
-        dispatch(addAccommodation(newAccommodation));
+        formData.append('product_id', editingAccommodationId); // Add the product_id for editing
+      }
+      formData.append('type', newAccommodation.type);
+      formData.append('name', newAccommodation.name);
+      formData.append('price', newAccommodation.price);
+      formData.append('pricing_unit', newAccommodation.pricing_unit);
+      formData.append('booking_operation', newAccommodation.booking_operation.toString());
+      
+      // Append inclusions and terms and conditions
+      if (Array.isArray(newAccommodation.inclusions)) {
+        newAccommodation.inclusions.forEach(inclusion => {
+          formData.append('inclusions[]', inclusion); // Append as an array
+        });
+      }
+      
+      if (Array.isArray(newAccommodation.termsAndConditions)) {
+        newAccommodation.termsAndConditions.forEach(term => {
+          formData.append('termsAndConditions[]', term); // Append as an array
+        });
       }
 
-      // Reset form
-      setModalOpen(false);
-      resetForm();
+      // Add the images to FormData
+      if (Array.isArray(images)) {
+        images.forEach((file) => {
+          if (file instanceof File) {
+            formData.append('productImages', file); // Append each image file
+          }
+        });
+      }
+
+      try {
+        let result;
+        // Check if we are in editing mode or adding a new accommodation
+        if (isEditing) {
+          result = await dispatch(handleUpdateAccommodation(formData));
+          console.log('Accommodation updated successfully:', result);
+        } else {
+          result = await dispatch(addProduct(formData));
+          console.log('Full result object:', result);
+          console.log('Accommodation added successfully:', result.payload);
+        }
+
+        // Close modal and reset form after successful submission
+        setModalOpen(false);
+        resetForm();
+      } catch (error) {
+        console.error('Failed to submit accommodation:', error);
+        alert('An error occurred while saving the accommodation. Please try again.');
+      }
     } else {
-      alert('Please fill in all required fields.');
+      alert('Please fill in all required fields.'); // Alert if required fields are missing
     }
   };
 
@@ -202,9 +275,9 @@ const AccommodationSection = () => {
         >
           All
         </Button>
-        {uniqueAccommodationTypes.map((type) => (
+        {uniqueAccommodationTypes.map((type, index) => (
           <Button
-            key={type}
+          key={`${type}-${index}`}
             onClick={() => setSelectedType(type)}
             className={`border p-2 rounded-md transition duration-300 ease-in-out ${
               selectedType === type
@@ -228,11 +301,7 @@ const AccommodationSection = () => {
             >
               {/* Accommodation Header */}
               <div className="flex mb-3 items-center gap-2 justify-between">
-                <Button
-                  size="sm"
-                  color="success"
-                  onClick={() => handleEdit(accommodation)}
-                >
+                <Button size="sm" color="success" onClick={() => handleEdit(accommodation)}>
                   Edit
                 </Button>
                 <Checkbox
@@ -251,54 +320,88 @@ const AccommodationSection = () => {
               </p>
 
               {/* Inclusions */}
-              <h1 className='text-sm font-semibold'>Inclusions or Details:</h1>
-              <ul className="list-disc overflow-auto h-24 pl-4 text-xs">
-                {accommodation.inclusions.map((inclusion, i) => (
-               
-                  <li key={i}>{inclusion}</li>
+              <h3 className="text-sm font-semibold">Inclusions or Details:</h3>
+              <ul className="list-disc overflow-auto max-h-24 pl-4 text-xs">
+                {accommodation.inclusions && Array.isArray(accommodation.inclusions) && accommodation.inclusions.map((inclusion) => (
+                  <li key={inclusion}>{inclusion}</li>
                 ))}
               </ul>
 
               {/* Terms and Conditions */}
-              <h1 className='text-sm font-semibold'>Terms and Conditions:</h1>
-              <ul className="list-disc overflow-auto h-24 pl-4 text-xs">
-                {accommodation.termsAndConditions?.map((term, i) => (
-                  <li key={i}>{term}</li>
-                ))}
-              </ul>
+              {Array.isArray(accommodation.termsAndConditions) && accommodation.termsAndConditions.length > 0 ? (
+                <>
+                  <h3 className="text-sm font-semibold">Terms and Conditions:</h3>
+                  <ul className="list-disc overflow-auto max-h-24 pl-4 text-xs">
+                    {accommodation.termsAndConditions.map((term) => (
+                      <li key={term}>{term}</li>
+                    ))}
+                  </ul>
+                </>
+              ) : (
+                <p className="text-sm italic text-gray-500">No terms and conditions provided</p>
+              )}
 
               {/* Image Carousel */}
-              {accommodation.images.length > 0 && (
-                <div className="relative mt-4">
+              {accommodation.images && Array.isArray(accommodation.images) && accommodation.images.length > 0 && (
+              <div className="relative mt-4">
+                {accommodation.images.length === 1 ? (
+                  // Render a single image without the slider
+                  <div className="relative">
+                    <img
+                      src={`http://localhost:5000/${accommodation.images[0]}`} // Base URL to the image
+                      alt={`Accommodation ${accommodation.accommodationName} Image`}
+                      className="w-full h-32 object-cover rounded-lg mt-2"
+                      onError={(e) => {
+                        e.target.onerror = null; // Prevents looping
+                        e.target.src = '/path/to/fallback/image.png'; // Fallback image
+                      }}
+                    />
+                  </div>
+                ) : (
+                  // Render the slider if there are multiple images
                   <Slider ref={(slider) => (sliderRefs.current[accommodation.id] = slider)} {...sliderSettings}>
                     {accommodation.images.map((image, index) => (
-                      <div key={index}>
+                      <div key={`${image}-${index}`} className="relative">
                         <img
-                          src={image}
-                          alt={`Accommodation ${index + 1}`}
+                          src={`http://localhost:5000/${image}`}  // Apply the base URL to the image
+                          alt={`Accommodation ${accommodation.accommodationName} Image ${index + 1}`}
                           className="w-full h-32 object-cover rounded-lg mt-2"
+                          onError={(e) => {
+                            e.target.onerror = null; // Prevents looping
+                            e.target.src = '/path/to/fallback/image.png'; // Fallback image
+                          }}
                         />
                       </div>
                     ))}
                   </Slider>
-                  {/* Next and Previous buttons */}
-                  <button
-                    className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow"
-                    onClick={() => sliderRefs.current[accommodation.id].slickPrev()}
-                  >
-                    <FaChevronLeft />
-                  </button>
-                  <button
-                    className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow"
-                    onClick={() => sliderRefs.current[accommodation.id].slickNext()}
-                  >
-                    <FaChevronRight />
-                  </button>
-                </div>
-              )}
+                )}
+                
+                {/* Next and Previous buttons */}
+                {accommodation.images.length > 1 && (
+                  <>
+                    <button
+                      className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow"
+                      onClick={() => sliderRefs.current[accommodation.id].slickPrev()}
+                      aria-label="Previous image"
+                    >
+                      <FaChevronLeft />
+                    </button>
+                    <button
+                      className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow"
+                      onClick={() => sliderRefs.current[accommodation.id].slickNext()}
+                      aria-label="Next image"
+                    >
+                      <FaChevronRight />
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+
             </div>
           ))}
       </div>
+
 
       {/* Modal for Adding/Editing Accommodations */}
       <Modal isOpen={modalOpen} onOpenChange={setModalOpen} size="2xl">
@@ -392,19 +495,23 @@ const AccommodationSection = () => {
 
                       {/* Terms List */}
                       <ul className="mt-3 flex items-center flex-wrap gap-3 pl-5 text-sm">
-                        {termsList.map((item, index) => (
-                          <li key={index} className="flex gap-3 items-center bg-light p-2 rounded-md">
-                            {item}
-                            <Button
-                              auto
-                              color="danger"
-                              size="sm"
-                              onClick={() => handleRemoveTerm(index)}
-                            >
-                              Remove
-                            </Button>
-                          </li>
-                        ))}
+                        {Array.isArray(termsList) && termsList.length > 0 ? (
+                          termsList.map((item, index) => (
+                            <li key={`${item}-${index}`} className="flex gap-3 items-center bg-light p-2 rounded-md">
+                              {item}
+                              <Button
+                                auto
+                                color="danger"
+                                size="sm"
+                                onClick={() => handleRemoveTerm(index)}
+                              >
+                                Remove
+                              </Button>
+                            </li>
+                          ))
+                        ) : (
+                          <li>No terms added.</li>
+                        )}
                       </ul>
                     </div>
                   )}
@@ -429,19 +536,23 @@ const AccommodationSection = () => {
 
                     {/* Inclusions List */}
                     <ul className="mt-3 flex items-center flex-wrap gap-3 pl-5 text-sm">
-                      {inclusionList.map((item, index) => (
-                        <li key={index} className="flex gap-3 items-center bg-light p-2 rounded-md">
-                          {item}
-                          <Button
-                            auto
-                            color="danger"
-                            size="sm"
-                            onClick={() => handleRemoveInclusion(index)}
-                          >
-                            Remove
-                          </Button>
-                        </li>
-                      ))}
+                      {Array.isArray(inclusionList) && inclusionList.length > 0 ? (
+                        inclusionList.map((item, index) => (
+                          <li key={`${item}-${index}`} className="flex gap-3 items-center bg-light p-2 rounded-md">
+                            {item}
+                            <Button
+                              auto
+                              color="danger"
+                              size="sm"
+                              onClick={() => handleRemoveInclusion(index)}
+                            >
+                              Remove
+                            </Button>
+                          </li>
+                        ))
+                      ) : (
+                        <li>No inclusions added.</li>
+                      )}
                     </ul>
                   </div>
 
@@ -469,23 +580,31 @@ const AccommodationSection = () => {
 
                   {/* Uploaded Images Preview with Remove Option */}
                   <div className="mb-4 flex flex-wrap gap-3">
-                    {images.map((image, index) => (
-                      <div key={index} className="flex gap-3 mb-2">
-                        <img
-                          src={typeof image === 'string' ? image : URL.createObjectURL(image)}
-                          alt={`Uploaded ${index + 1}`}
-                          className="h-16 w-16 object-cover rounded-lg"
-                        />
-                        <Button
-                          auto
-                          color="danger"
-                          size="xs"
-                          onClick={() => handleRemoveImage(index)}
-                        >
-                          Remove
-                        </Button>
-                      </div>
-                    ))}
+                    {images && Array.isArray(images) && images.length > 0 ? (
+                      images.map((image, index) => (
+                        <div key={`${image}-${index}`} className="flex gap-3 mb-2">
+                          <img
+                            src={
+                              typeof image === 'string'
+                                ? `http://localhost:5000/${image}` // If it's a string, construct the URL
+                                : URL.createObjectURL(image) // If it's an object (e.g., a file), create an object URL
+                            }
+                            alt={`Uploaded ${index + 1}`}
+                            className="h-16 w-16 object-cover rounded-lg"
+                          />
+                          <Button
+                            auto
+                            color="danger"
+                            size="xs"
+                            onClick={() => handleRemoveImage(index)}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No images to display</p> // Optionally display a message if there are no images
+                    )}
                   </div>
 
                   {/* Submit Button */}

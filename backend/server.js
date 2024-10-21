@@ -906,33 +906,171 @@ app.put('/updateBusinessPolicies/:id', (req, res) => {
   );
 });
 
-// Endpoint for updating business openingHours
-app.put('/update-opening-hours', (req, res) => {
+// Endpoint to get business product
+app.get('/getBusinessProduct', (req, res) => {
+  // console.log('Session:', req.session);
   const userId = req.session?.user?.user_id;
-  const openingHours = req.body.openingHours; // Expecting an array of opening hours
 
   if (!userId) {
     return res.status(400).json({ success: false, message: 'User not logged in or user ID missing' });
   }
 
-  if (!Array.isArray(openingHours)) {
-    return res.status(400).json({ success: false, message: 'Invalid opening hours format' });
-  }
-
-  // Update opening hours in the database (Assuming you have a business ID to update)
-  const sql = `UPDATE businesses SET openingHours = ? WHERE user_id = ?`; // Adjust this to your actual column name
-
-  connection.query(sql, [JSON.stringify(openingHours), userId], (err, results) => {
+  const sql = `SELECT * FROM products WHERE user_id = ?`;
+  
+  connection.query(sql, [userId], (err, results) => {
     if (err) {
       console.error('Error executing SQL query:', err);
       return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 
-    if (results.affectedRows > 0) {
-      return res.json({ success: true, message: 'Opening hours updated successfully' });
+    if (results.length > 0) {
+      return res.json({ success: true, businessProducts: results });
     } else {
-      return res.status(404).json({ success: false, message: 'Business not found or no changes made' });
+      // Return an empty string or an empty array instead of a 404 error
+      return res.json({ success: true, businessProducts: [] });
     }
+  });
+});
+
+app.post('/add-product', upload.array('productImages', 5), async (req, res) => { 
+  const { type, name, price, pricing_unit, booking_operation, inclusions, termsAndConditions } = req.body;
+  const user_id = req.session?.user?.user_id;
+
+  if (!user_id || !name || !price || !pricing_unit) {
+    return res.status(400).json({ success: false, message: 'Missing required fields' });
+  }
+
+  // Handling the product images
+  const productImages = req.files && req.files.length > 0 
+    ? req.files.map(file => file.path) 
+    : []; // Set to null if no images are uploaded
+
+  try {
+    // Ensure inclusions is a JSON array of strings or null if not provided
+    const inclusionsArray = inclusions && typeof inclusions === 'string' 
+      ? inclusions.split(',').map(inclusion => inclusion.trim()).filter(Boolean) // Convert comma-separated string to array and filter out empty values
+      : []; // Set to null if not provided
+
+    // Ensure termsAndConditions is a JSON array of strings or null if not provided
+    const termsAndConditionsArray = termsAndConditions && typeof termsAndConditions === 'string'
+      ? termsAndConditions.split(',').map(terms => terms.trim()).filter(Boolean) // Convert comma-separated string to array and filter out empty values
+      : []; // Set to null if not provided
+
+    const query = `
+      INSERT INTO products (user_id, type, name, price, pricing_unit, booking_operation, inclusions, termsAndConditions, images)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      user_id, 
+      type, 
+      name, 
+      price, 
+      pricing_unit || null, // Save null if pricing_unit is not provided
+      parseInt(booking_operation) || 0, // Save null if booking_operation is not provided
+      JSON.stringify(inclusionsArray), // Store inclusions as a JSON array or null
+      JSON.stringify(termsAndConditionsArray), // Store terms and conditions as a JSON array or null
+      JSON.stringify(productImages), // Store images as a JSON array or null
+    ];
+
+    connection.query(query, values, (err, results) => {
+      if (err) {
+        console.error('Error adding product:', err);
+        return res.status(500).json({ success: false, message: 'Failed to add product' });
+      }
+
+      // Return all relevant data about the newly added product
+      const addedProduct = {
+        success: true,
+        message: 'Product added successfully',
+        product_id: results.insertId,
+        user_id,
+        type: type,
+        name,
+        price,
+        pricing_unit: pricing_unit || [],
+        booking_operation: parseInt(booking_operation) || 0,
+        inclusions: inclusionsArray,
+        termsAndConditions: termsAndConditionsArray,
+        images: productImages, // Will be null if no images are uploaded
+      };
+      console.log(addedProduct);
+      res.json(addedProduct);
+    });
+  } catch (error) {
+    console.error('Error adding product:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Endpoint to update an existing product
+app.put('/update-product', upload.array('productImages', 5), async (req, res) => {
+  const { product_id, type, name, price, pricing_unit, booking_operation, inclusions, termsAndConditions } = req.body;
+  const user_id = req.session?.user?.user_id;
+
+  if (!user_id || !product_id || !name || !price || !pricing_unit) {
+    return res.status(400).json({ success: false, message: 'Missing required fields' });
+  }
+
+  const productImages = req.files && req.files.length > 0 
+    ? req.files.map(file => file.path) 
+    : [];
+
+  const inclusionsArray = Array.isArray(inclusions)
+    ? inclusions // Already an array
+    : inclusions ? inclusions.split(',').map(inclusion => inclusion.trim()).filter(Boolean) : []; // Convert and filter empty strings
+
+  const termsAndConditionsArray = Array.isArray(termsAndConditions)
+    ? termsAndConditions // Already an array
+    : termsAndConditions ? termsAndConditions.split(',').map(terms => terms.trim()).filter(Boolean) : []; // Convert and filter empty strings
+
+  const query = `
+    UPDATE products 
+    SET type = ?, name = ?, price = ?, pricing_unit = ?, booking_operation = ?, inclusions = ?, termsAndConditions = ?, images = ?
+    WHERE product_id = ? AND user_id = ?
+  `;
+
+  const values = [
+    type,
+    name,
+    price,
+    pricing_unit || null,
+    parseInt(booking_operation) || 0,
+    JSON.stringify(inclusionsArray), // Store inclusions as a JSON string
+    JSON.stringify(termsAndConditionsArray), // Store terms and conditions as a JSON string
+    JSON.stringify(productImages), // Store updated images as a JSON string
+    product_id,
+    user_id,
+  ];
+
+  connection.query(query, values, (err, results) => {
+    if (err) {
+      console.error('Error updating product:', err);
+      return res.status(500).json({ success: false, message: 'Failed to update product' });
+    }
+
+    if (results.affectedRows === 0) {
+      // No rows affected, meaning the product was not found for the user
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    // Construct the updated product object for response
+    const updatedProduct = {
+      success: true,
+      message: 'Product updated successfully',
+      product_id, // Return the product_id that was updated
+      user_id,
+      type,
+      name,
+      price,
+      pricing_unit: pricing_unit || null,
+      booking_operation: parseInt(booking_operation) || 0,
+      inclusions: inclusionsArray,
+      termsAndConditions: termsAndConditionsArray,
+      images: productImages, // Will be empty if no images are uploaded
+    };
+    console.log(updatedProduct);
+    res.json(updatedProduct);
   });
 });
 
