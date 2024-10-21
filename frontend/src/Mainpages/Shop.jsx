@@ -10,6 +10,7 @@ import { Checkbox, CheckboxGroup, Select, SelectItem, Slider } from "@nextui-org
 import { GiPositionMarker } from "react-icons/gi";
 import { Link } from 'react-router-dom';
 import { PiChatCircleText } from 'react-icons/pi';
+import { Spinner } from '@nextui-org/react'; // Add this import
 
 
 const Shop = () => {
@@ -19,7 +20,7 @@ const Shop = () => {
     const [selectedAmenities, setSelectedAmenities] = useState([]);
     const [selectedRatings, setSelectedRatings] = useState([]);
     const [priceRange, setPriceRange] = useState([0, 5000]); // Price range slider
-   
+    const [loading, setLoading] = useState(true);
 
     // Shop Details (mock data)
     const shopDetails = [
@@ -144,6 +145,15 @@ const Shop = () => {
             }
         }
     };
+
+    useEffect(() => {
+        // Simulate data fetching
+        setTimeout(() => setLoading(false), 1000);
+    }, []);
+
+    if (loading) {
+        return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
+    }
 
     return (
         <div className='mx-auto bg-light min-h-screen font-sans'>
@@ -327,7 +337,7 @@ const Shop = () => {
             </div>
                    {/* Floating chat button */}
        <button
-          className="fixed bottom-4 right-4 bg-color1 text-white p-4 rounded-full shadow-lg hover:bg-color2 focus:outline-none z-50"
+       className="fixed bottom-4 right-4  ring-light ring-1 bg-color1 text-white p-4 rounded-full shadow-lg hover:bg-color2 focus:outline-none z-50"
          
         >
           <PiChatCircleText size={30} />

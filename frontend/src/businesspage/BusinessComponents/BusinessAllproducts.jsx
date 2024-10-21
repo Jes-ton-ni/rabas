@@ -15,10 +15,11 @@ import {
   ModalBody,
   ModalFooter,
   Textarea,
+  Spinner,
+  useDisclosure,
 } from '@nextui-org/react';
 import { MdRateReview } from 'react-icons/md';
 import { AiFillStar } from 'react-icons/ai';
-import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import AccommodationBookingForm from './bookingFormModal/AccommodationBookingForm';
 import TableReservationForm from './bookingFormModal/TableReservationForm';
@@ -197,7 +198,7 @@ const ReviewModal = ({ isOpen, onClose, product }) => {
 };
 
 // Product Card Component
-const ProductCard = ({ product, openImageModal, openBookingModal }) => {
+const ProductCard = ({ product, openBookingModal, onOpen }) => {
   const [isReviewModalOpen, setReviewModalOpen] = useState(false);
 
   const openReviewModal = () => setReviewModalOpen(true);
@@ -213,12 +214,8 @@ const ProductCard = ({ product, openImageModal, openBookingModal }) => {
               alt={product.title}
               className="object-cover w-full h-[250px] md:h-[300px] rounded-lg"
             />
-            <Button
-              color="primary"
-              size="sm"
-              className="absolute bottom-4 right-4"
-              onClick={() => openImageModal(product.images)}
-            >
+            {/* View Images button with functionality */}
+            <Button size="sm" className="absolute bottom-2 right-2 text-white bg-color1" onClick={onOpen}>
               View Images
             </Button>
           </div>
@@ -250,28 +247,6 @@ const ProductCard = ({ product, openImageModal, openBookingModal }) => {
       </CardBody>
       <ReviewModal isOpen={isReviewModalOpen} onClose={closeReviewModal} product={product} />
     </Card>
-  );
-};
-
-// Image Modal Component
-const ImageModal = ({ isOpen, onClose, images }) => {
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} size='full' className="w-full h-full ">
-      <ModalContent className="p-4">
-        <ModalHeader>
-          <h2 className="text-xl font-semibold">Image Preview</h2>
-        </ModalHeader>
-        <ModalBody className="py-4 flex justify-center  items-center flex-row gap-4  overflow-y-auto max-h-screen p-6">
-          <Carousel className="overflow-x-auto w-full  bg-dark" showArrows={true} emulateTouch={true}>
-            {images.map((img, index) => (
-              <div key={index} className="flex justify-center items-center max-h-[500px]">
-                <img src={img} alt={`Slide ${index + 1}`} className="object-cover h-full max-w-full" />
-              </div>
-            ))}
-          </Carousel>
-        </ModalBody>
-      </ModalContent>
-    </Modal>
   );
 };
 
@@ -375,6 +350,16 @@ const LoadingSpinner = () => (
   </div>
 );
 
+// Add the images array from BusinessHero
+const images = [
+  { url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Sunset Over the Hills' },
+  { url: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Mountain Range' },
+  { url: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'City Skyline' },
+  { url: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Forest Path' },
+  { url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Ocean Waves' },
+  { url: 'https://images.unsplash.com/photo-1497215842964-222b430dc094?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Desert Dunes' },
+];
+
 // Main Business All Products Component
 const BusinessAllproducts = () => {
   const [activeTab, setActiveTab] = useState('all');
@@ -386,13 +371,9 @@ const BusinessAllproducts = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImages, setModalImages] = useState([]);
   const [activeModal, setActiveModal] = useState(null);
-
-  const openImageModal = (images) => {
-    setModalImages(images);
-    setIsModalOpen(true);
-  };
-
-  const closeImageModal = () => setIsModalOpen(false);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [previewIndex, setPreviewIndex] = useState(null);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure(); // Ensure this is included
 
   const openBookingModal = (product) => {
     if (product.type === 'Cabins' || product.type === 'Resorts') {
@@ -448,6 +429,39 @@ const BusinessAllproducts = () => {
     setLoading(false);
   }, [activeTab, selectedType, ratingFilter, budgetRange]);
 
+  useEffect(() => {
+    // Simulate data fetching
+    setTimeout(() => setLoading(false), 1000);
+  }, []);
+
+  const handleThumbnailClick = (index) => {
+    setPreviewImage(images[index].url);
+    setPreviewIndex(index);
+  };
+
+  const closePreview = () => {
+    setPreviewImage(null);
+    setPreviewIndex(null);
+  };
+
+  const goToPrevImage = () => {
+    if (previewIndex > 0) {
+      setPreviewIndex(previewIndex - 1);
+      setPreviewImage(images[previewIndex - 1].url);
+    }
+  };
+
+  const goToNextImage = () => {
+    if (previewIndex < images.length - 1) {
+      setPreviewIndex(previewIndex + 1);
+      setPreviewImage(images[previewIndex + 1].url);
+    }
+  };
+
+  if (loading) {
+    return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
+  }
+
   return (
     <div className="min-h-screen container mx-auto p-4 md:p-6 bg-white rounded-md shadow-md mb-4">
       <div className="text-3xl font-semibold mb-6 text-gray-800">What We Offer</div>
@@ -488,7 +502,7 @@ const BusinessAllproducts = () => {
               <LoadingSpinner />
             ) : filteredData.length > 0 ? (
               filteredData.map((product, index) => (
-                <ProductCard key={index} product={product} openImageModal={openImageModal} openBookingModal={openBookingModal} />
+                <ProductCard key={index} product={product} openBookingModal={openBookingModal} onOpen={onOpen} />
               ))
             ) : (
               <div>No results found</div>
@@ -498,7 +512,86 @@ const BusinessAllproducts = () => {
       </div>
 
       {/* Image Modal */}
-      <ImageModal isOpen={isModalOpen} onClose={closeImageModal} images={modalImages} />
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        scrollBehavior="inside"
+        size="5xl"
+        className='max-h-[90vh]'
+        closeOnOverlayClick={false} // Ensure this property is set to prevent closing on outside click
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Image Gallery</ModalHeader>
+              <ModalBody>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {images.map((image, index) => (
+                    <div
+                      key={index}
+                      className="relative group overflow-hidden rounded-lg shadow-md"
+                      onClick={() => handleThumbnailClick(index)}
+                    >
+                      <img
+                        src={image.url}
+                        alt={`Gallery image ${index + 1}`}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity duration-300"></div>
+                    </div>
+                  ))}
+                </div>
+                {previewImage && (
+                  <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+                    <div className="relative max-w-full max-h-full">
+                      <img
+                        src={previewImage}
+                        alt="Preview"
+                        className="w-auto h-auto max-w-full max-h-full object-contain"
+                      />
+                      <div className="absolute bottom-4 left-0 right-0 text-center text-white text-lg font-semibold bg-black bg-opacity-50 py-2">
+                        {images[previewIndex].title}
+                      </div>
+                      <button
+                        className="absolute top-2 right-2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full p-2 transition-all duration-300"
+                        onClick={closePreview} // This only closes the preview
+                        aria-label="Close preview"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                      <button
+                        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full p-2 transition-all duration-300"
+                        onClick={goToPrevImage}
+                        aria-label="Previous image"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </button>
+                      <button
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full p-2 transition-all duration-300"
+                        onClick={goToNextImage}
+                        aria-label="Next image"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </ModalBody>
+              <ModalFooter>
+                <Button onPress={onClose} color='danger'>Close</Button> {/* This closes the entire modal */}
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      {/* Removed Image Modal */}
 
       {/* Conditionally Render Modals */}
       {activeModal?.type === 'accommodation' && <AccommodationBookingForm isOpen={true} onClose={closeBookingModal} product={activeModal.product} />}

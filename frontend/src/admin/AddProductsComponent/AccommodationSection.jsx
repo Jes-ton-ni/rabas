@@ -19,7 +19,7 @@ const AccommodationSection = () => {
   const [hasBooking, setHasBooking] = useState(false);
   const [inclusions, setInclusions] = useState('');
   const [inclusionList, setInclusionList] = useState([]);
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState([]); // Updated to store objects with url and title
   const [selectedAccommodations, setSelectedAccommodations] = useState([]);
   const [accommodationType, setAccommodationType] = useState('');
   const [selectedType, setSelectedType] = useState('');
@@ -221,12 +221,13 @@ const AccommodationSection = () => {
   };
 
   // Slider Settings for Image Carousel
-  const sliderSettings = {
-    infinite: true,
-    speed: 500,
+  const getSliderSettings = (numImages) => ({
+    infinite: numImages > 1,
     slidesToShow: 1,
     slidesToScroll: 1,
-  };
+    speed: 500,
+    arrows: numImages > 1,
+  });
 
   // Get Unique Accommodation Types for Tabs
   const uniqueAccommodationTypes = [...new Set(accommodations.map((accommodation) => accommodation.accommodationType))];
@@ -371,6 +372,7 @@ const AccommodationSection = () => {
                             e.target.src = '/path/to/fallback/image.png'; // Fallback image
                           }}
                         />
+                        <p className="text-xs text-center mt-1">{image.title}</p>
                       </div>
                     ))}
                   </Slider>
@@ -455,7 +457,7 @@ const AccommodationSection = () => {
                     <div className="w-1/2">
                       <Input
                         label="Pricing Unit"
-                        placeholder="per night, per stay, etc."
+                        placeholder="per pax, per person, etc."
                         value={pricingUnit}
                         onChange={(e) => setPricingUnit(e.target.value)}
                         fullWidth
@@ -576,9 +578,14 @@ const AccommodationSection = () => {
                       <FaImage className="text-2xl text-gray-600" />
                       <span className="text-sm font-semibold text-gray-600">Upload Images</span>
                     </label>
+
+                    {/* Text below the input */}
+                    <p className="text-sm font-semibold mt-2 text-gray-500">
+                      You can upload up to 5 images.
+                    </p>
                   </div>
 
-                  {/* Uploaded Images Preview with Remove Option */}
+                  {/* Uploaded Images Preview with Title Input and Remove Option */}
                   <div className="mb-4 flex flex-wrap gap-3">
                     {images && Array.isArray(images) && images.length > 0 ? (
                       images.map((image, index) => (

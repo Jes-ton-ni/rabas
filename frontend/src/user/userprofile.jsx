@@ -6,6 +6,94 @@ import Search from '@/components/Search';
 import { Tabs, Tab, Card, CardBody, Button, useDisclosure } from "@nextui-org/react";
 import BusinessApplicationModal from '@/businesspage/BusinessComponents/BusinessApplicationModal'; // Import the modal
 import { GiPositionMarker } from 'react-icons/gi';
+import {Spinner} from "@nextui-org/react";
+import { AiOutlineLike } from 'react-icons/ai';
+import { Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
+
+
+// Simplified component for the "My Booking" tab
+const MyBookingTab = ({ bookings, onCancelBooking }) => {
+  const [activeTab, setActiveTab] = useState("active");
+
+  const filterBookings = (status) => {
+    return bookings.filter(booking => booking.status === status);
+  };
+
+  return (
+    <div className="p-6">
+      <h3 className="text-2xl font-bold ">My Bookings</h3>
+      <Tabs aria-label="Booking Status" selectedKey={activeTab} onSelectionChange={setActiveTab}>
+        <Tab key="active" title="Active">
+          <div className="overflow-y-auto max-h-[450px] scrollbar-custom">
+            {filterBookings("active").map((booking, index) => (
+              <div key={index} className="bg-white shadow-lg p-4 rounded-lg mb-4">
+                <div className="p-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200">
+                  <h4 className="font-semibold mb-2">Booking Details:</h4>
+                  <ul className="space-y-1">
+                    <li><strong>Product:</strong> {booking.formDetails?.productName || 'Sample Product'}</li>
+                    <li><strong>Guests:</strong> {booking.formDetails?.numberOfGuests}</li>
+                    <li><strong>Email:</strong> {booking.formDetails?.email}</li>
+                    <li><strong>Phone:</strong> {booking.formDetails?.phone}</li>
+                    <li><strong>Date:</strong> {booking.formDetails?.visitDate || booking.formDetails?.checkInOutDates?.start}</li>
+                    <li><strong>Time:</strong> {booking.formDetails?.activityTime || booking.formDetails?.reservationTime}</li>
+                    <li><strong>Special Requests:</strong> {booking.formDetails?.specialRequests}</li>
+                    <li><strong>Amount:</strong> {booking.formDetails?.amount}</li>
+                  </ul>
+                </div>
+                <Button className="mt-2 bg-red-500 text-white" onClick={() => onCancelBooking(booking.id)}>
+                  Cancel Booking
+                </Button>
+              </div>
+            ))}
+          </div>
+        </Tab>
+        <Tab key="completed" title="Completed">
+          <div className="overflow-y-auto max-h-[500px] scrollbar-custom">
+            {filterBookings("completed").map((booking, index) => (
+              <div key={index} className="bg-white shadow-lg p-4 rounded-lg ">
+                <div className="p-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200">
+                  <h4 className="font-semibold mb-2">Booking Details:</h4>
+                  <ul className="space-y-1">
+                    <li><strong>Product:</strong> {booking.formDetails?.productName || 'Sample Product'}</li>
+                    <li><strong>Guests:</strong> {booking.formDetails?.numberOfGuests}</li>
+                    <li><strong>Email:</strong> {booking.formDetails?.email}</li>
+                    <li><strong>Phone:</strong> {booking.formDetails?.phone}</li>
+                    <li><strong>Date:</strong> {booking.formDetails?.visitDate || booking.formDetails?.checkInOutDates?.start}</li>
+                    <li><strong>Time:</strong> {booking.formDetails?.activityTime || booking.formDetails?.reservationTime}</li>
+                    <li><strong>Special Requests:</strong> {booking.formDetails?.specialRequests}</li>
+                    <li><strong>Amount:</strong> {booking.formDetails?.amount}</li>
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Tab>
+        <Tab key="cancelled" title="Cancelled">
+          <div className="overflow-y-auto max-h-[500px] scrollbar-custom">
+            {filterBookings("cancelled").map((booking, index) => (
+              <div key={index} className="bg-white shadow-lg p-4 rounded-lg ">
+                <div className="p-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200">
+                  <h4 className="font-semibold mb-2">Booking Details:</h4>
+                  <ul className="space-y-1">
+                    <li><strong>Product:</strong> {booking.formDetails?.productName || 'Sample Product'}</li>
+                    <li><strong>Guests:</strong> {booking.formDetails?.numberOfGuests}</li>
+                    <li><strong>Email:</strong> {booking.formDetails?.email}</li>
+                    <li><strong>Phone:</strong> {booking.formDetails?.phone}</li>
+                    <li><strong>Date:</strong> {booking.formDetails?.visitDate || booking.formDetails?.checkInOutDates?.start}</li>
+                    <li><strong>Time:</strong> {booking.formDetails?.activityTime || booking.formDetails?.reservationTime}</li>
+                    <li><strong>Special Requests:</strong> {booking.formDetails?.specialRequests}</li>
+                    <li><strong>Amount:</strong> {booking.formDetails?.amount}</li>
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Tab>
+      </Tabs>
+    </div>
+  );
+};
 
 const UserProfile = ({ activities = [] }) => {
   // Debugging: Log activities to ensure data is passed correctly
@@ -22,10 +110,180 @@ const UserProfile = ({ activities = [] }) => {
   const { isOpen: isBusinessOpen, onOpen: onBusinessOpen, onOpenChange: onBusinessOpenChange } = useDisclosure(); // Modal state for business account application
   const [isLoggedIn, setIsLoggedIn] = useState(null); // User login status
   const [userData, setUserData] = useState(null); // State to store fetched user data
-  const [likedPages, setLikedPages] = useState([]); // State for storing user's liked pages
+  const [likedPages, setLikedPages] = useState([]); // Initialize with an empty array
   const [businessApplications, setBusinessApplications] = useState([]);
   const [businessData, setBusinessData] = useState(null); // State
   const [loading, setLoading] = useState(true);
+
+  // Updated initialBookings with three samples for each status
+  const initialBookings = {
+    1: [
+      { 
+        id: 1, 
+        sender: 'Business One', 
+        status: 'active',
+        formDetails: {
+          productName: 'Hiking Adventure', 
+          numberOfGuests: 3, 
+          email: 'bobjohnson@example.com', 
+          phone: '321-654-9870', 
+          visitDate: '2024-11-01', 
+          activityTime: '10:00 AM', 
+          specialRequests: 'Need a guide, bring extra snacks', 
+          amount: '₱0'
+        }
+      },
+      { 
+        id: 2, 
+        sender: 'Business Four', 
+        status: 'active',
+        formDetails: {
+          productName: 'City Tour', 
+          numberOfGuests: 2, 
+          email: 'johndoe@example.com', 
+          phone: '123-456-7890', 
+          visitDate: '2024-11-05', 
+          activityTime: '2:00 PM', 
+          specialRequests: 'Wheelchair accessible', 
+          amount: '₱1500'
+        }
+      },
+      { 
+        id: 3, 
+        sender: 'Business Five', 
+        status: 'active',
+        formDetails: {
+          productName: 'Cooking Class', 
+          numberOfGuests: 1, 
+          email: 'janedoe@example.com', 
+          phone: '987-654-3210', 
+          visitDate: '2024-11-10', 
+          activityTime: '11:00 AM', 
+          specialRequests: 'Vegetarian options', 
+          amount: '₱500'
+        }
+      },
+    ],
+    2: [
+      { 
+        id: 4, 
+        sender: 'Business Two', 
+        status: 'completed',
+        formDetails: {
+          productName: 'Luxury Suite', 
+          numberOfGuests: 2, 
+          email: 'alice.smith@example.com', 
+          phone: '789-456-1230', 
+          checkInOutDates: { start: '2024-10-20', end: '2024-10-22' }, 
+          specialRequests: 'Late check-in', 
+          amount: '₱5000'
+        }
+      },
+      { 
+        id: 5, 
+        sender: 'Business Six', 
+        status: 'completed',
+        formDetails: {
+          productName: 'Spa Day', 
+          numberOfGuests: 1, 
+          email: 'mikebrown@example.com', 
+          phone: '654-321-0987', 
+          visitDate: '2024-10-25', 
+          activityTime: '3:00 PM', 
+          specialRequests: 'Aromatherapy', 
+          amount: '₱2000'
+        }
+      },
+      { 
+        id: 6, 
+        sender: 'Business Seven', 
+        status: 'completed',
+        formDetails: {
+          productName: 'Concert Tickets', 
+          numberOfGuests: 2, 
+          email: 'sarahjones@example.com', 
+          phone: '321-987-6543', 
+          visitDate: '2024-10-30', 
+          activityTime: '8:00 PM', 
+          specialRequests: 'Front row seats', 
+          amount: '₱3000'
+        }
+      },
+    ],
+    3: [
+      { 
+        id: 7, 
+        sender: 'Business Three', 
+        status: 'cancelled',
+        formDetails: {
+          productName: 'Mountain View Dining', 
+          numberOfGuests: 4, 
+          email: 'janedoe@example.com', 
+          phone: '123-456-7890', 
+          reservationDate: '2024-10-15', 
+          reservationTime: '6:00 PM', 
+          specialRequests: 'Window seat', 
+          amount: '₱2000'
+        }
+      },
+      { 
+        id: 8, 
+        sender: 'Business Eight', 
+        status: 'cancelled',
+        formDetails: {
+          productName: 'Yoga Retreat', 
+          numberOfGuests: 1, 
+          email: 'emilywhite@example.com', 
+          phone: '456-789-0123', 
+          reservationDate: '2024-10-18', 
+          reservationTime: '9:00 AM', 
+          specialRequests: 'Private session', 
+          amount: '₱2500'
+        }
+      },
+      { 
+        id: 9, 
+        sender: 'Business Nine', 
+        status: 'cancelled',
+        formDetails: {
+          productName: 'Wine Tasting', 
+          numberOfGuests: 2, 
+          email: 'davidgreen@example.com', 
+          phone: '789-012-3456', 
+          reservationDate: '2024-10-22', 
+          reservationTime: '4:00 PM', 
+          specialRequests: 'Include cheese platter', 
+          amount: '₱1000'
+        }
+      },
+    ],
+  };
+
+  // Flatten the bookings to get all accepted bookings
+  const acceptedBookings = Object.values(initialBookings).flat().filter(booking => booking.sender !== 'You');
+
+  // Function to handle booking cancellation
+  const handleCancelBooking = (bookingId) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you really want to cancel this booking?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0BDA51',
+      cancelButtonColor: '#D33736',
+      confirmButtonText: 'Yes, cancel it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Implement cancellation logic here
+        console.log(`Booking with ID ${bookingId} has been cancelled.`);
+        Swal.fire(
+          'Cancelled!',
+          'Your booking has been cancelled.',
+          'success'
+        );
+      }
+    });
+  };
 
   // Function to check login status
   const checkLoginStatus = useCallback(async () => {
@@ -145,7 +403,12 @@ const UserProfile = ({ activities = [] }) => {
         throw new Error('Failed to update profile');
       }
 
-      alert('Profile updated successfully!');
+      Swal.fire({
+        title: 'Success!',
+        text: 'Profile updated successfully!',
+        icon: 'success',
+        confirmButtonColor: '#0BDA51'
+      });
 
       fetchUserData(); // Refresh user data after update
 
@@ -153,55 +416,47 @@ const UserProfile = ({ activities = [] }) => {
       setUsername('');  // Clear the username field
       setProfilePicFile(null);  // Clear the profilePicFile
 
-
     } catch (error) {
       console.error(error);
-      alert('There was an error updating the profile');
+      Swal.fire({
+        title: 'Error!',
+        text: 'There was an error updating the profile',
+        icon: 'error',
+        confirmButtonColor: '#D33736'
+      });
     }
   };
 
-  // Sample activities data
-  const sampleActivities = [
-    {
-      name: 'Beautiful Beach',
-      description: 'Relax and enjoy the scenic beach view.',
-      image: 'https://via.placeholder.com/150', // Placeholder image
-      category: 'Relaxation',
-      rating: 5,
-      destination: 'Donsol',
-      budget: '500-2000',
-    },
-    {
-      name: 'Mountain Adventure',
-      description: 'Hike through the mountains and enjoy nature.',
-      image: 'https://via.placeholder.com/150',
-      category: 'Adventure',
-      rating: 4,
-      destination: 'Bulusan',
-      budget: '250-3000',
-    },
-    {
-      name: 'Mountain Adventure',
-      description: 'Hike through the mountains and enjoy nature.',
-      image: 'https://via.placeholder.com/150',
-      category: 'Adventure',
-      rating: 4,
-      destination: 'Bulusan',
-      budget: '250-3000',
-    },
-    {
-      name: 'Mountain Adventure',
-      description: 'Hike through the mountains and enjoy nature.',
-      image: 'https://via.placeholder.com/150',
-      category: 'Adventure',
-      rating: 4,
-      destination: 'Bulusan',
-      budget: '250-3000',
-    },
-  ];
+  // Function to handle unliking a page
+  const handleUnlikePage = (index) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you want to unlike this page?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0BDA51',
+      cancelButtonColor: '#D33736',
+      confirmButtonText: 'Yes, unlike it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Simulate unliking by updating the local state
+        setLikedPages((prevLikedPages) => {
+          const updatedPages = [...prevLikedPages];
+          updatedPages.splice(index, 1); // Remove the unliked page
+          return updatedPages;
+        });
+
+        Swal.fire(
+          'Unliked!',
+          'Page unliked successfully!',
+          'success'
+        );
+      }
+    });
+  };
 
   if (loading) {
-    return <div>Loading...</div>;  // dapat may design to
+    return     <Spinner className='flex justify-center items-center h-screen ' size='lg' label="Loading..." color="primary" />;  // dapat may design to
   }
 
   return (
@@ -211,9 +466,9 @@ const UserProfile = ({ activities = [] }) => {
         <Search />
       </div>
 
-      <div className='container mx-auto flex flex-col md:flex-row mb-2 gap-4'>
+      <div className='container max-h-screen  mx-auto flex flex-col md:flex-row mb-4 gap-4'>
         {/* Sidebar */}
-        <div className='h-auto bg-white p-4 w-full md:w-[300px] flex flex-col justify-between shadow-lg shadow-slate-800 rounded-md items-center'>
+        <div className='max-h-[700px] bg-white p-4 w-full md:w-[300px] flex flex-col justify-between shadow-lg shadow-slate-800 rounded-md items-center'>
           <div className='flex flex-col items-center gap-2 flex-grow justify-center'>
             <div className='relative flex items-center w-28 h-28'>
               <Avatar className='w-full h-full object-cover rounded-full' 
@@ -261,12 +516,28 @@ const UserProfile = ({ activities = [] }) => {
               } else if (application.status === 1) {
                 // Show business name if status is 1
                 return (
-                  <Button 
-                  className='text-white bg-color1 hover:bg-color2'
+                  <>
+                  <h1 className='font-bold mb-2'>Switch to Business:</h1>
+                  <div className='max-h-[130px] bg-light shadow-md rounded-md shadow-slate-600 ring-gray-200 ring-1   p-3 flex flex-col gap-2 overflow-y-auto scrollbar-custom'>        
+                  <button 
+                  className='text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-lg gap-1'
                   onClick={() => window.location.href = '/businessprofileadmin'}
                   key={application.application_id}>
+                   <Avatar src=''/>
                     <p>{businessData.businessName}</p>
-                  </Button>
+                  </button>
+                  <button 
+                  className='text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-lg gap-1'
+                  onClick={() => window.location.href = '/businessprofileadmin'}
+                  key={application.application_id}>
+                   <Avatar src=''/>
+                    <p>{businessData.businessName}</p>
+                  </button>
+                  </div>
+                  <Button className='text-white bg-color1 hover:bg-color2 mt-4'  > 
+                   + Add Another Business 
+                 </Button>
+                  </>
                 );
               } else if (application.status === -1) {
                 // Show 'Denied' message if status is -1
@@ -274,6 +545,7 @@ const UserProfile = ({ activities = [] }) => {
                   <Button key={application.application_id} className='text-white bg-red-500 hover:bg-red-600'>
                     Denied
                   </Button>
+                  
                 );
               }
             })
@@ -287,12 +559,12 @@ const UserProfile = ({ activities = [] }) => {
         </div>
 
         {/* Main content */}
-        <div className='h-auto w-full'>
+        <div className=' w-full'>
           <Tabs aria-label="Options" selectedKey={selected} onSelectionChange={setSelected}>
             {/* Profile Tab */}
             <Tab key="profile" title="Profile">
               <Card>
-                <CardBody className='p-6 h-full'>
+                <CardBody className='p-6 min-h-[600px] max-h-full'>
                   <div>
                     <h1 className='text-4xl font-bold mb-3'>User Profile</h1>
                     <div className='bg-gray-300 w-full h-[1px] mb-8'></div>
@@ -382,16 +654,58 @@ const UserProfile = ({ activities = [] }) => {
             {/* Liked Pages Tab */}
             <Tab key="likedPages" title="Liked Pages">
               <Card>
-                <CardBody className='p-6 h-full'>
+                <CardBody className='p-6 min-h-[700px] max-h-full'>
                   <h1 className='text-4xl font-bold mb-3'>Liked Pages</h1>
                   <div className='bg-gray-300 w-full h-[1px] mb-8'></div>
 
-                  <div className='overflow-y-auto max-h-[calc(3*12rem)] flex flex-col items-center'> {/* Adjust the height as needed */}
-                    {sampleActivities.length === 0 ? (
+                  {/* Sample activities data */}
+                  {likedPages.length === 0 && (
+                    setLikedPages([
+                      {
+                        name: 'Beautiful Beach',
+                        description: 'Relax and enjoy the scenic beach view.',
+                        image: 'https://via.placeholder.com/150', // Placeholder image
+                        category: 'Relaxation',
+                        rating: 5,
+                        destination: 'Donsol',
+                        budget: '500-2000',
+                      },
+                      {
+                        name: 'Mountain Adventure',
+                        description: 'Hike through the mountains and enjoy nature.',
+                        image: 'https://via.placeholder.com/150',
+                        category: 'Adventure',
+                        rating: 4,
+                        destination: 'Bulusan',
+                        budget: '250-3000',
+                      },
+                      {
+                        name: 'Mountain Adventure',
+                        description: 'Hike through the mountains and enjoy nature.',
+                        image: 'https://via.placeholder.com/150',
+                        category: 'Adventure',
+                        rating: 4,
+                        destination: 'Bulusan',
+                        budget: '250-3000',
+                      },
+                      {
+                        name: 'Mountain Adventure',
+                        description: 'Hike through the mountains and enjoy nature.',
+                        image: 'https://via.placeholder.com/150',
+                        category: 'Adventure',
+                        rating: 4,
+                        destination: 'Bulusan',
+                        budget: '250-3000',
+                      },
+                    ])
+                  )}
+
+                  <div className='overflow-y-auto max-h-[500px] scrollbar-custom flex flex-col items-center'>
+                    {likedPages.length === 0 ? (
                       <p className='text-slate-500'>You haven't liked any pages yet.</p>
                     ) : (
-                      sampleActivities.map((activity, index) => (
-                        <div key={index} className='bg-white  max-w-[900px] w-full rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 mb-4 '>
+                      likedPages.map((activity, index) => (
+                        <div key={index} className='bg-white max-w-[900px] w-full rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 mb-4'>
                           <img
                             src={activity.image}
                             alt={activity.name}
@@ -419,12 +733,34 @@ const UserProfile = ({ activities = [] }) => {
                             </div>
                             <p className='text-sm text-gray-600 mb-2'>{activity.description}</p>
                             <p className='font-semibold text-md mb-2'>₱{activity.budget}</p>
-                            <Button className='bg-color1 text-white hover:bg-color2'>Visit</Button>
+                            <div className=' flex items-center justify-between'>
+                            <Link to="/business">  
+                            <Button className='bg-color1 text-white hover:bg-color2'>Visit</Button>  
+                            </Link> 
+                            <Button 
+                              className='h-9 px-3 bg-color2 text-white' 
+                              onClick={() => handleUnlikePage(index)}
+                            >
+                              <div className='text-sm flex items-center gap-2'>
+                                <AiOutlineLike />
+                                Unlike
+                              </div>
+                            </Button>
+                            </div>
                           </div>
                         </div>
                       ))
                     )}
                   </div>
+                </CardBody>
+              </Card>
+            </Tab>
+
+            {/* My Booking Tab */}
+            <Tab key="myBookings" title="My Bookings">
+              <Card>
+                <CardBody className='p-6 min-h-[700px] max-h-full'>
+                  <MyBookingTab bookings={acceptedBookings} onCancelBooking={handleCancelBooking} />
                 </CardBody>
               </Card>
             </Tab>
@@ -437,6 +773,9 @@ const UserProfile = ({ activities = [] }) => {
         onBusinessOpenChange={onBusinessOpenChange}
         userData={userData}
       />
+
+       
+
       <Footer />
     </div>
   );

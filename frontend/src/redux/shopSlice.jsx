@@ -8,8 +8,8 @@ const initialState = {
       price: "300",
       description: ["Best Traditional Product from Sorsogon"],
       images: [
-        "https://via.placeholder.com/150",
-        "https://via.placeholder.com/150"
+        { url: "https://via.placeholder.com/150", title: "Front View" },
+        { url: "https://via.placeholder.com/150", title: "Back View" }
       ],
       category: "Souvenir Item",
     },

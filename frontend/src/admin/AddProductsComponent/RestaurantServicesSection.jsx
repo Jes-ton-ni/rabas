@@ -61,7 +61,19 @@ const RestaurantServicesSection = () => {
   // Handlers for Image Upload
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-    setImages((prevImages) => [...prevImages, ...files]);  
+    const newImages = files.map((file) => ({
+      url: URL.createObjectURL(file),
+      title: '',
+    }));
+    setImages((prevImages) => [...prevImages, ...newImages]);
+  };
+
+  const handleImageTitleChange = (index, title) => {
+    setImages((prevImages) => {
+      const updatedImages = [...prevImages];
+      updatedImages[index].title = title;
+      return updatedImages;
+    });
   };
 
   const handleRemoveImage = (index) => {
@@ -97,9 +109,10 @@ const RestaurantServicesSection = () => {
         pricingUnit,
         hasBooking,
         inclusions: inclusionList,
-        images: images.map((file) =>
-          typeof file === 'string' ? file : URL.createObjectURL(file)
-        ),
+        images: images.map((image) => ({
+          url: image.url,
+          title: image.title,
+        })),
         serviceType,
         termsAndConditions: termsList, // Include terms list
       };
@@ -271,30 +284,31 @@ const RestaurantServicesSection = () => {
               {/* Image Carousel */}
               {service.images.length > 0 && (
                 <div className="relative mt-4">
-                 <Slider
+                  <Slider
                     ref={(slider) => (sliderRefs.current[service.id] = slider)}
                     {...getSliderSettings(service.images.length)}
                   >
                     {service.images.map((image, index) => (
                       <div key={index}>
                         <img
-                          src={image}
-                          alt={`Service ${index + 1}`}
+                          src={image.url}
+                          alt={image.title || `Service ${index + 1}`}
                           className="w-full h-32 object-cover rounded-lg mt-2"
                         />
+                        <p className="text-xs text-center mt-1">{image.title}</p>
                       </div>
                     ))}
                   </Slider>
                   {/* Next and Previous buttons */}
                   <button
                     className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow"
-                    onClick={() => sliderRefs.current[service.id].slickPrev()}
+                    onClick={() => sliderRefs.current[service.id]?.slickPrev()}
                   >
                     <FaChevronLeft />
                   </button>
                   <button
                     className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow"
-                    onClick={() => sliderRefs.current[service.id].slickNext()}
+                    onClick={() => sliderRefs.current[service.id]?.slickNext()}
                   >
                     <FaChevronRight />
                   </button>
@@ -476,14 +490,20 @@ const RestaurantServicesSection = () => {
                     </p>
                   </div>
 
-                  {/* Uploaded Images Preview with Remove Option */}
+                  {/* Uploaded Images Preview with Title Input and Remove Option */}
                   <div className="mb-4 flex flex-wrap gap-3">
                     {images.map((image, index) => (
-                      <div key={index} className="flex gap-3 mb-2">
+                      <div key={index} className="flex flex-col gap-2 mb-2">
                         <img
-                          src={typeof image === 'string' ? image : URL.createObjectURL(image)}
+                          src={image.url}
                           alt={`Uploaded ${index + 1}`}
                           className="h-16 w-16 object-cover rounded-lg"
+                        />
+                        <Input
+                          placeholder="Enter image title"
+                          value={image.title}
+                          onChange={(e) => handleImageTitleChange(index, e.target.value)}
+                          fullWidth
                         />
                         <Button
                           auto

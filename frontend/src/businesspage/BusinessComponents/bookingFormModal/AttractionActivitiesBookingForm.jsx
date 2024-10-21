@@ -187,6 +187,7 @@ const AttractionActivitiesBookingForm = ({ isOpen, onClose, product = {} }) => {
   return (
     <>
       <Modal
+      hideCloseButton
         isOpen={isOpen}
         onClose={() => {}}
         className="max-w-2xl p-8 bg-white rounded-lg shadow-2xl"

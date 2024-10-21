@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Logo from '../assets/rabas.png';
 import Logo2 from '../assets/Rabasorso.png'
-import { Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
+import { Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Badge } from "@nextui-org/react";
 import LoginSignup from '@/auth/loginSignup';
 import {
   NavigationMenu,
@@ -17,12 +17,14 @@ import { FaRegCircleUser } from "react-icons/fa6";
 import { FaPersonWalking } from "react-icons/fa6";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
 import { Link } from 'react-router-dom'; // Assuming this is already imported or added
+import UserChatModal from '@/user/userChatSystem/UserChatModal'; // Import the UserChatModal component
 
 const Nav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   const [userData, setUserData] = useState(null);  
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false); // State for chat modal
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -99,6 +101,14 @@ const Nav = () => {
       fetchUserData();
     }
   }, [isLoggedIn]);
+
+  const openChatModal = () => {
+    setIsChatModalOpen(true);
+  };
+
+  const closeChatModal = () => {
+    setIsChatModalOpen(false);
+  };
 
   // Only return the component content after userData is fetched
   if (isLoggedIn === null || (isLoggedIn && !userData)) {
@@ -304,6 +314,12 @@ const Nav = () => {
                     Profile
                   </Link>
                 </DropdownItem>
+                <DropdownItem key="messages" onClick={openChatModal}>
+                  <div className='flex items-center gap-4'>
+                    Messages
+                    <Badge color='danger' placement='top-right' content='2'/>
+                  </div>
+                </DropdownItem>
                 <DropdownItem key="logout" onClick={handleLogout} >Logout</DropdownItem>
               </DropdownMenu>
             </Dropdown>
@@ -329,13 +345,13 @@ const Nav = () => {
             body: "p-6", // Added padding for spacing within the modal
             closeButton: "  ", // Styled the close button
           }}
-          className='max-h-[700px] h-full w-full max-w-[600px] overflow-auto '
+          className='max-h-full w-full max-w-[600px] overflow-auto scrollbar-custom '
         
         >
           <ModalContent >
             {() => (
               <>
-                <ModalBody className=' p-0 '>
+                <ModalBody className='  '>
                 
                
                     <LoginSignup />
@@ -345,6 +361,9 @@ const Nav = () => {
             )}
           </ModalContent>
         </Modal>
+
+        {/* User Chat Modal */}
+        <UserChatModal isOpen={isChatModalOpen} onClose={closeChatModal} />
 
     </div>
   );
