@@ -41,6 +41,7 @@ export const addProduct = createAsyncThunk(
       accommodationType: product.type || "Unknown",
     };
 
+    // console.log(accommodationData);
     // Dispatch action to add accommodation to the state
     dispatch(addAccommodation(accommodationData));
 
@@ -74,6 +75,7 @@ export const handleUpdateAccommodation = createAsyncThunk(
         accommodationType: product.type || "Unknown",
       };
 
+      // console.log(accommodationData);
       // Dispatch action to update accommodation to the state
       dispatch(updateAccommodation(accommodationData));
 
@@ -110,10 +112,14 @@ const accommodationSlice = createSlice({
     },
     updateAccommodation(state, action) {
       const updatedAccommodation = action.payload;
+      console.log("Accommodation: ", updatedAccommodation);
+      console.log("All accommodation IDs in state:", state.accommodations.map(accommodation => accommodation.id));
 
       const accommodationIndex = state.accommodations.findIndex(
-        accommodation => accommodation.id === updatedAccommodation.product_id
+        accommodation => accommodation.id.toString() === updatedAccommodation.product_id.toString()
       );
+
+      console.log("Accomodation Index: ", accommodationIndex);
 
       if (accommodationIndex !== -1) {
         // Update the existing accommodation

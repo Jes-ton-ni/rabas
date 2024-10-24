@@ -1003,18 +1003,71 @@ app.post('/add-product', upload.array('productImages', 5), async (req, res) => {
   }
 });
 
+// Endpoint to fetch images for a specific product
+app.get('/get-product-images/:product_id', (req, res) => {
+  // console.log('Session:', req.session);
+  const { product_id } = req.params;
+
+  // Query to fetch images for the specific product
+  const query = 'SELECT images FROM products WHERE product_id = ?';
+
+  connection.query(query, [product_id], (err, results) => {
+    if (err) {
+      console.error('Error fetching product images:', err);
+      return res.status(500).json({ success: false, message: 'Failed to fetch product images' });
+    }
+
+    if (results.length === 0) {
+      // No product found for the user
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    //Check if images is null and handle accordingly
+    let current_image = results[0].images;
+
+    if (current_image === null) {
+      current_image = [];
+    } else {
+      // Convert to string in case it's a buffer or other type
+      if (typeof current_image !== 'string') {
+        current_image = current_image.toString();
+      }
+
+      // Check if it's valid JSON, if not treat it as a comma-separated string
+      try {
+        current_image = JSON.parse(current_image);
+      } catch (parseError) {
+        // Handle comma-separated string format
+        current_image = current_image.split(',');
+      }
+    }
+
+    // Parse the images field (stored as JSON) and send it back in the response
+    const images = current_image;
+    res.json({ success: true, images });
+  });
+});
+
 // Endpoint to update an existing product
 app.put('/update-product', upload.array('productImages', 5), async (req, res) => {
-  const { product_id, type, name, price, pricing_unit, booking_operation, inclusions, termsAndConditions } = req.body;
+  const { product_id, type, name, price, pricing_unit, booking_operation, inclusions, termsAndConditions, existingImages, removedImages } = req.body;
   const user_id = req.session?.user?.user_id;
 
   if (!user_id || !product_id || !name || !price || !pricing_unit) {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
 
+  console.log('removed images: ' + removedImages);
+
+  // Fetch newly uploaded image paths
   const productImages = req.files && req.files.length > 0 
     ? req.files.map(file => file.path) 
     : [];
+
+  // Merge the existing image URLs (received from the form) and new image paths
+  const mergedImages = Array.isArray(existingImages) 
+    ? [...existingImages, ...productImages] 
+    : productImages;
 
   const inclusionsArray = Array.isArray(inclusions)
     ? inclusions // Already an array
@@ -1038,7 +1091,7 @@ app.put('/update-product', upload.array('productImages', 5), async (req, res) =>
     parseInt(booking_operation) || 0,
     JSON.stringify(inclusionsArray), // Store inclusions as a JSON string
     JSON.stringify(termsAndConditionsArray), // Store terms and conditions as a JSON string
-    JSON.stringify(productImages), // Store updated images as a JSON string
+    JSON.stringify(mergedImages), // Store merged images as a JSON string
     product_id,
     user_id,
   ];
@@ -1054,6 +1107,40 @@ app.put('/update-product', upload.array('productImages', 5), async (req, res) =>
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
+    // Parse removedImages to an array
+    let parsedRemovedImages;
+    try {
+      parsedRemovedImages = JSON.parse(removedImages);
+    } catch (error) {
+      console.error('Error parsing removedImages:', error);
+      parsedRemovedImages = []; // Fallback to an empty array if parsing fails
+    }
+
+    // If there are images to remove, delete them from the filesystem
+    if (Array.isArray(parsedRemovedImages) && parsedRemovedImages.length > 0) {
+      parsedRemovedImages.forEach((imagePath) => {
+        const absolutePath = path.resolve(__dirname, imagePath.replace(/\\/g, '/')); // Normalize path
+
+        // Check if the file exists before attempting to delete
+        fs.access(absolutePath, fs.constants.F_OK, (accessErr) => {
+          if (accessErr) {
+            console.error(`File not found, unable to delete: ${absolutePath}`);
+          } else {
+            // Proceed with file deletion
+            fs.unlink(absolutePath, (unlinkErr) => {
+              if (unlinkErr) {
+                console.error(`Error deleting the image file (${absolutePath}):`, unlinkErr);
+              } else {
+                console.log(`Removed image file deleted successfully: ${absolutePath}`);
+              }
+            });
+          }
+        });
+      });
+    } else {
+      console.log("No images to remove.");
+    }
+    
     // Construct the updated product object for response
     const updatedProduct = {
       success: true,
@@ -1067,10 +1154,42 @@ app.put('/update-product', upload.array('productImages', 5), async (req, res) =>
       booking_operation: parseInt(booking_operation) || 0,
       inclusions: inclusionsArray,
       termsAndConditions: termsAndConditionsArray,
-      images: productImages, // Will be empty if no images are uploaded
+      images: mergedImages, // Return the merged list of images
     };
-    console.log(updatedProduct);
+
     res.json(updatedProduct);
+  });
+});
+
+// Endpoint to delete a product
+app.delete('/delete-product', (req, res) => {
+  const { selectedProduct } = req.body;
+
+  // Validate input
+  if (!selectedProduct) {
+    return res.status(400).json({ success: false, message: 'No selected product' });
+  }
+
+  // Ensure selectedProduct is an array
+  const productIds = Array.isArray(selectedProduct) ? selectedProduct : [selectedProduct];
+
+  // SQL query to delete the product(s)
+  const placeholders = productIds.map(() => '?').join(', ');
+  const query = `DELETE FROM products WHERE product_id IN (${placeholders})`;
+
+  connection.query(query, productIds, (err, results) => {
+    if (err) {
+      console.error('Error deleting product:', err);
+      return res.status(500).json({ success: false, message: 'Failed to delete product' });
+    }
+
+    if (results.affectedRows === 0) {
+      // No rows affected, meaning none of the products were found
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    // Successfully deleted the product(s)
+    res.json({ success: true, message: 'Product(s) deleted successfully' });
   });
 });
 
@@ -1293,7 +1412,7 @@ app.delete('/businessCardImage/:id', (req, res) => {
           }
 
           // Remove the file from the server
-          fs.unlink(cardImagePath, (unlinkErr) => {
+          fs.unlink(cardImagePath, (unlinkErr) => {            
             if (unlinkErr) {
               console.error('Error deleting the image file:', unlinkErr);
               return res.status(500).json({ success: false, message: 'Failed to delete the image file from server' });
@@ -1304,6 +1423,7 @@ app.delete('/businessCardImage/:id', (req, res) => {
               message: 'Business card image deleted successfully',
               updatedBusinessCard: businessCard, // Respond with the updated business card
             });
+
           });
         }
       );

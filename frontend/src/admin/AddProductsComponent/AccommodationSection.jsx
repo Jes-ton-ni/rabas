@@ -94,12 +94,37 @@ const AccommodationSection = () => {
   };
 
   // Handlers for Deleting Selected Accommodations
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = async () => {
     if (selectedAccommodations.length > 0) {
-      dispatch(deleteAccommodations(selectedAccommodations));
-      setSelectedAccommodations([]);
+      try {
+        // Create a request to delete selected accommodations
+        const response = await fetch('http://localhost:5000/delete-product', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ selectedProduct: selectedAccommodations }), // Pass selected accommodations here
+        });
+  
+        const data = await response.json();
+  
+        if (data.success) {
+          // Dispatch Redux action to remove accommodations from the state
+          dispatch(deleteAccommodations(selectedAccommodations));
+          
+          // Optionally reset the selection
+          setSelectedAccommodations([]);
+        } else {
+          console.error('Failed to delete products:', data.message);
+        }
+      } catch (error) {
+        console.error('Error deleting products:', error);
+      }
+    } else {
+      console.log('No accommodations selected for deletion.');
     }
   };
+  
 
   // Handlers for Checkbox Changes
   const handleCheckboxChange = (id, isChecked) => {
@@ -110,10 +135,9 @@ const AccommodationSection = () => {
     }
   };
 
-  // Handler for Form Submission (Add/Edit Accommodation)
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form submission behavior
-
+  
     // Check that all required fields are filled
     if (accommodationName && pricing && pricingUnit && accommodationType) {
       // Construct the new accommodation object
@@ -125,16 +149,15 @@ const AccommodationSection = () => {
         booking_operation: hasBooking ? 1 : 0,
         inclusions: inclusionList, // Should be an array
         termsAndConditions: termsList, // Should be an array
-        images: Array.isArray(images) 
-          ? images.map((file) => 
+        images: Array.isArray(images)
+          ? images.map((file) =>
               typeof file === 'string' ? file : URL.createObjectURL(file)
-            ) 
+            )
           : [], // Fallback to empty array if images is not an array
       };
-
+  
       // Create FormData for the accommodation and image upload
       const formData = new FormData();
-      // Append product_id if editing
       if (isEditing) {
         formData.append('product_id', editingAccommodationId); // Add the product_id for editing
       }
@@ -143,41 +166,65 @@ const AccommodationSection = () => {
       formData.append('price', newAccommodation.price);
       formData.append('pricing_unit', newAccommodation.pricing_unit);
       formData.append('booking_operation', newAccommodation.booking_operation.toString());
-      
+  
       // Append inclusions and terms and conditions
       if (Array.isArray(newAccommodation.inclusions)) {
-        newAccommodation.inclusions.forEach(inclusion => {
+        newAccommodation.inclusions.forEach((inclusion) => {
           formData.append('inclusions[]', inclusion); // Append as an array
         });
       }
-      
+  
       if (Array.isArray(newAccommodation.termsAndConditions)) {
-        newAccommodation.termsAndConditions.forEach(term => {
+        newAccommodation.termsAndConditions.forEach((term) => {
           formData.append('termsAndConditions[]', term); // Append as an array
         });
       }
-
-      // Add the images to FormData
-      if (Array.isArray(images)) {
-        images.forEach((file) => {
-          if (file instanceof File) {
-            formData.append('productImages', file); // Append each image file
-          }
-        });
+  
+      // Fetch existing images if editing
+      let existingImages = [];
+      if (isEditing) {
+        try {
+          const response = await fetch(
+            `http://localhost:5000/get-product-images/${editingAccommodationId}`
+          );
+          const data = await response.json();
+          existingImages = data.images || [];
+        } catch (error) {
+          console.error('Error fetching existing images:', error);
+        }
       }
 
+      // Removed images array to pass to backend
+      const removedImages = existingImages.filter(existingImage => 
+        !images.includes(existingImage)
+      );
+      formData.append('removedImages', JSON.stringify(removedImages)); // Send removed images
+      
+      // Separate the new files from existing image URLs
+      const newFiles = images.filter((file) => file instanceof File);
+      const existingImageUrls = images.filter((image) => typeof image === 'string');
+  
+      // Append the new files to FormData for upload
+      newFiles.forEach((file) => {
+        formData.append('productImages', file); // Append each new image file
+      });
+  
+      // Append the existing image URLs to FormData so they remain in the database
+      existingImageUrls.forEach((imageUrl) => {
+        formData.append('existingImages[]', imageUrl); // Include existing image URLs
+      });
+  
       try {
         let result;
         // Check if we are in editing mode or adding a new accommodation
         if (isEditing) {
-          result = await dispatch(handleUpdateAccommodation(formData));
+          result = dispatch(handleUpdateAccommodation(formData));
           console.log('Accommodation updated successfully:', result);
         } else {
-          result = await dispatch(addProduct(formData));
-          console.log('Full result object:', result);
+          result = dispatch(addProduct(formData));
           console.log('Accommodation added successfully:', result.payload);
         }
-
+  
         // Close modal and reset form after successful submission
         setModalOpen(false);
         resetForm();
@@ -188,8 +235,8 @@ const AccommodationSection = () => {
     } else {
       alert('Please fill in all required fields.'); // Alert if required fields are missing
     }
-  };
-
+  };  
+  
   // Reset Form Fields
   const resetForm = () => {
     setAccommodationName('');
@@ -360,7 +407,7 @@ const AccommodationSection = () => {
                   </div>
                 ) : (
                   // Render the slider if there are multiple images
-                  <Slider ref={(slider) => (sliderRefs.current[accommodation.id] = slider)} {...sliderSettings}>
+                  <Slider ref={(slider) => (sliderRefs.current[accommodation.id] = slider)} {...getSliderSettings}>
                     {accommodation.images.map((image, index) => (
                       <div key={`${image}-${index}`} className="relative">
                         <img
