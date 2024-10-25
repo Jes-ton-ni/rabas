@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import Nav from '../components/navuser';
+import Nav from '../components/nav';
 import Hero from '../components/heroshop';
-import Search from '@/components/Search';
 import Footer from '@/components/Footer';
 import ShopImage from '../assets/shop.webp';
 import { Button } from "@nextui-org/react";
 import { Checkbox, CheckboxGroup, Select, SelectItem, Slider } from "@nextui-org/react";
 import { GiPositionMarker } from "react-icons/gi";
 import { Link } from 'react-router-dom';
-import { PiChatCircleText } from 'react-icons/pi';
 import { Spinner } from '@nextui-org/react'; // Add this import
 
 
@@ -21,6 +19,29 @@ const Shop = () => {
     const [selectedRatings, setSelectedRatings] = useState([]);
     const [priceRange, setPriceRange] = useState([0, 5000]); // Price range slider
     const [loading, setLoading] = useState(true);
+    const [showFilters, setShowFilters] = useState(false);
+
+    // Custom hook to detect if the screen is large
+    const useIsLargeScreen = () => {
+        const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
+
+        useEffect(() => {
+            const handleResize = () => {
+                setIsLargeScreen(window.innerWidth >= 1024);
+            };
+
+            window.addEventListener('resize', handleResize);
+            return () => window.removeEventListener('resize', handleResize);
+        }, []);
+
+        return isLargeScreen;
+    };
+
+    const isLargeScreen = useIsLargeScreen();
+
+    const toggleFilters = () => {
+        setShowFilters(!showFilters);
+    };
 
     // Shop Details (mock data)
     const shopDetails = [
@@ -159,127 +180,136 @@ const Shop = () => {
         <div className='mx-auto bg-light min-h-screen font-sans'>
             <Nav />
             <Hero />
-            <Search />
+          
 
             <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12'>
                 <h1 className='font-semibold text-3xl text-color1 mb-8'>Shops in Sorsogon</h1>
-                 
+
+                {/* Toggle Button for Filters */}
+                <div className="lg:hidden mb-4 sticky top-[7.5rem] z-40 bg-white">
+                    <Button onClick={toggleFilters} className="w-full bg-color1 text-color3">
+                        {showFilters ? 'Hide Filters' : 'Show Filters'}
+                    </Button>
+                </div>
+
                 <div className='flex flex-col lg:flex-row gap-8'>
-                    {/* Filters Section */}
-                    <div className='w-full lg:w-1/4'>
-                        <div className='bg-white p-6 rounded-lg shadow-md'>
-                            <h2 className='text-xl font-semibold mb-4'>Filters</h2>
-                            
-                            {/* Destination Dropdown */}
-                            <div className='mb-6'>
-                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Destination</h3>
-                                <Select
-                                    placeholder="Select Destination"
-                                    selectedKeys={[selectedDestination]}
-                                    onSelectionChange={(value) => handleDestinationChange(value.currentKey)}
-                                >
-                                    {destinations.map((destination) => (
-                                        <SelectItem key={destination} value={destination}>
-                                            {destination}
-                                        </SelectItem>
-                                    ))}
-                                </Select>
-                            </div>
-
-                            {/* Shop Type Filter */}
-                            <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
-                                <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Shop Type</h3>
-                                <CheckboxGroup
-                                    value={selectedType}
-                                    onChange={handleTypeChange}
-                                >
-                                    {shopTypes.map((type) => (
-                                        <Checkbox key={type} value={type}>
-                                            {type}
-                                        </Checkbox>
-                                    ))}
-                                </CheckboxGroup>
-                            </div>
-
-                            {/* Category Filter */}
-                            <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
-                                <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Category</h3>
-                                <CheckboxGroup
-                                    value={selectedCategory}
-                                    onChange={handleCategoryChange}
-                                >
-                                    {categories.map((category) => (
-                                        <Checkbox key={category} value={category}>
-                                            {category}
-                                        </Checkbox>
-                                    ))}
-                                </CheckboxGroup>
-                            </div>
-
-                            {/* AmenitiesFilter */}
-                            <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
-                                <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Amenities</h3>
-                                <CheckboxGroup
-                                    value={selectedAmenities}
-                                    onChange={handleAmenitiesChange}
-                                >
-                                    {amenitiesList.map((amenities) => (
-                                        <Checkbox key={amenities} value={amenities}>
-                                            {amenities}
-                                        </Checkbox>
-                                    ))}
-                                </CheckboxGroup>
-                            </div>
-
-                            {/* Price Range Filter */}
-                            <div className='mb-6'>
-                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Price Range (PHP)</h3>
-                                <Slider
-                                    step={100}
-                                    minValue={0}
-                                    maxValue={5000}
-                                    value={priceRange}
-                                    onChange={setPriceRange}
-                                    formatOptions={{ style: 'currency', currency: 'PHP' }}
-                                    className="max-w-md flex"
-                                />
-                                <div className='flex justify-between text-xs'>
-                                    <span>₱{priceRange[0]}</span>
-                                    <span>₱{priceRange[1]}+</span>
+                    {/* Conditionally render filters based on screen size and toggle state */}
+                    {(showFilters || isLargeScreen) && (
+                        <div className='w-full lg:w-1/4'>
+                            <div className='bg-white p-6 rounded-lg shadow-md'>
+                                <h2 className='text-xl font-semibold mb-4'>Filters</h2>
+                                
+                                {/* Destination Dropdown */}
+                                <div className='mb-6'>
+                                    <h3 className='text-sm font-medium text-gray-700 mb-2'>Destination</h3>
+                                    <Select
+                                        placeholder="Select Destination"
+                                        selectedKeys={[selectedDestination]}
+                                        onSelectionChange={(value) => handleDestinationChange(value.currentKey)}
+                                    >
+                                        {destinations.map((destination) => (
+                                            <SelectItem key={destination} value={destination}>
+                                                {destination}
+                                            </SelectItem>
+                                        ))}
+                                    </Select>
                                 </div>
-                            </div>
 
-                            {/* Ratings Filter */}
-                            <div>
-                                <h3 className='text-sm font-medium text-gray-700 mb-2'>Ratings</h3>
-                                <div className='space-y-2'>
-                                    <label className='flex items-center'>
-                                        <input
-                                            type='checkbox'
-                                            onChange={() => handleRatingClick('All')}
-                                            checked={selectedRatings.length === 0}
-                                            className='form-checkbox text-color2'
-                                        />
-                                        <span className='ml-2 text-sm'>All Ratings</span>
-                                    </label>
-                                    {[5, 4, 3, 2, 1].map((star) => (
-                                        <label key={star} className='flex items-center'>
+                                {/* Shop Type Filter */}
+                                <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
+                                    <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Shop Type</h3>
+                                    <CheckboxGroup
+                                        value={selectedType}
+                                        onChange={handleTypeChange}
+                                    >
+                                        {shopTypes.map((type) => (
+                                            <Checkbox key={type} value={type}>
+                                                {type}
+                                            </Checkbox>
+                                        ))}
+                                    </CheckboxGroup>
+                                </div>
+
+                                {/* Category Filter */}
+                                <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
+                                    <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Category</h3>
+                                    <CheckboxGroup
+                                        value={selectedCategory}
+                                        onChange={handleCategoryChange}
+                                    >
+                                        {categories.map((category) => (
+                                            <Checkbox key={category} value={category}>
+                                                {category}
+                                            </Checkbox>
+                                        ))}
+                                    </CheckboxGroup>
+                                </div>
+
+                                {/* AmenitiesFilter */}
+                                <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
+                                    <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Amenities</h3>
+                                    <CheckboxGroup
+                                        value={selectedAmenities}
+                                        onChange={handleAmenitiesChange}
+                                    >
+                                        {amenitiesList.map((amenities) => (
+                                            <Checkbox key={amenities} value={amenities}>
+                                                {amenities}
+                                            </Checkbox>
+                                        ))}
+                                    </CheckboxGroup>
+                                </div>
+
+                                {/* Price Range Filter */}
+                                <div className='mb-6'>
+                                    <h3 className='text-sm font-medium text-gray-700 mb-2'>Price Range (PHP)</h3>
+                                    <Slider
+                                        step={100}
+                                        minValue={0}
+                                        maxValue={5000}
+                                        value={priceRange}
+                                        onChange={setPriceRange}
+                                        formatOptions={{ style: 'currency', currency: 'PHP' }}
+                                        className="max-w-md flex"
+                                    />
+                                    <div className='flex justify-between text-xs'>
+                                        <span>₱{priceRange[0]}</span>
+                                        <span>₱{priceRange[1]}+</span>
+                                    </div>
+                                </div>
+
+                                {/* Ratings Filter */}
+                                <div>
+                                    <h3 className='text-sm font-medium text-gray-700 mb-2'>Ratings</h3>
+                                    <div className='space-y-2'>
+                                        <label className='flex items-center'>
                                             <input
                                                 type='checkbox'
-                                                onChange={() => handleRatingClick(star)}
-                                                checked={selectedRatings.includes(star)}
+                                                onChange={() => handleRatingClick('All')}
+                                                checked={selectedRatings.length === 0}
                                                 className='form-checkbox text-color2'
                                             />
-                                            <span className='ml-2 text-sm flex items-center'>
-                                                {'★'.repeat(star)}{'☆'.repeat(5 - star)}
-                                                <span className='ml-1'>{star} Star{star > 1 ? 's' : ''}</span>
-                                            </span>
+                                            <span className='ml-2 text-sm'>All Ratings</span>
                                         </label>
-                                    ))}
+                                        {[5, 4, 3, 2, 1].map((star) => (
+                                            <label key={star} className='flex items-center'>
+                                                <input
+                                                    type='checkbox'
+                                                    onChange={() => handleRatingClick(star)}
+                                                    checked={selectedRatings.includes(star)}
+                                                    className='form-checkbox text-color2'
+                                                />
+                                                <span className='ml-2 text-sm flex items-center'>
+                                                    {'★'.repeat(star)}{'☆'.repeat(5 - star)}
+                                                    <span className='ml-1'>{star} Star{star > 1 ? 's' : ''}</span>
+                                                </span>
+                                            </label>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Shop List */}
                     <div className='w-full'>
@@ -335,13 +365,7 @@ const Shop = () => {
                     </div>
                 </div>
             </div>
-                   {/* Floating chat button */}
-       <button
-       className="fixed bottom-4 right-4  ring-light ring-1 bg-color1 text-white p-4 rounded-full shadow-lg hover:bg-color2 focus:outline-none z-50"
-         
-        >
-          <PiChatCircleText size={30} />
-        </button>
+            
 
             <Footer />
 

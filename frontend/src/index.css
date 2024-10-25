@@ -106,6 +106,32 @@
 }
 
 
+.slick-prev, .slick-next {
+ 
+  z-index: 2;
+  border-radius: 50%;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  top: 50%; /* Center vertically */
+  transform: translateY(-50%); /* Adjust for centering */
+}
+
+.slick-prev {
+  left: 0px; /* Adjust the left position */
+}
+
+.slick-next {
+  right: 0px; /* Adjust the right position */
+}
+
+
+
+.slick-prev:before, .slick-next:before {
+  font-size: 40px;
+  color:#092635;
+}
 @keyframes expand {
   from {
     width: 50px;

@@ -79,45 +79,43 @@ const BusinessInfo = () => {
   });
 
   return (
-    <div className='container mx-auto   mt-4 px-4'>
+    <div className='container mx-auto mt-4 px-4'>
       <Tabs aria-label="Business Information">
         <Tab key="about-location" title="About Us">
           <Card>
             <CardBody>
-              <div className="flex flex-col lg:flex-row  h-[47em] overflow-y-auto scrollbar-custom gap-8">
-                <div className="flex-1  p-4 ">
+              <div className="flex flex-col lg:flex-row h-auto lg:h-[47em] overflow-y-auto scrollbar-custom gap-8">
+                <div className="flex-1 p-4">
                   <h2 className="text-2xl md:text-3xl font-bold mb-4">About Our Business</h2>
-                  <div className='max-w-[40rem] w-full  flex  flex-col justify-center items-center '>  
-                  <div className="text-black mb-6 break-words whitespace-normal">
-                   <h1 className="text-md font-normal">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia,
-                molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum
-                numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium
-                optio, eaque rerum! Provident similique accusantium nemo autem. Veritatis
-                obcaecati tenetur iure eius earum ut molestias architecto voluptate aliquam
-                nihil, eveniet aliquid culpa officia aut! Impedit sit sunt quaerat, odit,
-                tenetur error, harum nesciunt ipsum debitis quas aliquid. Reprehenderit,
-                quia. Quo neque error repudiandae fuga? Ipsa laudantium molestias eos   optio,
-                obcaecati tenetur iure eius earum ut molestias architecto voluptate aliquam
-                nihil, eveniet aliquid culpa officia aut! Impedit sit sunt quaerat, odit,
-                tenetur error, harum nesciunt ipsum debitis quas aliquid. Reprehenderit,  
-          
-                </h1>  
-                </div> 
-                 
-                </div>
+                  <div className='max-w-full lg:max-w-[40rem] w-full flex flex-col justify-center items-center'>
+                    <div className="text-black mb-6 break-words whitespace-normal">
+                      <h1 className="text-md font-normal">
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia,
+                        molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum
+                        numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium
+                        optio, eaque rerum! Provident similique accusantium nemo autem. Veritatis
+                        obcaecati tenetur iure eius earum ut molestias architecto voluptate aliquam
+                        nihil, eveniet aliquid culpa officia aut! Impedit sit sunt quaerat, odit,
+                        tenetur error, harum nesciunt ipsum debitis quas aliquid. Reprehenderit,
+                        quia. Quo neque error repudiandae fuga? Ipsa laudantium molestias eos optio,
+                        obcaecati tenetur iure eius earum ut molestias architecto voluptate aliquam
+                        nihil, eveniet aliquid culpa officia aut! Impedit sit sunt quaerat, odit,
+                        tenetur error, harum nesciunt ipsum debitis quas aliquid. Reprehenderit,
+                      </h1>
+                    </div>
+                  </div>
                   <div className="mb-6">
                     <h3 className="text-xl font-semibold flex items-center gap-3 mb-2">Contact Information</h3>
                     <ul className="space-y-2">
                       {businessData.contactInfo && businessData.contactInfo.map((info, index) => (
                         <li key={index} className="flex items-center gap-2">
                           {renderIcon(info.icon)}
-                          <span>{info.label}: {info.value}</span> 
+                          <span>{info.label}: {info.value}</span>
                         </li>
                       ))}
-                     <li className='flex items-center gap-2'><FaFacebook/> Business Facebook page</li>
-                     <li className='flex items-center gap-2'><FaInstagram/> Business Instagram</li>
-                     <li className='flex items-center gap-2'><FaPhone/> 09123456645</li>
+                      <li className='flex items-center gap-2'><FaFacebook /> Business Facebook page</li>
+                      <li className='flex items-center gap-2'><FaInstagram /> Business Instagram</li>
+                      <li className='flex items-center gap-2'><FaPhone /> 09123456645</li>
                     </ul>
                   </div>
                   <Card>
@@ -126,8 +124,8 @@ const BusinessInfo = () => {
                       <ul className="space-y-2">
                         {businessData.openingHours && businessData.openingHours.map((hours, index) => (
                           <li key={index} className="flex justify-between items-center py-2 border-b">
-                            <span className="font-medium">{hours.day}  </span>
-                            <span className="text-gray-600"> 6:00 am -  8:00 pm</span>
+                            <span className="font-medium">{hours.day}</span>
+                            <span className="text-gray-600">6:00 am - 8:00 pm</span>
                           </li>
                         ))}
                       </ul>
@@ -137,9 +135,9 @@ const BusinessInfo = () => {
                 <div className="flex-1 p-4">
                   <h2 className="text-2xl md:text-3xl font-bold mb-4">Location</h2>
                   <p className="mb-4 text-gray-600">{businessData.location} Sorsogon City Philippines</p>
-                  <div className="relative h-full  rounded-xl  mb-4">
+                  <div className="relative h-full rounded-xl mb-4">
                     {businessData.mapEmbedUrl ? (
-                      <iframe 
+                      <iframe
                         src={businessData.mapEmbedUrl}
                         width="100%"
                         height="100%"
@@ -171,51 +169,32 @@ const BusinessInfo = () => {
           <Card>
             <CardBody>
               <h2 className="text-2xl font-bold mb-4">Our Facilities & Amenities</h2>
-
-              <div className=" p-4 flex flex-wrap justify-start gap-4"> 
-               
-              <div className=' h-auto flex flex-col  items-center w-52 p-4 '>
-                {/* facility or amenity title  */}
-                <p className='font-semibold text-md mb-2'>Facility Title</p>
-                <ul color=''>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                </ul>
+              <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className='h-auto flex flex-col items-center w-full p-4'>
+                  <p className='font-semibold text-md mb-2'>Swimming Pool</p>
+                  <ul>
+                    <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Heated pool</li>
+                    <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Poolside bar</li>
+                    <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Lifeguard on duty</li>
+                  </ul>
+                </div>
+                <div className='h-auto flex flex-col items-center w-full p-4'>
+                  <p className='font-semibold text-md mb-2'>Gym</p>
+                  <ul>
+                    <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> 24/7 Access</li>
+                    <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Personal trainers available</li>
+                    <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Modern equipment</li>
+                  </ul>
+                </div>
+                <div className='h-auto flex flex-col items-center w-full p-4'>
+                  <p className='font-semibold text-md mb-2'>Conference Rooms</p>
+                  <ul>
+                    <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> High-speed internet</li>
+                    <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Audio/Visual equipment</li>
+                    <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Catering services</li>
+                  </ul>
+                </div>
               </div>
-
-              <div className=' h-auto flex flex-col  items-center w-52 p-4 '>
-                {/* facility or amenity title  */}
-                <p className='font-semibold text-md mb-2'>Facility Title</p>
-                <ul color=''>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                </ul>
-              </div>
-
-              <div className=' h-auto flex flex-col  items-center w-52 p-4 '>
-                {/* facility or amenity title  */}
-                <p className='font-semibold text-md mb-2'>Facility Title</p>
-                <ul color=''>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                  <li className='font-normal text-sm  items-center gap-2 flex '>  <FaWifi/>Free wifi</li>
-                </ul>
-              </div>
-             </div>
             </CardBody>
           </Card>
         </Tab>
@@ -239,7 +218,7 @@ const BusinessInfo = () => {
                   <h3 className="text-xl font-bold mb-4">Leave a Review</h3>
                   <form onSubmit={handleSubmitReview} className="space-y-4">
                     <div>
-                      <label className=" mb-2 font-semibold flex items-center gap-3">Your Rating</label>
+                      <label className="mb-2 font-semibold flex items-center gap-3">Your Rating</label>
                       <StarRating rating={rating} onRatingChange={setRating} size="lg" />
                     </div>
                     <Textarea
@@ -269,73 +248,40 @@ const BusinessInfo = () => {
           <Card>
             <CardBody>
               <h2 className="text-2xl font-bold mb-4">Our Policies</h2>
-            
-              
-                 <div className=" p-4 flex flex-wrap justify-start gap-4"> 
-                   
-                 <div className='h-auto flex flex-col w-52 p-4'>  
-                  {/* Policy title */}  
-                  <p className='font-semibold text-md mb-2'>Policy Title</p>  
-                  <ul className=' pl-5'>  
-                    <li className='font-normal text-sm list-disc items-center gap-2'>  
-                      <span className='flex-grow'>Policy Item</span>  
-                    </li>  
-                    <li className='font-normal text-sm list-disc items-center gap-2'>  
-                      <span className='flex-grow'>Policy Item</span>  
-                    </li>  
-                    <li className='font-normal text-sm list-disc items-center gap-2'>  
-                      <span className='flex-grow'>Policy Item</span>  
-                    </li>           
-                  </ul>  
-                </div>  
-                   
-                <div className='h-auto flex flex-col w-52 p-4'>  
-                  {/* Policy title */}  
-                  <p className='font-semibold text-md mb-2'>Policy Title</p>  
-                  {/*  Policy Item */}
-                  <ul className=' pl-5'>  
-                    <li className='font-normal text-sm list-disc items-center gap-2'>  
-                      <span className='flex-grow'>Policy Item</span>  
-                    </li>  
-                    <li className='font-normal text-sm list-disc items-center gap-2'>  
-                      <span className='flex-grow'>Policy Item</span>  
-                    </li>  
-                    <li className='font-normal text-sm list-disc items-center gap-2'>  
-                      <span className='flex-grow'>Policy Item</span>  
-                    </li>           
-                  </ul>  
-                </div>  
-                <div className='h-auto flex flex-col w-52 p-4'>  
-                  {/* Policy title */}  
-                  <p className='font-semibold text-md mb-2'>Policy Title</p>  
-                  <ul className=' pl-5'>  
-                    <li className='font-normal text-sm list-disc items-center gap-2'>  
-                      <span className='flex-grow'>Policy Item</span>  
-                    </li>  
-                    <li className='font-normal text-sm list-disc items-center gap-2'>  
-                      <span className='flex-grow'>Policy Item</span>  
-                    </li>  
-                    <li className='font-normal text-sm list-disc items-center gap-2'>  
-                      <span className='flex-grow'>Policy Item</span>  
-                    </li>           
-                  </ul>  
-                </div>  
-                <div className='h-auto flex flex-col w-52 p-4'>  
-                  {/* Policy title */}  
-                  <p className='font-semibold text-md mb-2'>Policy Title</p>  
-                  <ul className=' pl-5'>  
-                    <li className='font-normal text-sm list-disc items-center gap-2'>  
-                      <span className='flex-grow'>Policy Item</span>  
-                    </li>  
-                    <li className='font-normal text-sm list-disc items-center gap-2'>  
-                      <span className='flex-grow'>Policy Item</span>  
-                    </li>  
-                    <li className='font-normal text-sm list-disc items-center gap-2'>  
-                      <span className='flex-grow'>Policy Item</span>  
-                    </li>           
-                  </ul>  
-                </div>  
-                    
+              <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className='h-auto flex flex-col items-center w-full p-4'>
+                  <p className='font-semibold text-md mb-2'>Cancellation Policy</p>
+                  <ul className='pl-5'>
+                    <li className='font-normal text-sm list-disc items-center gap-2'>
+                      <span className='flex-grow'>Free cancellation up to 24 hours before check-in</span>
+                    </li>
+                    <li className='font-normal text-sm list-disc items-center gap-2'>
+                      <span className='flex-grow'>50% refund for cancellations within 24 hours</span>
+                    </li>
+                  </ul>
+                </div>
+                <div className='h-auto flex flex-col items-center w-full p-4'>
+                  <p className='font-semibold text-md mb-2'>Pet Policy</p>
+                  <ul className='pl-5'>
+                    <li className='font-normal text-sm list-disc items-center gap-2'>
+                      <span className='flex-grow'>Pets allowed with prior notice</span>
+                    </li>
+                    <li className='font-normal text-sm list-disc items-center gap-2'>
+                      <span className='flex-grow'>Additional cleaning fee may apply</span>
+                    </li>
+                  </ul>
+                </div>
+                <div className='h-auto flex flex-col items-center w-full p-4'>
+                  <p className='font-semibold text-md mb-2'>Check-in/Check-out</p>
+                  <ul className='pl-5'>
+                    <li className='font-normal text-sm list-disc items-center gap-2'>
+                      <span className='flex-grow'>Check-in: 3:00 PM</span>
+                    </li>
+                    <li className='font-normal text-sm list-disc items-center gap-2'>
+                      <span className='flex-grow'>Check-out: 11:00 AM</span>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </CardBody>
           </Card>

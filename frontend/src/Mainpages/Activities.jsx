@@ -2,14 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Nav from '../components/nav';
 import Hero from '../components/heroactivity';
-import Search from '../components/Search';
 import Footer from '@/components/Footer';
 import pic1 from '../assets/donsol.jpg';
-import {Button, useDisclosure, Spinner } from "@nextui-org/react";
+import { Button, Spinner } from "@nextui-org/react";
 import { Checkbox, CheckboxGroup, Select, SelectItem, Slider } from "@nextui-org/react";
 import { GiPositionMarker } from "react-icons/gi";
-import { Link } from 'react-router-dom';  
-import { PiChatCircleText } from 'react-icons/pi';
+import { Link } from 'react-router-dom';
+
+// Custom hook to detect if the screen is large
+const useIsLargeScreen = () => {
+  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsLargeScreen(window.innerWidth >= 1024);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return isLargeScreen;
+};
 
 const Activities = () => {
   // State Variables
@@ -17,10 +31,12 @@ const Activities = () => {
   const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [selectedRatings, setSelectedRatings] = useState([]);
   const [selectedDestination, setSelectedDestination] = useState('All');
-  const [selectedCategories, setSelectedCategories] = useState([]); // New state for categories
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const [budgetRange, setBudgetRange] = useState([0, 10000]);
-  const [selectedActivity, setSelectedActivity] = useState(null); // New state for selected activity
   const [loading, setLoading] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
+
+  const isLargeScreen = useIsLargeScreen();
 
   useEffect(() => {
     // Simulate data fetching
@@ -31,7 +47,6 @@ const Activities = () => {
     return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
   }
 
-  // Handlers
   const handleActivityChange = (selected) => {
     setSelectedActivities(selected);
   };
@@ -58,6 +73,10 @@ const Activities = () => {
 
   const handleBudgetChange = (value) => {
     setBudgetRange(value);
+  };
+
+  const toggleFilters = () => {
+    setShowFilters(!showFilters);
   };
 
   // Activity Details
@@ -149,7 +168,7 @@ const Activities = () => {
     'All', 'Bulusan', 'Bulan', 'Barcelona', 'Casiguran', 'Castilla', 'Donsol', 'Gubat', 'Irosin', 'Juban', 'Magallanes', 'Matnog', 'Pilar', 'Prieto Diaz', 'Sta. Magdalena', 'Sorsogon City',
   ];
 
-  const categories = ['Adventure', 'Tour', 'Relaxation', 'Water Sports', 'Cultural', 'Nature']; // Category options
+  const categories = ['Adventure', 'Tour', 'Relaxation', 'Water Sports', 'Cultural', 'Nature'];
 
   // Animation Variants
   const containerVariants = {
@@ -179,39 +198,29 @@ const Activities = () => {
     <div className='mx-auto bg-light min-h-screen font-sans'>
       <Nav />
       <Hero />
-      <Search />
+   
 
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12'>
         <h1 className='font-semibold text-3xl text-color1 mb-8'>Activities in Sorsogon</h1>
-         
-        <div className='flex flex-col lg:flex-row gap-8'>
-          {/* Filters Section */}
-          <div className='w-full lg:w-1/4'>
-            <div className='bg-white p-6 rounded-lg shadow-md'>
-              <h2 className='text-xl font-semibold mb-4'>Filters</h2>
-              
-              {/* Destination Dropdown */}
-              <div className='mb-6'>
-                <h3 className='text-sm font-medium text-gray-700 mb-2'>Destination</h3>
-                <Select
-                  placeholder="Select Destination"
-                  selectedKeys={selectedDestination !== 'All' ? [selectedDestination] : []}
-                  onSelectionChange={(value) => handleDestinationChange(value.currentKey)}
-                >
-                  {destinations.map((destination) => (
-                    <SelectItem key={destination} value={destination}>
-                      {destination}
-                    </SelectItem>
-                  ))}
-                </Select>
-              </div>
 
-              {/* Category Checkbox Group */}
-              <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
-                <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Category</h3>
+        {/* Toggle Button for Filters */}
+        <div className="lg:hidden mb-4 sticky top-[7.5rem] z-40 bg-white">
+          <Button onClick={toggleFilters} className="w-full bg-color1 text-color3">
+            {showFilters ? 'Hide Filters' : 'Show Filters'}
+          </Button>
+        </div>
+
+        <div className='flex flex-col lg:flex-row gap-8'>
+          {/* Conditionally render filters based on screen size and toggle state */}
+          {(showFilters || isLargeScreen) && (
+            <div className='w-full lg:w-1/4'>
+              <div className='bg-white p-6 rounded-lg shadow-md'>
+                <h2 className='text-xl font-semibold mb-4'>Filters</h2>
+                {/* Filter components go here */}
                 <CheckboxGroup
-                  value={selectedCategories}
-                  onChange={setSelectedCategories}
+                  label="Activity Type"
+                  value={selectedActivities}
+                  onChange={handleActivityChange}
                 >
                   {categories.map((category) => (
                     <Checkbox key={category} value={category}>
@@ -219,27 +228,9 @@ const Activities = () => {
                     </Checkbox>
                   ))}
                 </CheckboxGroup>
-              </div>
 
-              {/* Activity Types Filter */}
-              <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
-                <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Activities</h3>
                 <CheckboxGroup
-                  value={selectedActivities}
-                  onChange={handleActivityChange}
-                >
-                  {['Diving', 'Camping', 'Hiking', 'Island Hopping', 'Swimming', 'Surfing'].map((activity) => (
-                    <Checkbox key={activity} value={activity}>
-                      {activity}
-                    </Checkbox>
-                  ))}
-                </CheckboxGroup>
-              </div>
-
-              {/* Amenities Filter */}
-              <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
-                <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Amenities</h3>
-                <CheckboxGroup
+                  label="Amenities"
                   value={selectedAmenities}
                   onChange={handleAmenitiesChange}
                 >
@@ -249,57 +240,64 @@ const Activities = () => {
                     </Checkbox>
                   ))}
                 </CheckboxGroup>
-              </div>
 
-              {/* Budget Filter */}
-              <div className='mb-6'>
-                <h3 className='text-sm font-medium text-gray-700 mb-2'>Budget (PHP)</h3>
+                <Select
+                  label="Destination"
+                  value={selectedDestination}
+                  onChange={handleDestinationChange}
+                >
+                  {destinations.map((destination) => (
+                    <SelectItem key={destination} value={destination}>
+                      {destination}
+                    </SelectItem>
+                  ))}
+                </Select>
+
                 <Slider
+                  label="Budget Range"
                   step={100}
                   minValue={0}
                   maxValue={10000}
                   value={budgetRange}
                   onChange={setBudgetRange}
                   formatOptions={{ style: 'currency', currency: 'PHP' }}
-                  className="max-w-md flex "
                 />
                 <div className='flex justify-between text-xs'>
                   <span>₱{budgetRange[0]}</span>
                   <span>₱{budgetRange[1]}+</span>
                 </div>
-              </div>
 
-              {/* Ratings Filter */}
-              <div>
-                <h3 className='text-sm font-medium text-gray-700 mb-2'>Ratings</h3>
-                <div className='space-y-2'>
-                  <label className='flex items-center'>
-                    <input
-                      type='checkbox'
-                      onChange={() => handleRatingClick('All')}
-                      checked={selectedRatings.length === 0}
-                      className='form-checkbox text-color2'
-                    />
-                    <span className='ml-2 text-sm'>All Ratings</span>
-                  </label>
-                  {[5, 4, 3, 2, 1].map((star) => (
-                    <label key={star} className='flex items-center'>
+                <div>
+                  <h3 className='text-sm font-medium text-gray-700 mb-2'>Ratings</h3>
+                  <div className='space-y-2'>
+                    <label className='flex items-center'>
                       <input
                         type='checkbox'
-                        onChange={() => handleRatingClick(star)}
-                        checked={selectedRatings.includes(star)}
+                        onChange={() => handleRatingClick('All')}
+                        checked={selectedRatings.length === 0}
                         className='form-checkbox text-color2'
                       />
-                      <span className='ml-2 text-sm flex items-center'>
-                        {'★'.repeat(star)}{'☆'.repeat(5 - star)}
-                        <span className='ml-1'>{star} Star{star > 1 ? 's' : ''}</span>
-                      </span>
+                      <span className='ml-2 text-sm'>All Ratings</span>
                     </label>
-                  ))}
+                    {[5, 4, 3, 2, 1].map((star) => (
+                      <label key={star} className='flex items-center'>
+                        <input
+                          type='checkbox'
+                          onChange={() => handleRatingClick(star)}
+                          checked={selectedRatings.includes(star)}
+                          className='form-checkbox text-color2'
+                        />
+                        <span className='ml-2 text-sm flex items-center'>
+                          {'★'.repeat(star)}{'☆'.repeat(5 - star)}
+                          <span className='ml-1'>{star} Star{star > 1 ? 's' : ''}</span>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Activity List */}
           <div className='w-full'>
@@ -323,12 +321,12 @@ const Activities = () => {
                     />
                     <div className='p-4'>
                       <div className='flex items-center justify-between gap-2'>
-                         {/* Category Badge */}
-                      <div className='mb-2'>
-                        <span className='inline-block bg-color2 text-white text-xs px-2 py-1 rounded-full'>
-                          {activity.category}
-                        </span>
-                      </div>
+                        {/* Category Badge */}
+                        <div className='mb-2'>
+                          <span className='inline-block bg-color2 text-white text-xs px-2 py-1 rounded-full'>
+                            {activity.category}
+                          </span>
+                        </div>
                         <div className='flex items-center gap-2'>
                           <div className='flex items-center gap-1 '>
                             <span className='text-black text-[12px] '>{activity.rating}</span> 
@@ -343,15 +341,15 @@ const Activities = () => {
                         <GiPositionMarker/> {activity.destination}
                       </div>
                       <div className=' flex mb-2  max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom  flex-col '>      
-                      <p className='text-sm text-gray-600 mb-2'>{activity.description}</p>
+                        <p className='text-sm text-gray-600 mb-2'>{activity.description}</p>
                       </div>
                       <p className='font-semibold text-md mb-2'>₱{activity.budget}</p>
-                     <Link to="/business" target='_blank'>
-                      <Button 
-                        className='w-full bg-color1 text-color3 hover:bg-color2'
-                      >
-                        Explore More
-                      </Button>
+                      <Link to="/business" target='_blank'>
+                        <Button 
+                          className='w-full bg-color1 text-color3 hover:bg-color2'
+                        >
+                          Explore More
+                        </Button>
                       </Link>
                     </div>
                   </motion.div>
@@ -365,7 +363,6 @@ const Activities = () => {
       </div>
 
       <Footer />
-
     </div>
   );
 };

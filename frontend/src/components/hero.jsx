@@ -73,10 +73,10 @@ const Hero = () => {
   };
 
   return (
-    <div className="mx-auto mt-28 h-[600px] relative font-sans overflow-hidden">
+    <div className="mx-auto mt-28 h-[500px] relative font-sans overflow-hidden">
       <Slider {...settings}>
         {images.map((image, index) => (
-          <div key={index} className="relative h-[600px]">
+          <div key={index} className="relative h-[500px]">
             <img
               src={image}
               alt={`Slide ${index + 1}`}
@@ -94,7 +94,7 @@ const Hero = () => {
           </div>
         ))}
       </Slider>
-      <div className="absolute bottom-[10rem] left-0 right-0 flex justify-center">
+      <div className="absolute bottom-[8rem] left-0 right-0 flex justify-center">
         <a
           href='/destination'
           className="mt-4 flex items-center bg-light text-black font-semibold py-3 px-6 rounded-full transform transition-all duration-300 hover:translate-x-2 hover:bg-color1 hover:text-light animate-slideUp animation-delay-600"

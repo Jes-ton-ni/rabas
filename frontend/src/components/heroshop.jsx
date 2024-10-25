@@ -1,5 +1,6 @@
 import React from 'react';
 import ShopBackground from '../assets/shop.webp';
+import Search from './Search';
 
 const HeroShop = () => {
   return (
@@ -20,6 +21,7 @@ const HeroShop = () => {
             <li>Shopping</li>
           </ol>
         </nav>
+        <Search/>
       </div>
       
     </div>

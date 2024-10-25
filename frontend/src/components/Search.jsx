@@ -1,127 +1,192 @@
 import React, { useState } from 'react';
-import { FaSearch, FaMapMarkerAlt, FaWalking, FaBed } from 'react-icons/fa';
-import { Select, SelectItem } from "@nextui-org/select";
-import { Button } from '@nextui-org/react';
-import { MdOutlineLocalDining } from "react-icons/md";
-import { FaShop } from "react-icons/fa6";
+import { FaSearch, FaTimes, FaHiking, FaBed, FaUtensils, FaShoppingBag, FaMapMarkerAlt } from 'react-icons/fa';
+import { Tabs, Tab } from '@nextui-org/react';
 
 const Search = () => {
-  const [destination, setDestination] = useState(null);
-  const [activity, setActivity] = useState(null);
-  const [accommodation, setAccommodation] = useState(null);
-  const [food, setFood] = useState(null);
-  const [shop, setShop] = useState(null);
+  const [activeTab, setActiveTab] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
-  const handleSearch = () => {
-    // Handle search logic based on the selected options
-    console.log('Selected Destination:', destination);
-    console.log('Selected Activity:', activity);
-    console.log('Selected Accommodation:', accommodation);
-    console.log('Selected Food:', food);
-    console.log('Selected Shop:', shop);
+  const activities = [
+    { name: 'Hiking Adventure', destination: 'Bulusan', image: 'https://via.placeholder.com/50' },
+    // Add more activities as needed
+  ];
+
+  const accommodations = [
+    { name: 'Luxury Hotel', destination: 'Sorsogon City', image: 'https://via.placeholder.com/50' },
+    // Add more accommodations as needed
+  ];
+
+  const foodPlaces = [
+    { name: 'Mountain View Dining', destination: 'Sorsogon City', image: 'https://via.placeholder.com/50' },
+    // Add more food places as needed
+  ];
+
+  const shops = [
+    { name: 'Sample Souvenir Shop', destination: 'Sorsogon City', image: 'https://via.placeholder.com/50' },
+    // Add more shops as needed
+  ];
+
+  const locations = [
+    { name: 'Bulusan' },
+    { name: 'Bulan' },
+    { name: 'Barcelona' },
+    { name: 'Casiguran' },
+    { name: 'Castilla' },
+    { name: 'Donsol' },
+    { name: 'Gubat' },
+    { name: 'Irosin' },
+    { name: 'Juban' },
+    { name: 'Magallanes' },
+    { name: 'Matnog' },
+    { name: 'Pilar' },
+    { name: 'Prieto Diaz' },
+    { name: 'Sta. Magdalena' },
+    { name: 'Sorsogon City' },
+  ];
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+
+    if (value.length > 0) {
+      performSearch(value);
+    } else {
+      setSearchResults([]);
+    }
   };
 
-  // This function will toggle between selecting and deselecting an option
-  const handleToggleSelection = (value, currentSelection, setSelection) => {
-    if (currentSelection === value) {
-      setSelection(null); // Reset to the default (unselected)
-    } else {
-      setSelection(value); // Otherwise, select the new option
+  const performSearch = (query) => {
+    let results = [];
+    const firstLetter = query.charAt(0).toLowerCase();
+
+    const matchesFirstLetter = (str) => str.charAt(0).toLowerCase() === firstLetter;
+
+    switch (activeTab) {
+      case 'all':
+        results = [
+          ...activities.filter((activity) => 
+            matchesFirstLetter(activity.name)
+          ),
+          ...accommodations.filter((accommodation) => 
+            matchesFirstLetter(accommodation.name)
+          ),
+          ...foodPlaces.filter((food) => 
+            matchesFirstLetter(food.name)
+          ),
+          ...shops.filter((shop) => 
+            matchesFirstLetter(shop.name)
+          ),
+          ...locations.filter((location) => 
+            matchesFirstLetter(location.name)
+          ),
+        ];
+        break;
+      case 'activities':
+        results = activities.filter((activity) =>
+          matchesFirstLetter(activity.name)
+        );
+        break;
+      case 'accommodation':
+        results = accommodations.filter((accommodation) =>
+          matchesFirstLetter(accommodation.name)
+        );
+        break;
+      case 'food':
+        results = foodPlaces.filter((food) =>
+          matchesFirstLetter(food.name)
+        );
+        break;
+      case 'shops':
+        results = shops.filter((shop) =>
+          matchesFirstLetter(shop.name)
+        );
+        break;
+      default:
+        break;
+    }
+
+    setSearchResults(results);
+  };
+
+  const clearSearchField = () => {
+    setSearchQuery('');
+    setSearchResults([]);
+  };
+
+  const handleTabChange = (key) => {
+    setActiveTab(key);
+    setSearchQuery('');
+    setSearchResults([]);
+  };
+
+  const getTitleForTab = (tab) => {
+    switch (tab) {
+      case 'all':
+        return 'Explore Everything';
+      case 'activities':
+        return 'Find Exciting Activities';
+      case 'accommodation':
+        return 'Discover Comfortable Stays';
+      case 'food':
+        return 'Taste Delicious Food';
+      case 'shops':
+        return 'Shop Till You Drop';
+      default:
+        return 'What to Visit';
     }
   };
 
   return (
-    <div className="flex flex-col items-center w-full">
-      <div className="bg-light rounded-md shadow-lg p-4 flex flex-wrap justify-center gap-4">
-        
-        {/* Destination */}
-        <div className="flex items-center space-x-2 flex-1 min-w-[195px]">
-          <FaMapMarkerAlt className="text-dark text-md" />
-          <Select
-            placeholder={!destination ? "Select Destination" : destination}
-            selectedKeys={destination ? [destination] : []}
-            onSelectionChange={(value) => handleToggleSelection(value.currentKey, destination, setDestination)}
-          >
-            <SelectItem key="Bulusan">Bulusan</SelectItem>
-            <SelectItem key="Bulan">Bulan</SelectItem>
-            <SelectItem key="Barcelona">Barcelona</SelectItem>
-            <SelectItem key="Casiguran">Casiguran</SelectItem>
-            <SelectItem key="Castilla">Castilla</SelectItem>
-            <SelectItem key="Donsol">Donsol</SelectItem>
-            <SelectItem key="Gubat">Gubat</SelectItem>
-            <SelectItem key="Irosin">Irosin</SelectItem>
-            <SelectItem key="Juban">Juban</SelectItem>
-            <SelectItem key="Magallanes">Magallanes</SelectItem>
-            <SelectItem key="Matnog">Matnog</SelectItem>
-            <SelectItem key="Pilar">Pilar</SelectItem>
-            <SelectItem key="Prieto Diaz">Prieto Diaz</SelectItem>
-            <SelectItem key="Sta. Magdalena">Sta. Magdalena</SelectItem>
-            <SelectItem key="Sorsogon City">Sorsogon City</SelectItem>
-          </Select>
-        </div>
+    <div className="flex flex-col items-center mt-6 p-6 bg-white rounded-lg shadow-lg w-full max-w-2xl mx-auto">
+      <div>
+        <h1 className='font-semibold text-2xl'>{getTitleForTab(activeTab)}</h1>
+      </div>
+      <Tabs
+        aria-label="Search Options"
+        onSelectionChange={handleTabChange}
+        className="w-full mb-6 flex justify-center"
+        variant="underlined"
+      >
+        <Tab key="all" title={<span className="flex items-center"><FaSearch className="mr-2" />Search All</span>} />
+        <Tab key="activities" title={<span className="flex items-center"><FaHiking className="mr-2" />Activities</span>} />
+        <Tab key="accommodation" title={<span className="flex items-center"><FaBed className="mr-2" />Accommodation</span>} />
+        <Tab key="food" title={<span className="flex items-center"><FaUtensils className="mr-2" />Food Places</span>} />
+        <Tab key="shops" title={<span className="flex items-center"><FaShoppingBag className="mr-2" />Shops</span>} />
+      </Tabs>
 
-        {/* Activity */}
-        <div className="flex items-center space-x-2 flex-1 min-w-[220px]">
-          <FaWalking className="text-dark text-md" />
-          <Select
-            placeholder={!activity ? "Select Activity" : activity}
-            selectedKeys={activity ? [activity] : []}
-            onSelectionChange={(value) => handleToggleSelection(value.currentKey, activity, setActivity)}
-          >
-            <SelectItem key="Diving">Diving</SelectItem>
-            <SelectItem key="Camping">Camping</SelectItem>
-            <SelectItem key="Hiking">Hiking</SelectItem>
-            <SelectItem key="Island Hopping">Island Hopping</SelectItem>
-            <SelectItem key="Swimming">Swimming</SelectItem>
-            <SelectItem key="Surfing">Surfing</SelectItem>
-          </Select>
-        </div>
+      <div className="flex items-center w-full mb-4">
+        <FaSearch className="text-gray-500 mr-2" />
+        <input
+          type="text"
+          placeholder={`Search for ${activeTab}`}
+          value={searchQuery}
+          onChange={handleInputChange}
+          className="flex-grow p-2 border-b border-gray-300 focus:outline-none"
+        />
+        {searchQuery && (
+          <FaTimes
+            onClick={clearSearchField}
+            className="text-gray-500 cursor-pointer ml-2"
+          />
+        )}
+      </div>
 
-        {/* Accommodation */}
-        <div className="flex items-center space-x-2 flex-1 min-w-[220px]">
-          <FaBed className="text-dark text-md" />
-          <Select
-            placeholder={!accommodation ? "Select Accommodation" : accommodation}
-            selectedKeys={accommodation ? [accommodation] : []}
-            onSelectionChange={(value) => handleToggleSelection(value.currentKey, accommodation, setAccommodation)}
-          >
-            <SelectItem key="Hotel">Hotel</SelectItem>
-            <SelectItem key="Inn">Inn</SelectItem>
-            <SelectItem key="Lodging">Lodging</SelectItem>
-          </Select>
-        </div>
-
-        {/* Food */}
-        <div className="flex items-center space-x-2 flex-1 min-w-[230px]">
-          <MdOutlineLocalDining className="text-dark text-md" />
-          <Select
-            placeholder={!food ? "Food Place" : food}
-            selectedKeys={food ? [food] : []}
-            onSelectionChange={(value) => handleToggleSelection(value.currentKey, food, setFood)}
-          >
-            <SelectItem key="Restaurant">Restaurant</SelectItem>
-            <SelectItem key="Bar">Bar</SelectItem>
-          </Select>
-        </div>
-
-        {/* Shop */}
-        <div className="flex items-center space-x-2 flex-1 min-w-[200px]">
-          <FaShop className="text-dark text-md" />
-          <Select
-            placeholder={!shop ? "Select Shop" : shop}
-            selectedKeys={shop ? [shop] : []}
-            onSelectionChange={(value) => handleToggleSelection(value.currentKey, shop, setShop)}
-          >
-            <SelectItem key="Souvenir">Souvenir Shop</SelectItem>
-          </Select>
-        </div>
-
-        {/* Search Button */}
-        <div className="ml-4 mt-4 md:mt-0">
-          <Button auto onClick={handleSearch} className='bg-color1 text-light hover:bg-color2'>
-            <FaSearch />
-            <span className="ml-2">Search</span>
-          </Button>
+      <div className="relative w-full">
+        <div className="absolute w-full max-h-[500px] z-10 overflow-y-auto scrollbar-custom bg-white shadow-lg rounded-lg">
+          {searchResults.map((result, index) => (
+            <div key={index} className="flex items-center p-2 hover:bg-gray-200 cursor-pointer">
+              {result.image ? (
+                <img src={result.image} alt={result.name} className="w-12 h-12 rounded-full mr-3" />
+              ) : (
+                <FaMapMarkerAlt className="w-12 h-12 text-gray-500 mr-3" />
+              )}
+              <div>
+                <h3 className="text-md font-semibold">{result.name}</h3>
+                {result.destination && <p className="text-sm text-gray-500">{result.destination}</p>}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

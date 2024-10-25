@@ -170,15 +170,17 @@ const Nav = () => {
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="flex gap-1 text-color1 hover:text-gray-700 text-lg cursor-pointer hover:font-semibold duration-100 font-light">
+                <NavigationMenuTrigger className="flex gap-1 text-color1 hover:text-gray-700 text-lg cursor-pointer hover:font-semibold duration-100 font-light">       
                   <FaPersonWalking />
+                  <a href='/Discover'>
                    Discover
+                   </a>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <NavigationMenuLink>
                     <div className="w-max p-9 bg-light">
                       <ul className="text-dark text-sm space-y-3">
-                      <a href='/activities'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Activities and Attractions</li></a>
+                      <a href='/activities'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Activities</li></a>
                             <a href='/accomodation'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Accommodations</li></a>
                             <a href='/food'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Food Places</li></a>       
                             <a href='/shop'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Shops</li></a>                
@@ -281,7 +283,7 @@ const Nav = () => {
           </div>
         )}
 
-        {/** Search Bar and User Icon */}
+        {/** User Icon */}
         <div className="hidden lg:flex items-center gap-9">
           <div className="hover:text-gray-700 cursor-pointer hover:font-semibold duration-100 text-lg font-light text-color1 flex items-center gap-1">
            <h1>Deals</h1>

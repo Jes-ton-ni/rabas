@@ -7,6 +7,7 @@ import { Spinner } from '@nextui-org/react';
 
 
 
+
 const Home = () => {
   const [loading, setLoading] = useState(true);
 
@@ -31,10 +32,10 @@ const Home = () => {
         <Hero />
       </div>
 
-        {/** Search */}
+        {/** Search */}  
 
         <div >
-         <Search />
+         <Search/>
            </div>
 
       <div className='h-[900px]'></div>
