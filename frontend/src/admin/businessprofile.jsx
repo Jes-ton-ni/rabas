@@ -1066,7 +1066,12 @@ const BusinessProfile = () => {
                         </>
                       ) : (
                         <>
-                          <p className="mt-2">{image.title || 'No Title'}</p>
+                          <Input 
+                            type="text"
+                            value = {image.title || 'No Title'}
+                            className="mt-2"
+                            disabled
+                          />
                           <AiOutlineEdit
                             onClick={() => handleEditImageTitle(image.id)}
                             className="cursor-pointer text-gray-600 ml-2 text-2xl"
