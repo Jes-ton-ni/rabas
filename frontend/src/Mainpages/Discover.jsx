@@ -9,6 +9,8 @@ import { Link } from 'react-router-dom';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import TopRated from '@/components/TopRated'; // Import the new component
+import Search from '@/components/Search';
+
 
 
 // Mock Data
@@ -406,7 +408,7 @@ const Discover = () => {
     <div className="mx-auto bg-light min-h-screen font-sans">
       <Nav />
       <Hero />
-
+      <Search/>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
         <h1 className="font-semibold text-3xl text-color1 mb-8">
           What To Discover in Sorsogon

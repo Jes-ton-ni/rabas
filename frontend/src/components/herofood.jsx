@@ -1,6 +1,6 @@
 import React from 'react';
 import FoodBackground from '../assets/resto.webp';
-import Search from './Search';
+
 
 const HeroFood = () => {
   return (
@@ -21,7 +21,7 @@ const HeroFood = () => {
             <li>Food & Dining</li>
           </ol>
         </nav>
-        <Search/>
+    
       </div>
 
       

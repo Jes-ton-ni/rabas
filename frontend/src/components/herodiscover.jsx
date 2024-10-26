@@ -1,7 +1,6 @@
 import React from 'react'
 import Sorsogon from '../assets/sorsogon city.jpg'
-import Search from './Search'
-Search
+
 
 const herodiscover = () => {  
   return (  
@@ -20,7 +19,7 @@ const herodiscover = () => {
             <li>Discover</li>  
           </ol>  
         </nav> 
-        <Search/>
+
       </div>  
 
     </div>  

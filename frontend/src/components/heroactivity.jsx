@@ -1,6 +1,6 @@
 import React from 'react';
 import ActivityBackground from '../assets/activity.jpg';
-import Search from './Search';
+
 
 
 const HeroActivity = () => {
@@ -22,7 +22,6 @@ const HeroActivity = () => {
             <li>Activities</li>
           </ol>
         </nav>
-        <Search/>
       </div>
       
     </div>

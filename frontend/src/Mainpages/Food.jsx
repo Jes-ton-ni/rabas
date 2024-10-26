@@ -9,6 +9,8 @@ import { Checkbox, CheckboxGroup, Select, SelectItem, Slider } from "@nextui-org
 import { GiPositionMarker } from "react-icons/gi";
 import { Link } from 'react-router-dom';
 import { Spinner } from '@nextui-org/react'; // Add this import
+import Search from '@/components/Search';
+
 
 const Food = () => {
     const [selectedType, setSelectedType] = useState([]);
@@ -181,7 +183,7 @@ const Food = () => {
         <div className='mx-auto bg-light min-h-screen font-sans'>
             <Nav />
             <Hero />
-          
+            <Search/>
             <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12'>
                 <h1 className='font-semibold text-3xl text-color1 mb-8'>Food Places in Sorsogon</h1>
 

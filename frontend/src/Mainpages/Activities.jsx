@@ -8,6 +8,8 @@ import { Button, Spinner } from "@nextui-org/react";
 import { Checkbox, CheckboxGroup, Select, SelectItem, Slider } from "@nextui-org/react";
 import { GiPositionMarker } from "react-icons/gi";
 import { Link } from 'react-router-dom';
+import Search from '@/components/Search';
+
 
 // Custom hook to detect if the screen is large
 const useIsLargeScreen = () => {
@@ -198,7 +200,7 @@ const Activities = () => {
     <div className='mx-auto bg-light min-h-screen font-sans'>
       <Nav />
       <Hero />
-   
+      <Search/>
 
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12'>
         <h1 className='font-semibold text-3xl text-color1 mb-8'>Activities in Sorsogon</h1>
