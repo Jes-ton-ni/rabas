@@ -360,6 +360,12 @@ const UserProfile = ({ activities = [] }) => {
 
   useEffect(() => {
     checkLoginStatus(); // Check login status when component mounts
+
+    // Set the initial tab based on the URL hash
+    const hash = window.location.hash.substring(1); // Remove the '#' character
+    if (hash) {
+      setSelected(hash);
+    }
   }, [checkLoginStatus]);
 
   useEffect(() => {
@@ -460,7 +466,7 @@ const UserProfile = ({ activities = [] }) => {
   }
 
   return (
-    <div className='mx-auto min-h-screen font-sans'>
+    <div className='mx-auto min-h-screen font-sans bg-light'>
       <Nav />
       <div className='container p-3 rounded-md mt-[7.2rem] flex justify-center'>
         <Search />

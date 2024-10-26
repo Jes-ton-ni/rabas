@@ -1,6 +1,8 @@
 import React from 'react';
 import ActivityBackground from '../assets/activity.jpg';
 
+
+
 const HeroActivity = () => {
   return (
     <div

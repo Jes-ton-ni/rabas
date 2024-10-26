@@ -22,22 +22,24 @@ const BusinessSection = () => {
   const settings = {
     infinite: true,
     speed: 500,
-    slidesToShow: 3,
+    slidesToShow: 3, // Default for large screens
     slidesToScroll: 1,
-    arrows: false, // Disable arrows
+    arrows: true, // Ensure arrows are enabled
     responsive: [
       {
-        breakpoint: 1024,
+        breakpoint: 1024, // Medium screens
         settings: {
           slidesToShow: 2,
           slidesToScroll: 1,
+          arrows: true, // Ensure arrows are enabled for medium screens
         }
       },
       {
-        breakpoint: 600,
+        breakpoint: 768, // Small screens
         settings: {
           slidesToShow: 1,
           slidesToScroll: 1,
+          arrows: true, // Ensure arrows are enabled for small screens
         }
       }
     ]
@@ -51,11 +53,11 @@ const BusinessSection = () => {
   const closeModal = () => setVisible(false);
 
   return (
-    <div className='mx-auto mt-4 container p-4 rounded-xl mb-4 bg-white'>
+    <div className='mx-auto mt-4 container p-4 rounded-xl mb-4 '>
       {/* Header Section */}
       <div className='flex justify-between items-center p-2'>
         <h1 className='text-2xl font-semibold'>Deals</h1>
-        <h1 className='text-md font-semibold text-blue-600 hover:text-blue-400 cursor-pointer' onClick={openModal}>
+        <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer' onClick={openModal}>
           See More
         </h1>
       </div>
@@ -92,7 +94,7 @@ const BusinessSection = () => {
             <h2 className='text-lg font-semibold'>All Deals</h2>
     
           </ModalHeader>
-          <ModalBody className="overflow-y-auto h-[500px] p-4">
+          <ModalBody className="overflow-y-auto scrollbar-custom h-[500px] p-4">
             {/* Scrollable Grid for the deals */}
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
               {sampleDeals.map(deal => (

@@ -20,6 +20,7 @@ const HeroShop = () => {
             <li>Shopping</li>
           </ol>
         </nav>
+      
       </div>
       
     </div>

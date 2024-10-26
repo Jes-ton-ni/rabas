@@ -20,6 +20,7 @@ import SuperAdminProducts from './admin/SuperAdmin/SuperAdminProducts';
 import SuperAdminVerification from './admin/SuperAdmin/SuperAdminVerification';
 import SuperAdminReports from './admin/SuperAdmin/SuperAdminReports';
 import SuperAdminTransportation from './admin/SuperAdmin/SuperAdminTransportation';
+import Discover from './Mainpages/Discover';
 
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
           <Route path='/superadminverification' element={<SuperAdminVerification />} />
           <Route path='/superadminreports' element={<SuperAdminReports />} />
           <Route path='/superadmintransportation' element={<SuperAdminTransportation />} />
+          <Route path='/discover' element={<Discover/>}/>
         </Routes>
      
     </Router>

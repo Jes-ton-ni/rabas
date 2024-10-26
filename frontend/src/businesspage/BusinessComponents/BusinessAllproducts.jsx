@@ -505,7 +505,7 @@ const BusinessAllproducts = () => {
                 <ProductCard key={index} product={product} openBookingModal={openBookingModal} onOpen={onOpen} />
               ))
             ) : (
-              <div>No results found</div>
+              <div className="text-center text-gray-500">No results found</div>
             )}
           </div>
         </div>
@@ -518,7 +518,7 @@ const BusinessAllproducts = () => {
         scrollBehavior="inside"
         size="5xl"
         className='max-h-[90vh]'
-        closeOnOverlayClick={false} // Ensure this property is set to prevent closing on outside click
+        closeOnOverlayClick={false}
       >
         <ModalContent>
           {(onClose) => (
@@ -554,7 +554,7 @@ const BusinessAllproducts = () => {
                       </div>
                       <button
                         className="absolute top-2 right-2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full p-2 transition-all duration-300"
-                        onClick={closePreview} // This only closes the preview
+                        onClick={closePreview}
                         aria-label="Close preview"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
@@ -584,14 +584,12 @@ const BusinessAllproducts = () => {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button onPress={onClose} color='danger'>Close</Button> {/* This closes the entire modal */}
+                <Button onPress={onClose} color='danger'>Close</Button>
               </ModalFooter>
             </>
           )}
         </ModalContent>
       </Modal>
-
-      {/* Removed Image Modal */}
 
       {/* Conditionally Render Modals */}
       {activeModal?.type === 'accommodation' && <AccommodationBookingForm isOpen={true} onClose={closeBookingModal} product={activeModal.product} />}

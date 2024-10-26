@@ -1,6 +1,7 @@
 import React from 'react';
 import Sorso from '../assets/accomodation.webp';
 
+
 const HeroAccomodation = () => {
   return (
     <div
@@ -20,6 +21,7 @@ const HeroAccomodation = () => {
             <li >Accommodations</li>
           </ol>
         </nav>
+
       </div>
       
     </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import FoodBackground from '../assets/resto.webp';
 
+
 const HeroFood = () => {
   return (
     <div
@@ -20,7 +21,9 @@ const HeroFood = () => {
             <li>Food & Dining</li>
           </ol>
         </nav>
+    
       </div>
+
       
     </div>
   );

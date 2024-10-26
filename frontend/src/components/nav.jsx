@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import Logo from '../assets/rabas.png';
 import Logo2 from '../assets/Rabasorso.png'
 import { Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Badge } from "@nextui-org/react";
+import { CiSquareInfo } from "react-icons/ci";
+import { IoPricetagsOutline } from "react-icons/io5";
+import { TbNotes } from "react-icons/tb";
 import LoginSignup from '@/auth/loginSignup';
+import { PiJeep } from "react-icons/pi";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -170,15 +174,17 @@ const Nav = () => {
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="flex gap-1 text-color1 hover:text-gray-700 text-lg cursor-pointer hover:font-semibold duration-100 font-light">
+                <NavigationMenuTrigger className="flex gap-1 text-color1 hover:text-gray-700 text-lg cursor-pointer hover:font-semibold duration-100 font-light">       
                   <FaPersonWalking />
+                  <a href='/Discover'>
                    Discover
+                   </a>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <NavigationMenuLink>
                     <div className="w-max p-9 bg-light">
                       <ul className="text-dark text-sm space-y-3">
-                      <a href='/activities'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Activities and Attractions</li></a>
+                      <a href='/activities'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Activities</li></a>
                             <a href='/accomodation'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Accommodations</li></a>
                             <a href='/food'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Food Places</li></a>       
                             <a href='/shop'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Shops</li></a>                
@@ -189,6 +195,11 @@ const Nav = () => {
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
+
+         
+          <div className="hover:text-gray-700 cursor-pointer hover:font-semibold duration-100 text-lg font-light text-color1 flex items-center gap-1">
+            <TbNotes/> <a href='/'>Plan a trip</a>
+          </div>
         </div>
         
         {/** Mobile Menu Button */}
@@ -280,19 +291,20 @@ const Nav = () => {
             </div>
           </div>
         )}
-
-        {/** Search Bar and User Icon */}
+           
+        
+        {/** User Icon */}
         <div className="hidden lg:flex items-center gap-9">
           <div className="hover:text-gray-700 cursor-pointer hover:font-semibold duration-100 text-lg font-light text-color1 flex items-center gap-1">
-           <h1>Deals</h1>
+          <IoPricetagsOutline/>Deals
           </div>
 
           <div className="hover:text-gray-700 cursor-pointer hover:font-semibold duration-100 text-lg font-light text-color1 flex items-center gap-1">
-           <h1>Transportation</h1>
+          <PiJeep/>Transportation
           </div>
       
           <div className="hover:text-gray-700 cursor-pointer hover:font-semibold duration-100 text-lg font-light text-color1 flex items-center gap-1">
-            <h1>About</h1>
+            <CiSquareInfo/>About
           </div>
 
           {isLoggedIn ? (
@@ -310,17 +322,21 @@ const Nav = () => {
               </DropdownTrigger>
               <DropdownMenu  >
                 <DropdownItem key="profile">
-                  <Link to='/userprofile' className="block w-full text-left">
+                  <Link to='/userprofile' className="block w-full text-left p-2 ">
                     Profile
                   </Link>
                 </DropdownItem>
                 <DropdownItem key="messages" onClick={openChatModal}>
-                  <div className='flex items-center gap-4'>
+                  <div className='flex items-center gap-4 p-2'>
                     Messages
                     <Badge color='danger' placement='top-right' content='2'/>
                   </div>
                 </DropdownItem>
-                <DropdownItem key="logout" onClick={handleLogout} >Logout</DropdownItem>
+                <DropdownItem key="Bookings">
+                  <Link to='/userprofile#myBookings' className="block w-full text-left p-2">Bookings</Link>
+                </DropdownItem>
+                <DropdownItem key="Bookings"><div  className="block w-full text-left p-2">Plan a Trip</div></DropdownItem>
+                <DropdownItem key="logout" onClick={handleLogout} ><div  className="block w-full text-left p-2">Logout</div></DropdownItem>
               </DropdownMenu>
             </Dropdown>
           ) : (

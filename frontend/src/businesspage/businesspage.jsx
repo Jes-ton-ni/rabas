@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import Nav from '../components/navuser';
+import Nav from '../components/nav';
 import HeroAndGallery from './BusinessComponents/BusinessHero';
 import Footer from '@/components/Footer';
 import Info from '../businesspage/BusinessComponents/BuseinessInfo.jsx';

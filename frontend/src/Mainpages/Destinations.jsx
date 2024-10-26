@@ -18,7 +18,7 @@ import Pilar from '../assets/pilar.jpg'
 import Prieto from '../assets/prieto.jpg'
 import Santa from '../assets/santa.jpg'
 import Sorso from '../assets/sorsogon city.jpg'
-import Search from '../components/Search';
+import Search from '@/components/Search';
 import { PiChatCircleText } from 'react-icons/pi';
 import { Spinner } from '@nextui-org/react'; // Add this import
 
@@ -48,10 +48,9 @@ const Destinations = () => {
         <Hero/>
       </div>
 
-      <div>
       <Search/>
-      </div>
 
+  
     {/** Contents */}
 <div className=' mt-4  mx-auto w-full container '>
   <div className='  p-4 mb-4  '>
