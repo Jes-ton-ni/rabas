@@ -180,22 +180,23 @@ const businessSlice = createSlice({
 
     // Update the title of a specific hero image
     updateHeroImageTitle: (state, action) => {
-      const { index, title } = action.payload;
-      if (index >= 0 && index < state.heroImages.length) {
-        state.heroImages[index].title = title;
-      } else {
-        console.error('Invalid index for updateHeroImageTitle:', action.payload);
+      const { id, title } = action.payload;
+      if (!id) {
+        console.error('Invalid payload for updateHeroImageTitle:', action.payload);
       }
+      state.heroImages = state.heroImages.map(image =>
+        image.id == id ? { ...image, title } : image
+      );
     },
 
     // Remove a hero image
     removeHeroImage: (state, action) => {
-      const { index } = action.payload;
-      if (index >= 0 && index < state.heroImages.length) {
-        state.heroImages.splice(index, 1);
-      } else {
-        console.error('Invalid index for removeHeroImage:', action.payload);
+      const { id } = action.payload || {};
+      if (!id) {
+        console.error('Invalid payload for removeHeroImage:', action.payload);
+        return;
       }
+      state.heroImages = state.heroImages.filter(image => image.id!== id);
     },
   },
   extraReducers: (builder) => {
@@ -218,6 +219,7 @@ const businessSlice = createSlice({
           priceRange: fetchedData.businessCard.priceRange,
         };
         state.heroImages = fetchedData.heroImages.map(image => ({
+          id: image.id,
           path: image.path,
           title: image.title || ''
         }));

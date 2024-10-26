@@ -48,6 +48,9 @@ const BusinessProfile = () => {
   const [isEditingName, setIsEditingName] = useState(false); // Edit mode state
   const [tempBusinessName, setTempBusinessName] = useState(businessData.businessName); // Temporary name for editing
 
+  const [editingImageTitles, setEditingImageTitles] = useState({}); // Stores editing states for each image
+  const [tempImageTitles, setTempImageTitles] = useState({}); // Temporary titles for hero images
+
   const [isEditingAboutUs, setIsEditingAboutUs] = useState(false);
   const [tempAboutUs, setTempAboutUs] = useState(businessData.aboutUs);
 
@@ -81,6 +84,7 @@ const BusinessProfile = () => {
   // Fetch business data and set initial state
   useEffect(() => {
     setTempBusinessName(businessData.businessName);
+    setTempAboutUs(businessData.aboutUs);
   }, [businessData]);
 
   // Handle editing business name
@@ -424,6 +428,7 @@ const BusinessProfile = () => {
     // Append each selected file to the formData object (use the correct field name: 'heroImages')
     files.forEach((file) => {
       formData.append('heroImages', file);
+      formData.append('imageTitle', '');
     });
 
     // Make API call to upload the hero images
@@ -436,7 +441,7 @@ const BusinessProfile = () => {
         if (data.success) {
           // Update Redux store with the new hero images and initialize titles
           dispatch(updateBusinessData({
-            heroImages: data.updatedHeroImages.map(image => ({ path: image, title: '' }))
+            heroImages: data.updatedHeroImages
           }));
 
           MySwal.fire({
@@ -467,8 +472,8 @@ const BusinessProfile = () => {
   };
 
   // Handle removing a hero image
-  const handleRemoveHeroImage = (index) => {
-    const imagePath = businessData.heroImages[index].path; // Get the image path to be removed
+  const handleRemoveHeroImage = (id, path) => {
+    const imagePath = path; // Get the image path to be removed
 
     MySwal.fire({
       title: 'Are you sure?',
@@ -492,7 +497,7 @@ const BusinessProfile = () => {
           .then((data) => {
             if (data.success) {
               // Remove the image from Redux store after successful deletion
-              dispatch(updateBusinessData({ heroImages: businessData.heroImages.filter((_, i) => i !== index) }));
+              dispatch(removeHeroImage({ id }));
 
               MySwal.fire({
                 title: 'Removed!',
@@ -521,6 +526,58 @@ const BusinessProfile = () => {
           });
       }
     });
+  };
+
+  // Handle editing each hero image title by image ID
+  const handleEditImageTitle = (imageId) => {
+    setEditingImageTitles((prev) => ({ ...prev, [imageId]: true }));
+  };
+
+  // Save edited title for a hero image
+  const handleSaveImageTitle = async (imageId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/updateBusinessCoverImagesTitle/${businessData.business_id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          imageId,
+          title: tempImageTitles[imageId],
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        dispatch(updateHeroImageTitle({ id: imageId, title: tempImageTitles[imageId] }));
+        setEditingImageTitles((prev) => ({ ...prev, [imageId]: false }));
+  
+        MySwal.fire({
+          title: 'Success',
+          text: 'Image title updated successfully!',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51',
+        });
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      console.error('Error updating image title:', error);
+      MySwal.fire({
+        title: 'Error',
+        text: 'Failed to update image title.',
+        icon: 'error',
+        confirmButtonColor: '#0BDA51',
+      });
+    }
+  };
+  
+  // Cancel editing for a hero image
+  const handleCancelImageTitleEdit = (imageId) => {
+    const originalTitle = businessData.heroImages.find((img) => img.id === imageId)?.title || '';
+    setTempImageTitles((prev) => ({ ...prev, [imageId]: originalTitle }));
+    setEditingImageTitles((prev) => ({ ...prev, [imageId]: false }));
   };
 
   const handleSaveContact = async () => {
@@ -981,22 +1038,44 @@ const BusinessProfile = () => {
                 <h2 className="text-lg lg:text-xl font-semibold mb-4 text-gray-700">Cover Photo</h2>
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4'>
                   {/* Rendering the hero images with delete button */}
-                  {businessData.heroImages && Array.isArray(businessData.heroImages) && businessData.heroImages.map((image, index) => (
-                    <div key={index} className="relative">
+                  {businessData.heroImages && Array.isArray(businessData.heroImages) && businessData.heroImages.map((image) => (
+                    <div key={image.id} className="relative">
                       <img
                         src={`http://localhost:5000/${image.path}`}  // Apply the base URL to the image
-                        alt={`Hero ${index + 1}`}
+                        alt={`Cover Photo ${image.title}`}
                         className="w-full h-40 object-cover rounded-lg"
                       />
-                      <Input
-                        type="text"
-                        value={image.title}
-                        onChange={(e) => dispatch(updateHeroImageTitle({ index, title: e.target.value }))}
-                        placeholder="Enter image title"
-                        className="mt-2"
-                      />
+                      <div className='flex flex-col lg:flex-row items-center mt-2'>
+                      {editingImageTitles[image.id] ? (
+                        <>
+                          <Input
+                            type="text"
+                            value={tempImageTitles[image.id] || ''}
+                            onChange={(e) => setTempImageTitles((prev) => ({ ...prev, [image.id]: e.target.value }))}
+                            placeholder="Enter image title"
+                            className="mt-2"
+                          />
+                          <AiOutlineCheck
+                            onClick={() => handleSaveImageTitle(image.id)}
+                            className="cursor-pointer text-green-600 ml-2 text-2xl"
+                          />
+                          <AiOutlineClose
+                            onClick={() => handleCancelImageTitleEdit(image.id)}
+                            className="cursor-pointer text-red-600 ml-2 text-2xl"
+                          />
+                        </>
+                      ) : (
+                        <>
+                          <p className="mt-2">{image.title || 'No Title'}</p>
+                          <AiOutlineEdit
+                            onClick={() => handleEditImageTitle(image.id)}
+                            className="cursor-pointer text-gray-600 ml-2 text-2xl"
+                          />
+                        </>
+                      )}
+                      </div>
                       <Button
-                        onClick={() => handleRemoveHeroImage(index)}
+                        onClick={() => handleRemoveHeroImage(image.id, image.path)}
                         className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
                       >
                         <FaTrash size={12} />

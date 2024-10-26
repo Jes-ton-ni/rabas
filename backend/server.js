@@ -10,6 +10,7 @@ const MySQLStore = require('express-mysql-session')(session); // npm install exp
 const bcrypt = require('bcrypt'); //install bcrypt using this commant 'npm install bcrypt'
 const nodemailer = require('nodemailer'); // npm install nodemailer
 const crypto = require('crypto'); // crypto is a built-in Node.js module, no need to install
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 // app.use(cors());
@@ -906,6 +907,368 @@ app.put('/updateBusinessPolicies/:id', (req, res) => {
   );
 });
 
+// Endpoint for updating business card image
+app.put('/updateBusinessCardImage/:id', upload.single('businessCardImage'), (req, res) => {
+  const businessId = req.params.id;
+
+  // Fetch the current business data to get the existing businessCard JSON
+  connection.query(
+    'SELECT businessCard FROM businesses WHERE business_id = ?', 
+    [businessId], (err, results) => {
+    if (err) {
+      console.error('Error fetching business data:', err);
+      return res.status(500).json({ success: false, message: 'Failed to fetch business data' });
+    }
+    
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: 'Business not found' });
+    }
+
+    // The businessCard is already a JavaScript object, no need to parse it
+    let businessCard = results[0].businessCard;
+
+    // Update the cardImage if a new file was uploaded
+    if (req.file) {
+      businessCard.cardImage = req.file.path; // Update the cardImage path
+    }
+
+    // Update the database with the modified businessCard JSON
+    connection.query('UPDATE businesses SET businessCard = ? WHERE business_id = ?', [JSON.stringify(businessCard), businessId], (err) => {
+      if (err) {
+        console.error('Error updating business card image:', err);
+        return res.status(500).json({ success: false, message: 'Failed to update business card image' });
+      }
+
+      return res.json({
+        success: true,
+        message: 'Business card image updated successfully',
+        updatedBusinessCard: businessCard,
+      });
+    });
+  });
+});
+
+// Endpoint for updating business details
+app.put('/updateBusinessDetails/:id', (req, res) => {
+  const businessId = req.params.id;
+  const { description, location, priceRange } = req.body;
+
+  if (!description || !location || !priceRange) {
+    return res.status(400).json({ success: false, message: 'All fields are required' });
+  }
+
+  // Fetch the current business data to get the existing businessCard JSON
+  connection.query(
+    'SELECT businessCard FROM businesses WHERE business_id = ?', 
+    [businessId], 
+    (err, results) => {
+      if (err) {
+        console.error('Error fetching business details:', err);
+        return res.status(500).json({ success: false, message: 'Failed to fetch business details' });
+      }
+
+      if (results.length === 0) {
+        return res.status(404).json({ success: false, message: 'Business not found' });
+      }
+
+      // Parse businessCard if it exists, otherwise use an empty object
+      let businessCard = results[0].businessCard;
+
+      // Update the businessCard object with the new details
+      businessCard.description = description;
+      businessCard.location = location;
+      businessCard.priceRange = priceRange;
+
+      // Update the database with the modified businessCard JSON
+      connection.query(
+        'UPDATE businesses SET businessCard = ? WHERE business_id = ?', 
+        [JSON.stringify(businessCard), businessId], 
+        (err) => {
+          if (err) {
+            console.error('Error updating business card details:', err);
+            return res.status(500).json({ success: false, message: 'Failed to update business card details' });
+          }
+
+          return res.json({
+            success: true,
+            message: 'Business details updated successfully',
+            updatedDetails: { description, location, priceRange },
+          });
+        }
+      );
+    }
+  );
+});
+
+// Endpoint for updating business cover images
+app.put('/updateBusinessCover/:id', upload.array('heroImages', 10), (req, res) => {
+  const businessId = req.params.id;
+  const { imageTitle } = req.body;
+
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).json({ success: false, message: "No files uploaded" });
+  }
+
+  // Map the uploaded files to objects with id, path, and title
+  const newHeroImages = req.files.map(file => ({
+    id: uuidv4(),
+    path: file.path,
+    title: imageTitle
+  }));
+
+  // Fetch the current heroImages from the businesses table
+  connection.query('SELECT heroImages FROM businesses WHERE business_id = ?', [businessId], (err, results) => {
+    if (err) {
+      console.error('Error fetching business heroImages:', err);
+      return res.status(500).json({ success: false, message: 'Failed to fetch business heroImages' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: 'Business not found' });
+    }
+
+    // Check if heroImages is an object or null and handle accordingly
+    let currentHeroImages = results[0].heroImages;
+    if (currentHeroImages === null) {
+      currentHeroImages = []; // Initialize as an empty array if it's null
+    } else if (typeof currentHeroImages === 'string') {
+      try {
+        currentHeroImages = JSON.parse(currentHeroImages); // Attempt to parse if it's a string
+      } catch (parseError) {
+        console.error('Failed to parse heroImages:', parseError);
+        currentHeroImages = []; // Initialize as an empty array if parsing fails
+      }
+    } else if (typeof currentHeroImages === 'object' && !Array.isArray(currentHeroImages)) {
+      currentHeroImages = [currentHeroImages]; // Wrap it in an array if it's a single object
+    }
+
+    // Flatten any nested arrays in heroImages and merge with newHeroImages
+    const updatedHeroImages = [...currentHeroImages.flat(), ...newHeroImages];
+
+    // Update the database with the modified heroImages as a JSON string
+    connection.query(
+      'UPDATE businesses SET heroImages = ? WHERE business_id = ?',
+      [JSON.stringify(updatedHeroImages), businessId],
+      (err) => {
+        if (err) {
+          console.error('Error updating business cover images:', err);
+          return res.status(500).json({ success: false, message: 'Failed to update business cover images' });
+        }
+
+        // console.log(updatedHeroImages);
+
+        return res.json({
+          success: true,
+          message: 'Business cover images updated successfully',
+          updatedHeroImages, // Respond with the updated images
+        });
+      }
+    );
+  });
+});
+
+// Endpoint to update the image title for a specific business cover image
+app.put('/updateBusinessCoverImagesTitle/:businessId', (req, res) => {
+  const businessId = req.params.businessId;
+  const { imageId, title } = req.body;
+
+  // Fetch the current heroImages from the businesses table
+  connection.query('SELECT heroImages FROM businesses WHERE business_id = ?', [businessId], (err, results) => {
+    if (err) {
+      console.error('Error fetching business heroImages:', err);
+      return res.status(500).json({ success: false, message: 'Failed to fetch business heroImages' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: 'Business not found' });
+    }
+
+    let currentHeroImages = results[0].heroImages;
+
+    // Check if heroImages is already an object
+    if (typeof currentHeroImages === 'string') {
+      try {
+        currentHeroImages = JSON.parse(currentHeroImages);
+      } catch (parseError) {
+        console.error('Failed to parse heroImages:', parseError);
+        return res.status(500).json({ success: false, message: 'Failed to parse heroImages' });
+      }
+    }
+
+    // Ensure it's an array
+    if (!Array.isArray(currentHeroImages)) {
+      currentHeroImages = [currentHeroImages];
+    }
+
+    // Find and update the image with the specified imageId
+    const imageToUpdate = currentHeroImages.find((img) => img.id === imageId);
+
+    if (!imageToUpdate) {
+      return res.status(404).json({ success: false, message: 'Image not found' });
+    }
+
+    // Update the title
+    imageToUpdate.title = title;
+
+    // Update the database with the modified heroImages
+    connection.query(
+      'UPDATE businesses SET heroImages = ? WHERE business_id = ?',
+      [JSON.stringify(currentHeroImages), businessId],
+      (updateErr) => {
+        if (updateErr) {
+          console.error('Error updating business cover image title:', updateErr);
+          return res.status(500).json({ success: false, message: 'Failed to update image title' });
+        }
+
+        return res.json({
+          success: true,
+          message: 'Image title updated successfully',
+          updatedHeroImages: currentHeroImages, // Return updated heroImages
+        });
+      }
+    );
+  });
+});
+
+// Endpoint to delete business card image
+app.delete('/businessCardImage/:id', (req, res) => {
+  const businessId = req.params.id;
+
+  // Fetch the current business data to get the existing businessCard JSON
+  connection.query(
+    'SELECT businessCard FROM businesses WHERE business_id = ?', 
+    [businessId], (err, results) => {
+      if (err) {
+        console.error('Error fetching business data:', err);
+        return res.status(500).json({ success: false, message: 'Failed to fetch business data' });
+      }
+
+      if (results.length === 0) {
+        return res.status(404).json({ success: false, message: 'Business not found' });
+      }
+
+      // The businessCard is already a JavaScript object, no need to parse it
+      let businessCard = results[0].businessCard;
+
+      // Check if there is a cardImage to delete
+      if (!businessCard || !businessCard.cardImage) {
+        return res.status(404).json({ success: false, message: 'No business card image to delete' });
+      }
+
+      // Store the path of the current cardImage to delete it from the server
+      const cardImagePath = businessCard.cardImage;
+
+      // Set cardImage to null in the businessCard object
+      businessCard.cardImage = null;
+
+      // Update the database with the modified businessCard JSON
+      connection.query(
+        'UPDATE businesses SET businessCard = ? WHERE business_id = ?', 
+        [JSON.stringify(businessCard), businessId], (err) => {
+          if (err) {
+            console.error('Error updating business card image:', err);
+            return res.status(500).json({ success: false, message: 'Failed to update business card image' });
+          }
+
+          // Remove the file from the server
+          fs.unlink(cardImagePath, (unlinkErr) => {            
+            if (unlinkErr) {
+              console.error('Error deleting the image file:', unlinkErr);
+              return res.status(500).json({ success: false, message: 'Failed to delete the image file from server' });
+            }
+
+            return res.json({
+              success: true,
+              message: 'Business card image deleted successfully',
+              updatedBusinessCard: businessCard, // Respond with the updated business card
+            });
+
+          });
+        }
+      );
+    }
+  );
+});
+
+// Endpoint to delete cover photo
+app.delete('/businessCoverPhoto/:id', (req, res) => {
+  const businessId = req.params.id;
+  const { imagePath } = req.body; // Image path to be deleted should be passed in the request body
+  // console.log("imagePath:", imagePath);
+
+  if (!imagePath) {
+    return res.status(400).json({ success: false, message: 'No image path provided' });
+  }
+
+  // Fetch the current heroImages from the businesses table
+  connection.query('SELECT heroImages FROM businesses WHERE business_id = ?', [businessId], (err, results) => {
+    if (err) {
+      console.error('Error fetching heroImages:', err);
+      return res.status(500).json({ success: false, message: 'Failed to fetch business heroImages' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ success: false, message: 'Business not found' });
+    }
+
+    let currentHeroImages = results[0].heroImages;
+
+    // Check if heroImages is null
+    if (currentHeroImages === null) {
+      return res.status(404).json({ success: false, message: 'No cover photos to delete' });
+    } else if (typeof currentHeroImages === 'string') {
+      // Parse heroImages from JSON or comma-separated string
+      try {
+        currentHeroImages = JSON.parse(currentHeroImages);
+      } catch (parseError) {
+        console.error('Failed to parse heroImages:', parseError);
+        currentHeroImages = []; // Initialize as an empty array if parsing fails
+      }
+    } else if (typeof currentHeroImages === 'object' && !Array.isArray(currentHeroImages)) {
+      currentHeroImages = [currentHeroImages]; // Wrap it in an array if it's a single object
+    }
+
+    // console.log('Current hero images:', currentHeroImages);
+
+    // Find and remove the specified image path from heroImages
+    const updatedHeroImages = currentHeroImages.filter(img => img.path !== imagePath);
+
+    // console.log('updatedHeroImages:', updatedHeroImages);
+
+    if (updatedHeroImages.length === currentHeroImages.length) {
+      return res.status(404).json({ success: false, message: 'Image not found in heroImages' });
+    }
+
+    // Update the database with the modified heroImages
+    connection.query(
+      'UPDATE businesses SET heroImages = ? WHERE business_id = ?',
+      [updatedHeroImages.length > 0 ? JSON.stringify(updatedHeroImages) : null, businessId],
+      (err) => {
+        if (err) {
+          console.error('Error updating heroImages:', err);
+          return res.status(500).json({ success: false, message: 'Failed to update heroImages' });
+        }
+
+        // Remove the file from the server
+        const filePath = path.join(__dirname, imagePath); // Build the full path to the file
+        fs.unlink(filePath, (unlinkErr) => {
+          if (unlinkErr) {
+            console.error('Error deleting the image file:', unlinkErr);
+            return res.status(500).json({ success: false, message: 'Failed to delete the image file from server' });
+          }
+
+          return res.json({
+            success: true,
+            message: 'Cover photo deleted successfully',
+            updatedHeroImages: updatedHeroImages.length > 0 ? updatedHeroImages : null, // Respond with the updated list of hero images
+          });
+        });
+      }
+    );
+  });
+});
+
+
 // Endpoint to get business product
 app.get('/getBusinessProduct', (req, res) => {
   // console.log('Session:', req.session);
@@ -1190,319 +1553,6 @@ app.delete('/delete-product', (req, res) => {
 
     // Successfully deleted the product(s)
     res.json({ success: true, message: 'Product(s) deleted successfully' });
-  });
-});
-
-// Endpoint for updating business card image
-app.put('/updateBusinessCardImage/:id', upload.single('businessCardImage'), (req, res) => {
-  const businessId = req.params.id;
-
-  // Fetch the current business data to get the existing businessCard JSON
-  connection.query(
-    'SELECT businessCard FROM businesses WHERE business_id = ?', 
-    [businessId], (err, results) => {
-    if (err) {
-      console.error('Error fetching business data:', err);
-      return res.status(500).json({ success: false, message: 'Failed to fetch business data' });
-    }
-    
-    if (results.length === 0) {
-      return res.status(404).json({ success: false, message: 'Business not found' });
-    }
-
-    // The businessCard is already a JavaScript object, no need to parse it
-    let businessCard = results[0].businessCard;
-
-    // Update the cardImage if a new file was uploaded
-    if (req.file) {
-      businessCard.cardImage = req.file.path; // Update the cardImage path
-    }
-
-    // Update the database with the modified businessCard JSON
-    connection.query('UPDATE businesses SET businessCard = ? WHERE business_id = ?', [JSON.stringify(businessCard), businessId], (err) => {
-      if (err) {
-        console.error('Error updating business card image:', err);
-        return res.status(500).json({ success: false, message: 'Failed to update business card image' });
-      }
-
-      return res.json({
-        success: true,
-        message: 'Business card image updated successfully',
-        updatedBusinessCard: businessCard,
-      });
-    });
-  });
-});
-
-// Endpoint for updating business details
-app.put('/updateBusinessDetails/:id', (req, res) => {
-  const businessId = req.params.id;
-  const { description, location, priceRange } = req.body;
-
-  if (!description || !location || !priceRange) {
-    return res.status(400).json({ success: false, message: 'All fields are required' });
-  }
-
-  // Fetch the current business data to get the existing businessCard JSON
-  connection.query(
-    'SELECT businessCard FROM businesses WHERE business_id = ?', 
-    [businessId], 
-    (err, results) => {
-      if (err) {
-        console.error('Error fetching business details:', err);
-        return res.status(500).json({ success: false, message: 'Failed to fetch business details' });
-      }
-
-      if (results.length === 0) {
-        return res.status(404).json({ success: false, message: 'Business not found' });
-      }
-
-      // Parse businessCard if it exists, otherwise use an empty object
-      let businessCard = results[0].businessCard;
-
-      // Update the businessCard object with the new details
-      businessCard.description = description;
-      businessCard.location = location;
-      businessCard.priceRange = priceRange;
-
-      // Update the database with the modified businessCard JSON
-      connection.query(
-        'UPDATE businesses SET businessCard = ? WHERE business_id = ?', 
-        [JSON.stringify(businessCard), businessId], 
-        (err) => {
-          if (err) {
-            console.error('Error updating business card details:', err);
-            return res.status(500).json({ success: false, message: 'Failed to update business card details' });
-          }
-
-          return res.json({
-            success: true,
-            message: 'Business details updated successfully',
-            updatedDetails: { description, location, priceRange },
-          });
-        }
-      );
-    }
-  );
-});
-
-// Endpoint for updating business cover images
-app.put('/updateBusinessCover/:id', upload.array('heroImages', 10), (req, res) => {
-  const businessId = req.params.id;
-
-  if (!req.files || req.files.length === 0) {
-    return res.status(400).json({ success: false, message: "No files uploaded" });
-  }
-
-  // Map the uploaded files to their file paths
-  const newHeroImages = req.files.map(file => file.path);
-
-  // Fetch the current heroImages JSON or string from the businesses table
-  connection.query('SELECT heroImages FROM businesses WHERE business_id = ?', [businessId], (err, results) => {
-    if (err) {
-      console.error('Error fetching business heroImages:', err);
-      return res.status(500).json({ success: false, message: 'Failed to fetch business heroImages' });
-    }
-
-    if (results.length === 0) {
-      return res.status(404).json({ success: false, message: 'Business not found' });
-    }
-
-    // Check if heroImages is null and handle accordingly
-    let currentHeroImages = results[0].heroImages;
-
-    if (currentHeroImages === null) {
-      currentHeroImages = []; // Initialize as an empty array if it's null
-    } else {
-      // Convert to string in case it's a buffer or other type
-      if (typeof currentHeroImages !== 'string') {
-        currentHeroImages = currentHeroImages.toString();
-      }
-
-      // Check if it's valid JSON, if not treat it as a comma-separated string
-      try {
-        currentHeroImages = JSON.parse(currentHeroImages);
-      } catch (parseError) {
-        // Handle comma-separated string format
-        currentHeroImages = currentHeroImages.split(',');
-      }
-    }
-
-    // Merge new images with the current heroImages
-    const updatedHeroImages = [...currentHeroImages, ...newHeroImages];
-
-    // Check if updatedHeroImages is empty
-    if (updatedHeroImages.length === 0) {
-      // Set heroImages to null if there are no images left
-      connection.query(
-        'UPDATE businesses SET heroImages = NULL WHERE business_id = ?',
-        [businessId],
-        (err) => {
-          if (err) {
-            console.error('Error updating business cover images:', err);
-            return res.status(500).json({ success: false, message: 'Failed to update business cover images' });
-          }
-
-          return res.json({
-            success: true,
-            message: 'Business cover images updated successfully, no images left',
-          });
-        }
-      );
-    } else {
-      // Update the database with the modified heroImages as a JSON string
-      connection.query(
-        'UPDATE businesses SET heroImages = ? WHERE business_id = ?',
-        [JSON.stringify(updatedHeroImages), businessId],
-        (err) => {
-          if (err) {
-            console.error('Error updating business cover images:', err);
-            return res.status(500).json({ success: false, message: 'Failed to update business cover images' });
-          }
-
-          return res.json({
-            success: true,
-            message: 'Business cover images updated successfully',
-            updatedHeroImages, // Respond with the updated images
-          });
-        }
-      );
-    }
-  });
-});
-
-// Endpoint to delete business card image
-app.delete('/businessCardImage/:id', (req, res) => {
-  const businessId = req.params.id;
-
-  // Fetch the current business data to get the existing businessCard JSON
-  connection.query(
-    'SELECT businessCard FROM businesses WHERE business_id = ?', 
-    [businessId], (err, results) => {
-      if (err) {
-        console.error('Error fetching business data:', err);
-        return res.status(500).json({ success: false, message: 'Failed to fetch business data' });
-      }
-
-      if (results.length === 0) {
-        return res.status(404).json({ success: false, message: 'Business not found' });
-      }
-
-      // The businessCard is already a JavaScript object, no need to parse it
-      let businessCard = results[0].businessCard;
-
-      // Check if there is a cardImage to delete
-      if (!businessCard || !businessCard.cardImage) {
-        return res.status(404).json({ success: false, message: 'No business card image to delete' });
-      }
-
-      // Store the path of the current cardImage to delete it from the server
-      const cardImagePath = businessCard.cardImage;
-
-      // Set cardImage to null in the businessCard object
-      businessCard.cardImage = null;
-
-      // Update the database with the modified businessCard JSON
-      connection.query(
-        'UPDATE businesses SET businessCard = ? WHERE business_id = ?', 
-        [JSON.stringify(businessCard), businessId], (err) => {
-          if (err) {
-            console.error('Error updating business card image:', err);
-            return res.status(500).json({ success: false, message: 'Failed to update business card image' });
-          }
-
-          // Remove the file from the server
-          fs.unlink(cardImagePath, (unlinkErr) => {            
-            if (unlinkErr) {
-              console.error('Error deleting the image file:', unlinkErr);
-              return res.status(500).json({ success: false, message: 'Failed to delete the image file from server' });
-            }
-
-            return res.json({
-              success: true,
-              message: 'Business card image deleted successfully',
-              updatedBusinessCard: businessCard, // Respond with the updated business card
-            });
-
-          });
-        }
-      );
-    }
-  );
-});
-
-// Endpoint to delete cover photo
-app.delete('/businessCoverPhoto/:id', (req, res) => {
-  const businessId = req.params.id;
-  const { imagePath } = req.body; // Image path to be deleted should be passed in the request body
-
-  if (!imagePath) {
-    return res.status(400).json({ success: false, message: 'No image path provided' });
-  }
-
-  // Fetch the current heroImages from the businesses table
-  connection.query('SELECT heroImages FROM businesses WHERE business_id = ?', [businessId], (err, results) => {
-    if (err) {
-      console.error('Error fetching heroImages:', err);
-      return res.status(500).json({ success: false, message: 'Failed to fetch business heroImages' });
-    }
-
-    if (results.length === 0) {
-      return res.status(404).json({ success: false, message: 'Business not found' });
-    }
-
-    let currentHeroImages = results[0].heroImages;
-
-    // Check if heroImages is null
-    if (currentHeroImages === null) {
-      return res.status(404).json({ success: false, message: 'No cover photos to delete' });
-    }
-
-    // Convert to string in case it's a buffer or other type
-    if (typeof currentHeroImages !== 'string') {
-      currentHeroImages = currentHeroImages.toString();
-    }
-
-    // Parse heroImages from JSON or comma-separated string
-    try {
-      currentHeroImages = JSON.parse(currentHeroImages);
-    } catch (parseError) {
-      currentHeroImages = currentHeroImages.split(',');
-    }
-
-    // Find and remove the specified image path from heroImages
-    const updatedHeroImages = currentHeroImages.filter(img => img !== imagePath);
-
-    if (updatedHeroImages.length === currentHeroImages.length) {
-      return res.status(404).json({ success: false, message: 'Image not found in heroImages' });
-    }
-
-    // Update the database with the modified heroImages
-    connection.query(
-      'UPDATE businesses SET heroImages = ? WHERE business_id = ?',
-      [updatedHeroImages.length > 0 ? JSON.stringify(updatedHeroImages) : null, businessId],
-      (err) => {
-        if (err) {
-          console.error('Error updating heroImages:', err);
-          return res.status(500).json({ success: false, message: 'Failed to update heroImages' });
-        }
-
-        // Remove the file from the server
-        const filePath = path.join(__dirname, imagePath); // Build the full path to the file
-        fs.unlink(filePath, (unlinkErr) => {
-          if (unlinkErr) {
-            console.error('Error deleting the image file:', unlinkErr);
-            return res.status(500).json({ success: false, message: 'Failed to delete the image file from server' });
-          }
-
-          return res.json({
-            success: true,
-            message: 'Cover photo deleted successfully',
-            updatedHeroImages: updatedHeroImages.length > 0 ? updatedHeroImages : null, // Respond with the updated list of hero images
-          });
-        });
-      }
-    );
   });
 });
 

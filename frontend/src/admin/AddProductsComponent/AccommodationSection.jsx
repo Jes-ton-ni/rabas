@@ -88,6 +88,14 @@ const AccommodationSection = () => {
     setImages((prevImages) => Array.isArray(prevImages) ? [...prevImages, ...files] : [...files]);  
   };
 
+  const handleImageTitleChange = (index, title) => {
+    setImages((prevImages) => {
+      const updatedImages = [...prevImages];
+      updatedImages[index].title = title;
+      return updatedImages;
+    });
+  };
+
   const handleRemoveImage = (index) => {
     const updatedImages = images.filter((_, i) => i !== index);
     setImages(updatedImages);
@@ -222,7 +230,7 @@ const AccommodationSection = () => {
           console.log('Accommodation updated successfully:', result);
         } else {
           result = dispatch(addProduct(formData));
-          console.log('Accommodation added successfully:', result.payload);
+          // console.log('Accommodation added successfully:', result.payload);
         }
   
         // Close modal and reset form after successful submission
@@ -636,7 +644,7 @@ const AccommodationSection = () => {
                   <div className="mb-4 flex flex-wrap gap-3">
                     {images && Array.isArray(images) && images.length > 0 ? (
                       images.map((image, index) => (
-                        <div key={`${image}-${index}`} className="flex gap-3 mb-2">
+                        <div key={`${image}-${index}`} className="flex flex-col gap-2 mb-2">
                           <img
                             src={
                               typeof image === 'string'
@@ -645,6 +653,12 @@ const AccommodationSection = () => {
                             }
                             alt={`Uploaded ${index + 1}`}
                             className="h-16 w-16 object-cover rounded-lg"
+                          />
+                          <Input
+                            placeholder="Enter image title"
+                            value={image.title}
+                            onChange={(e) => handleImageTitleChange(index, e.target.value)}
+                            fullWidth
                           />
                           <Button
                             auto
