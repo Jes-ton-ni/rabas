@@ -21,6 +21,11 @@ import SuperAdminVerification from './admin/SuperAdmin/SuperAdminVerification';
 import SuperAdminReports from './admin/SuperAdmin/SuperAdminReports';
 import SuperAdminTransportation from './admin/SuperAdmin/SuperAdminTransportation';
 import Discover from './Mainpages/Discover';
+import Trip from './Mainpages/Trip';
+import DealsPage from './Mainpages/Deals';
+import Transportation from './Mainpages/Transportation';
+import About from './Mainpages/About';
+
 
 
 function App() {
@@ -49,6 +54,11 @@ function App() {
           <Route path='/superadminreports' element={<SuperAdminReports />} />
           <Route path='/superadmintransportation' element={<SuperAdminTransportation />} />
           <Route path='/discover' element={<Discover/>}/>
+          <Route path='/trip' element={<Trip/>}/>
+          <Route path='/deals' element={<DealsPage/>}/>
+          <Route path='/transportation' element={<Transportation/>}/>
+          <Route path='/about' element={<About/>}/>
+    
         </Routes>
      
     </Router>

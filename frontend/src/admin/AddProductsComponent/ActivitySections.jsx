@@ -300,19 +300,7 @@ const ActivitySections = () => {
                       </div>
                     ))}
                   </Slider>
-                  {/* Next and Previous buttons */}
-                  <button
-                    className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow"
-                    onClick={() => sliderRefs.current[activity.id]?.slickPrev()}
-                  >
-                    <FaChevronLeft />
-                  </button>
-                  <button
-                    className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow"
-                    onClick={() => sliderRefs.current[activity.id]?.slickNext()}
-                  >
-                    <FaChevronRight />
-                  </button>
+                
                 </div>
               )}
             </div>

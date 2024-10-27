@@ -30,25 +30,31 @@ const Hero = () => {
     }
   ];
 
-  const CustomPrevArrow = (props) => (
-    <button
-      {...props}
-      className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black hover:bg-color3 hover:text-dark duration-300 bg-opacity-50 text-white p-2 rounded-full focus:outline-none"
-      onClick={props.onClick}
-    >
-      <FiChevronLeft size={24} />
-    </button>
-  );
+  const CustomPrevArrow = ({ onClick, ...rest }) => {
+    const { currentSlide, slideCount, ...buttonProps } = rest;
+    return (
+      <button
+        {...buttonProps}
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black hover:bg-color3 hover:text-dark duration-300 bg-opacity-50 text-white p-2 rounded-full focus:outline-none"
+        onClick={onClick}
+      >
+        <FiChevronLeft size={24} />
+      </button>
+    );
+  };
 
-  const CustomNextArrow = (props) => (
-    <button
-      {...props}
-      className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black hover:bg-color3 hover:text-dark duration-300 bg-opacity-50 text-white p-2 rounded-full focus:outline-none"
-      onClick={props.onClick}
-    >
-      <FiChevronRight size={24} />
-    </button>
-  );
+  const CustomNextArrow = ({ onClick, ...rest }) => {
+    const { currentSlide, slideCount, ...buttonProps } = rest;
+    return (
+      <button
+        {...buttonProps}
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black hover:bg-color3 hover:text-dark duration-300 bg-opacity-50 text-white p-2 rounded-full focus:outline-none"
+        onClick={onClick}
+      >
+        <FiChevronRight size={24} />
+      </button>
+    );
+  };
 
   const settings = {
     dots: true,

@@ -137,23 +137,35 @@ const Search = () => {
     }
   };
 
+  const scrollTabs = (direction) => {
+    const tabsContainer = document.querySelector('.tabs-container');
+    const scrollAmount = 100; // Adjust this value as needed
+    if (direction === 'left') {
+      tabsContainer.scrollLeft -= scrollAmount;
+    } else {
+      tabsContainer.scrollLeft += scrollAmount;
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center mt-6 p-6  w-full max-w-4xl mx-auto">
+    <div className="flex flex-col items-center mt-6 p-6 w-full max-w-4xl mx-auto">
       <div>
         <h1 className='font-semibold text-2xl'>{getTitleForTab(activeTab)}</h1>
       </div>
-      <Tabs
-        aria-label="Search Options"
-        onSelectionChange={handleTabChange}
-        className="w-full mb-6 flex justify-center"
-        variant="underlined"
-      >
-        <Tab key="all" title={<span className="flex items-center"><FaSearch className="mr-2" />Search All</span>} />
-        <Tab key="activities" title={<span className="flex items-center"><FaHiking className="mr-2" />Activities</span>} />
-        <Tab key="accommodation" title={<span className="flex items-center"><FaBed className="mr-2" />Accommodation</span>} />
-        <Tab key="food" title={<span className="flex items-center"><FaUtensils className="mr-2" />Food Places</span>} />
-        <Tab key="shops" title={<span className="flex items-center"><FaShoppingBag className="mr-2" />Shops</span>} />
-      </Tabs>
+      <div className="w-full mb-6 overflow-x-auto">
+        <Tabs
+          aria-label="Search Options"
+          onSelectionChange={handleTabChange}
+          className="flex justify-center w-full"
+          variant="underlined"
+        >
+          <Tab key="all" title={<span className="flex items-center"><FaSearch className="mr-2" />Search All</span>} />
+          <Tab key="activities" title={<span className="flex items-center"><FaHiking className="mr-2" />Activities</span>} />
+          <Tab key="accommodation" title={<span className="flex items-center"><FaBed className="mr-2" />Accommodation</span>} />
+          <Tab key="food" title={<span className="flex items-center"><FaUtensils className="mr-2" />Food Places</span>} />
+          <Tab key="shops" title={<span className="flex items-center"><FaShoppingBag className="mr-2" />Shops</span>} />
+        </Tabs>
+      </div>
 
       <div className="flex items-center w-full mb-4">
         <FaSearch className="text-gray-500 mr-2" />
