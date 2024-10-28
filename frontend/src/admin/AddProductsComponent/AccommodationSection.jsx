@@ -52,8 +52,13 @@ const AccommodationSection = () => {
   // Handlers for Inclusions
   const handleAddInclusion = () => {
     if (typeof inclusions === 'string' && inclusions.trim()) {
-      // Add the trimmed inclusion to the inclusion list
-      setInclusionList([...inclusionList, inclusions.trim()]);
+      // Create a new inclusion object
+      const newInclusion = {
+        id: Date.now(), // or generate a unique ID as appropriate
+        item: inclusions.trim()
+      };
+      // Add the new inclusion to the inclusion list
+      setInclusionList([...inclusionList, newInclusion]);
       // Clear the input
       setInclusions('');
     }
@@ -68,14 +73,19 @@ const AccommodationSection = () => {
   const handleAddTerm = () => {
     // Check if termsAndConditions is a string and not empty after trimming
     if (typeof termsAndConditions === 'string' && termsAndConditions.trim()) {
-      // Add the trimmed term to the terms list
-      setTermsList([...termsList, termsAndConditions.trim()]);
+      // Create a new term object
+      const newTerm = {
+        id: Date.now(), // or generate a unique ID as appropriate
+        item: termsAndConditions.trim()
+      };
+      // Add the new term to the terms list
+      setTermsList([...termsList, newTerm]);
       // Clear the input
       setTermsAndConditions('');
     } else {
       console.error("termsAndConditions is not a valid string:", termsAndConditions);
     }
-  };  
+  };
 
   const handleRemoveTerm = (index) => {
     const updatedTermsList = termsList.filter((_, i) => i !== index);
@@ -155,14 +165,16 @@ const AccommodationSection = () => {
         price: pricing,
         pricing_unit: pricingUnit,
         booking_operation: hasBooking ? 1 : 0,
-        inclusions: inclusionList, // Should be an array
-        termsAndConditions: termsList, // Should be an array
+        inclusions: inclusionList,
+        termsAndConditions: termsList,
         images: Array.isArray(images)
           ? images.map((file) =>
-              typeof file === 'string' ? file : URL.createObjectURL(file)
+              file instanceof File ? URL.createObjectURL(file) : file
             )
           : [], // Fallback to empty array if images is not an array
       };
+
+      console.log('asdasda', inclusionList);
   
       // Create FormData for the accommodation and image upload
       const formData = new FormData();
@@ -178,13 +190,19 @@ const AccommodationSection = () => {
       // Append inclusions and terms and conditions
       if (Array.isArray(newAccommodation.inclusions)) {
         newAccommodation.inclusions.forEach((inclusion) => {
-          formData.append('inclusions[]', inclusion); // Append as an array
+          formData.append('inclusions[]', JSON.stringify({
+            id: inclusion.id || '', // Ensure id is assigned or default to ''
+            item: inclusion.item // Assuming item is a property of inclusion object
+          })); // Append as JSON string
         });
       }
-  
+
       if (Array.isArray(newAccommodation.termsAndConditions)) {
         newAccommodation.termsAndConditions.forEach((term) => {
-          formData.append('termsAndConditions[]', term); // Append as an array
+          formData.append('termsAndConditions[]', JSON.stringify({
+            id: term.id || '', // Ensure id is assigned or default to ''
+            item: term.item // Assuming item is a property of term object
+          })); // Append as JSON string
         });
       }
   
@@ -200,26 +218,33 @@ const AccommodationSection = () => {
         } catch (error) {
           console.error('Error fetching existing images:', error);
         }
-      }
-
+      }    
+      
       // Removed images array to pass to backend
       const removedImages = existingImages.filter(existingImage => 
-        !images.includes(existingImage)
+        !images.some(newImage => newImage.path === existingImage.path)
       );
+
       formData.append('removedImages', JSON.stringify(removedImages)); // Send removed images
+
+      // Append existing images as { id, path, title } to FormData
+      existingImages.forEach((image) => {
+        formData.append('existingImages[]', JSON.stringify({
+          id: image.id,
+          path: image.path,
+          title: image.title || ''
+        }));
+      });      
+
+      // console.log('existing images: ', existingImages);
       
+      // console.log('remove images: ', removedImages);
       // Separate the new files from existing image URLs
       const newFiles = images.filter((file) => file instanceof File);
-      const existingImageUrls = images.filter((image) => typeof image === 'string');
   
       // Append the new files to FormData for upload
       newFiles.forEach((file) => {
         formData.append('productImages', file); // Append each new image file
-      });
-  
-      // Append the existing image URLs to FormData so they remain in the database
-      existingImageUrls.forEach((imageUrl) => {
-        formData.append('existingImages[]', imageUrl); // Include existing image URLs
       });
   
       try {
@@ -266,7 +291,7 @@ const AccommodationSection = () => {
     setPricing(accommodation.pricing);
     setPricingUnit(accommodation.pricingUnit);
     setInclusionList(accommodation.inclusions);
-    setImages(accommodation.images);
+    setImages(accommodation.images || []);
     setHasBooking(accommodation.hasBooking);
     setEditingAccommodationId(accommodation.id);
     setIsEditing(true);
@@ -379,7 +404,7 @@ const AccommodationSection = () => {
               <h3 className="text-sm font-semibold">Inclusions or Details:</h3>
               <ul className="list-disc overflow-auto max-h-24 pl-4 text-xs">
                 {accommodation.inclusions && Array.isArray(accommodation.inclusions) && accommodation.inclusions.map((inclusion) => (
-                  <li key={inclusion}>{inclusion}</li>
+                  <li key={inclusion.id}>{inclusion.item}</li> // Accessing item property of the inclusion object
                 ))}
               </ul>
 
@@ -389,7 +414,7 @@ const AccommodationSection = () => {
                   <h3 className="text-sm font-semibold">Terms and Conditions:</h3>
                   <ul className="list-disc overflow-auto max-h-24 pl-4 text-xs">
                     {accommodation.termsAndConditions.map((term) => (
-                      <li key={term}>{term}</li>
+                      <li key={term.id}>{term.item}</li> // Accessing item property of the term object
                     ))}
                   </ul>
                 </>
@@ -404,27 +429,28 @@ const AccommodationSection = () => {
                   // Render a single image without the slider
                   <div className="relative">
                     <img
-                      src={`http://localhost:5000/${accommodation.images[0]}`} // Base URL to the image
+                      src={`http://localhost:5000/${accommodation.images[0].path}`} // Base URL to the image
                       alt={`Accommodation ${accommodation.accommodationName} Image`}
                       className="w-full h-32 object-cover rounded-lg mt-2"
                       onError={(e) => {
+                        // e.target.src = '/path/to/fallback/image.png'; // Fallback image
                         e.target.onerror = null; // Prevents looping
-                        e.target.src = '/path/to/fallback/image.png'; // Fallback image
                       }}
                     />
+                    <p className="text-xs text-center mt-1">{accommodation.images.title}</p>
                   </div>
                 ) : (
                   // Render the slider if there are multiple images
                   <Slider ref={(slider) => (sliderRefs.current[accommodation.id] = slider)} {...getSliderSettings}>
-                    {accommodation.images.map((image, index) => (
-                      <div key={`${image}-${index}`} className="relative">
+                    {accommodation.images.map((image) => (
+                      <div key={`${image.id}`} className="relative">
                         <img
-                          src={`http://localhost:5000/${image}`}  // Apply the base URL to the image
-                          alt={`Accommodation ${accommodation.accommodationName} Image ${index + 1}`}
+                          src={`http://localhost:5000/${image.path}`}  // Apply the base URL to the image
+                          alt={`Accommodation ${accommodation.accommodationName} Image ${image.id}`}
                           className="w-full h-32 object-cover rounded-lg mt-2"
                           onError={(e) => {
                             e.target.onerror = null; // Prevents looping
-                            e.target.src = '/path/to/fallback/image.png'; // Fallback image
+                            // e.target.src = '/path/to/fallback/image.png'; // Fallback image
                           }}
                         />
                         <p className="text-xs text-center mt-1">{image.title}</p>
@@ -553,9 +579,9 @@ const AccommodationSection = () => {
                       {/* Terms List */}
                       <ul className="mt-3 flex items-center flex-wrap gap-3 pl-5 text-sm">
                         {Array.isArray(termsList) && termsList.length > 0 ? (
-                          termsList.map((item, index) => (
-                            <li key={`${item}-${index}`} className="flex gap-3 items-center bg-light p-2 rounded-md">
-                              {item}
+                          termsList.map((term, index) => (
+                            <li key={index} className="flex gap-3 items-center bg-light p-2 rounded-md">
+                              {term.item}
                               <Button
                                 auto
                                 color="danger"
@@ -594,9 +620,9 @@ const AccommodationSection = () => {
                     {/* Inclusions List */}
                     <ul className="mt-3 flex items-center flex-wrap gap-3 pl-5 text-sm">
                       {Array.isArray(inclusionList) && inclusionList.length > 0 ? (
-                        inclusionList.map((item, index) => (
-                          <li key={`${item}-${index}`} className="flex gap-3 items-center bg-light p-2 rounded-md">
-                            {item}
+                        inclusionList.map((inclusion, index) => (
+                          <li key={index} className="flex gap-3 items-center bg-light p-2 rounded-md">
+                            {inclusion.item}
                             <Button
                               auto
                               color="danger"
@@ -647,8 +673,8 @@ const AccommodationSection = () => {
                         <div key={`${image}-${index}`} className="flex flex-col gap-2 mb-2">
                           <img
                             src={
-                              typeof image === 'string'
-                                ? `http://localhost:5000/${image}` // If it's a string, construct the URL
+                              typeof image.path === 'string'
+                                ? `http://localhost:5000/${image.path}` // If it's a string, construct the URL
                                 : URL.createObjectURL(image) // If it's an object (e.g., a file), create an object URL
                             }
                             alt={`Uploaded ${index + 1}`}

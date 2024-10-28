@@ -35,9 +35,19 @@ export const addProduct = createAsyncThunk(
       pricing: product.price,
       pricingUnit: product.pricing_unit,
       hasBooking: parseInt(product.booking_operation) === 1, // Convert to number and compare
-      inclusions: product.inclusions || [],
-      termsAndConditions: product.termsAndConditions || [],
-      images: product.images || [],
+      inclusions: (product.inclusions || []).map((inclusion) => ({
+        id: inclusion.id,
+        item: inclusion.item, // assuming `inclusion` is a text string
+      })),
+      termsAndConditions: (product.termsAndConditions || []).map((term) => ({
+        id: term.id,
+        item: term.item, // assuming `term` is a text string
+      })),
+      images: product.images.map(image => ({
+        id: image.id,
+        path: image.path,
+        title: image.title || '', // Handle title or default to an empty string
+      })),
       accommodationType: product.type || "Unknown",
     };
 
@@ -62,6 +72,7 @@ export const handleUpdateAccommodation = createAsyncThunk(
       if (!product || !product.product_id || !product.name) {
         throw new Error('Invalid accommodation data received from the server');
       }
+      console.log(formData, product);
 
       const accommodationData = {
         product_id: product.product_id,
@@ -69,9 +80,19 @@ export const handleUpdateAccommodation = createAsyncThunk(
         pricing: product.price,
         pricingUnit: product.pricing_unit,
         hasBooking: parseInt(product.booking_operation) === 1,
-        inclusions: product.inclusions || [],
-        termsAndConditions: product.termsAndConditions || [],
-        images: product.images || [],
+        inclusions: (product.inclusions || []).map((inclusion) => ({
+          id: inclusion.id,
+          item: inclusion.item, // assuming `inclusion` is a text string
+        })),
+        termsAndConditions: (product.termsAndConditions || []).map((term) => ({
+          id: term.id,
+          item: term.item, // assuming `term` is a text string
+        })),
+        images: product.images.map(image => ({
+          id: image.id,
+          path: image.path,
+          title: image.title || '', // Handle title or default to an empty string
+        })),
         accommodationType: product.type || "Unknown",
       };
 
@@ -104,9 +125,19 @@ const accommodationSlice = createSlice({
         pricing: newAccommodation.pricing || "0",
         pricingUnit: newAccommodation.pricingUnit || "per night",
         hasBooking: newAccommodation.hasBooking || false,
-        inclusions: newAccommodation.inclusions || [],
-        termsAndConditions: newAccommodation.termsAndConditions || [],
-        images: newAccommodation.images || [],
+        inclusions: newAccommodation.inclusions.map(inclusion => ({
+          id: inclusion.id,
+          item: inclusion.item,
+        })),
+        termsAndConditions: newAccommodation.termsAndConditions.map(term => ({
+          id: term.id,
+          item: term.item,
+        })),
+        images: newAccommodation.images.map((img) => ({
+          id: img.id,
+            path: img.path,
+            title: img.title || '',
+        })),
         accommodationType: newAccommodation.accommodationType || "Unknown",
       });
     },
@@ -129,9 +160,19 @@ const accommodationSlice = createSlice({
           pricing: updatedAccommodation.pricing || "0",
           pricingUnit: updatedAccommodation.pricingUnit || "per night",
           hasBooking: updatedAccommodation.hasBooking || false,
-          inclusions: updatedAccommodation.inclusions || [],
-          termsAndConditions: updatedAccommodation.termsAndConditions || [],
-          images: updatedAccommodation.images || [],
+          inclusions: updatedAccommodation.inclusions.map(inclusion => ({
+            id: inclusion.id,
+            item: inclusion.item,
+          })),
+          termsAndConditions: updatedAccommodation.termsAndConditions.map(term => ({
+            id: term.id,
+            item: term.item,
+          })),
+          images: updatedAccommodation.images.map((img) => ({
+            id: img.id,
+            path: img.path,
+            title: img.title || '',
+          })),
           accommodationType: updatedAccommodation.accommodationType || "Unknown",
         };
       }
