@@ -38,7 +38,8 @@ const Home = () => {
          <Search/>
            </div>
 
-      <div className='h-[900px]'></div>
+      <div className='h-screen  bg-color2 mb-2'></div>
+     
 
       
       {/** Footer */}

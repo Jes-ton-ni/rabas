@@ -19,7 +19,6 @@ import Prieto from '../assets/prieto.jpg'
 import Santa from '../assets/santa.jpg'
 import Sorso from '../assets/sorsogon city.jpg'
 import Search from '@/components/Search';
-import { PiChatCircleText } from 'react-icons/pi';
 import { Spinner } from '@nextui-org/react'; // Add this import
 
 
@@ -273,13 +272,7 @@ Explore
   </div>  
 </div>
   </div>
-         {/* Floating chat button */}
-         <button
-          className="fixed bottom-4 right-4 bg-color1 text-white p-4 rounded-full shadow-lg hover:bg-color2 focus:outline-none z-50"
-         
-        >
-          <PiChatCircleText size={30} />
-        </button>
+       
   {/** Footer */}
 
   <div className='mt-9'>

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ModalContent, ModalHeader, ModalBody, ModalFooter, Modal } from "@nextui-org/modal";
-import { Button, Input, Avatar, Textarea } from '@nextui-org/react';
+import { Button, Avatar, Textarea } from '@nextui-org/react';
 import { FiSend } from "react-icons/fi";
 import { RangeCalendar, TimeInput } from "@nextui-org/react";
 import { Time } from "@internationalized/date";
@@ -152,16 +152,15 @@ const AvailabilityModalActivity = ({ isOpen, onClose, currentBookingDetails, onA
   );
 };
 
-// Component for rendering different types of bookings
+// Component for rendering booking details
 const BookingDetailsCard = ({ message, onCheckAvailability }) => {
   return (
-    <div className="bg-gray-300 text-black p-3 rounded-lg max-w-md">
-      <div className="flex justify-between items-center">
-        <strong>{message.sender}</strong>
+    <div className={`bg-white shadow-md text-black p-4 rounded-lg border border-gray-200 ${message.sender === 'You' ? 'ml-auto' : 'mr-auto'} max-w-full sm:max-w-sm break-words`}>
+      <div className="flex justify-between items-center mb-1">
+        <strong className="text-lg">{message.sender}</strong>
         <span className="text-xs text-gray-500">{message.time}</span>
       </div>
-      <p>{message.text}</p>
-
+      <p className="font-semibold mb-2 break-words">{message.text}</p>
       {message.formDetails?.imageUrl && (
         <img
           src={message.formDetails.imageUrl}
@@ -169,45 +168,37 @@ const BookingDetailsCard = ({ message, onCheckAvailability }) => {
           className="w-full h-auto mt-2 rounded-lg max-h-40 object-cover"
         />
       )}
-
-      <div className="p-2 mt-2 bg-gray-100 rounded-lg text-sm text-black">
-        <h4 className="font-semibold mb-1">Booking Details:</h4>
+      <div className="p-3 mt-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200 break-words">
+        <h4 className="font-semibold mb-2">Booking Details:</h4>
         <ul className="space-y-1">
           <li><strong>Product:</strong> {message.formDetails?.productName || 'Sample Product'}</li>
-          <li><MdPeople className="inline-block text-lg" /><strong> Guests:</strong> {message.formDetails?.numberOfGuests || '2'}</li>
-          <li><MdEmail className="inline-block text-lg" /><strong> Email:</strong> {message.formDetails?.email || 'john.doe@example.com'}</li>
-          <li><MdPhone className="inline-block text-lg" /><strong> Phone:</strong> {message.formDetails?.phone || '123-456-7890'}</li>
-          
+          <li><MdPeople className="inline-block text-lg" /> <strong> Guests:</strong> {message.formDetails?.numberOfGuests || '2'}</li>
+          <li><MdEmail className="inline-block text-lg" /> <strong> Email:</strong> {message.formDetails?.email || 'john.doe@example.com'}</li>
+          <li><MdPhone className="inline-block text-lg" /> <strong> Phone:</strong> {message.formDetails?.phone || '123-456-7890'}</li>
           {message.formType === 'accommodationBooking' && (
             <>
-              <li><MdDateRange className="inline-block text-lg" /><strong> Check-in:</strong> {message.formDetails?.checkInOutDates?.start || '2024-10-20'}</li>
-              <li><MdDateRange className="inline-block text-lg" /><strong> Check-out:</strong> {message.formDetails?.checkInOutDates?.end || '2024-10-22'}</li>
+              <li><MdDateRange className="inline-block text-lg" /> <strong> Check-in:</strong> {message.formDetails?.checkInOutDates?.start || '2024-10-20'}</li>
+              <li><MdDateRange className="inline-block text-lg" /> <strong> Check-out:</strong> {message.formDetails?.checkInOutDates?.end || '2024-10-22'}</li>
             </>
           )}
-
           {message.formType === 'tableReservation' && (
             <>
-              <li><MdDateRange className="inline-block text-lg" /><strong> Reservation Date:</strong> {message.formDetails?.reservationDate || '2024-10-15'}</li>
+              <li><MdDateRange className="inline-block text-lg" /> <strong> Reservation Date:</strong> {message.formDetails?.reservationDate || '2024-10-15'}</li>
               <li><strong>Reservation Time:</strong> {message.formDetails?.reservationTime || '6:00 PM'}</li>
             </>
           )}
-
           {message.formType === 'activityBooking' && (
             <>
-              <li><MdDateRange className="inline-block text-lg" /><strong> Activity Date:</strong> {message.formDetails?.visitDate || '2024-11-01'}</li>
+              <li><MdDateRange className="inline-block text-lg" /> <strong> Activity Date:</strong> {message.formDetails?.visitDate || '2024-11-01'}</li>
               <li><strong>Activity Time:</strong> {message.formDetails?.activityTime || '10:00 AM'}</li>
             </>
           )}
-
-          {/* Additional details from booking forms */}
           <li><strong>Special Requests:</strong> {message.formDetails?.specialRequests || 'None'}</li>
           <li><strong>Total Amount:</strong> ₱{message.formDetails?.amount || '0'}</li>
         </ul>
-        {message.formType !== 'bookingAccepted' && (
-          <Button auto color="primary" onClick={() => onCheckAvailability(message)} className="mt-2">
-            Check Availability
-          </Button>
-        )}
+        <Button auto color="primary" onClick={() => onCheckAvailability(message)} className="mt-2">
+          Check Availability
+        </Button>
       </div>
     </div>
   );
@@ -326,7 +317,7 @@ const ChatModal = ({ isOpen, onClose }) => {
     const baseMessage = (
       <div className="p-4 bg-green-100 rounded-lg">
         <p className="font-bold ">
-          Booking for {bookingDetails.formDetails.productName} has been accepted.
+          Booking for {bookingDetails.formDetails.productName} ha been accepted.
         </p>
         <div className="mt-2">
           {bookingDetails.formType === 'accommodationBooking' && (
@@ -384,9 +375,9 @@ const ChatModal = ({ isOpen, onClose }) => {
           </div>
         </ModalHeader>
 
-        <ModalBody className="flex flex-row gap-4 overflow-y-auto max-h-screen p-6 bg-gray-100 text-black">
+        <ModalBody className="flex flex-col lg:flex-row gap-4 overflow-y-auto max-h-screen p-6 bg-gray-100 text-black">
           {/* Sidebar for user list */}
-          <div className="w-1/4 bg-gray-200 p-4 rounded-lg">
+          <div className="w-full lg:w-1/4 bg-gray-200 p-4 rounded-lg">
             <h3 className="font-semibold mb-4">Available Users</h3>
             <ul className="space-y-3">
               {users.map((user, i) => (
@@ -407,22 +398,22 @@ const ChatModal = ({ isOpen, onClose }) => {
           </div>
 
           {/* Main chat area */}
-          <div className="w-full bg-white rounded-lg p-6 flex flex-col justify-between">
+          <div className="flex flex-col justify-between w-full lg:w-3/4 h-full bg-white rounded-md p-4">
             {selectedUser ? (
               <>
-                <div className="flex-grow overflow-y-auto mb-4 space-y-3">
+                <div className="flex flex-col space-y-3 overflow-y-auto scrollbar-custom">
                   <h3 className="font-semibold mb-4 text-black">Chat with {activeChatUser}</h3>
                   {messages[selectedUser].map((message) => (
-                    <div key={message.id} className={`p-3 rounded-lg ${message.sender === 'You' ? 'bg-color1 text-white ml-auto' : 'bg-gray-300 text-black'} max-w-md`}>
+                    <div key={message.id} className={`p-3 rounded-lg ${message.sender === 'You' ? 'bg-color1 text-white ml-auto' : 'bg-gray-300 text-black'}  sm:max-w-sm break-words max-w-[70%]`}  >
                       {message.formType ? (
                         <BookingDetailsCard message={message} onCheckAvailability={handleCheckAvailability} />
                       ) : (
                         <>
-                          <div className="flex justify-between items-center">
+                          <div className="  flex justify-between items-center mb-1">
                             <strong>{message.sender}</strong>
-                            <span className="text-xs text-gray-500">{message.time}</span>
+                            <span className="text-xs text-gray-500 ml-2">{message.time}</span>
                           </div>
-                          <p>{message.text}</p>
+                          <p className="break-words">{message.text}</p>
                         </>
                       )}
                     </div>
@@ -431,15 +422,16 @@ const ChatModal = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Input to send messages */}
-                <div className="flex items-center space-x-2">
-                  <Input
+                <div className="flex items-center space-x-2 mt-4">
+                  <Textarea
                     value={messageInput}
                     onChange={(e) => setMessageInput(e.target.value)}
                     onKeyDown={handleKeyPress}
                     placeholder="Type a message..."
-                    className="flex-grow bg-white text-black rounded-l-lg focus:ring-2"
+                    className="w-full bg-white text-black rounded-lg border border-gray-300 focus:border-black focus:ring resize-none p-2"
+                    rows="2"
                   />
-                  <Button onClick={handleSendMessage} color="primary" className="rounded-r-lg"><FiSend /></Button>
+                  <Button onClick={handleSendMessage} color="primary" className="rounded-lg h-full max-w-[100px] w-full"><FiSend /></Button>
                 </div>
               </>
             ) : (

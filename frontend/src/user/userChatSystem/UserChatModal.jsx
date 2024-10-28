@@ -6,48 +6,48 @@ import { toast } from 'react-toastify';
 import { MdDateRange, MdPeople, MdEmail, MdPhone } from "react-icons/md";
 
 // Component for rendering booking details
-const BookingDetailsCard = ({ message }) => {
+const BookingDetailsCard = ({ message, isSender }) => {
   return (
-    <div className="bg-white shadow-lg text-black p-4 rounded-lg max-w-md border border-gray-200">
-      <div className="flex justify-between items-center mb-2">
+    <div className={`bg-white shadow-md text-black p-4 rounded-lg border border-gray-200 ${isSender ? 'ml-auto' : 'mr-auto'} max-w-full sm:max-w-sm`}>
+      <div className="flex justify-between items-center mb-1">
         <strong className="text-lg">{message.sender}</strong>
-        <span className="text-xs text-gray-500">{message.time}</span>
+        <span className="text-xs text-gray-500 ">{message.time}</span>
       </div>
-      <p className="font-semibold mb-2">{message.text}</p>
+      <p className="font-semibold mb-2 break-words ">{message.text}</p>
       {message.additionalInfo && (
-        <p className="text-sm text-gray-700 mb-2">{message.additionalInfo}</p>
+        <p className="text-sm text-gray-700 mb-2 break-words ">{message.additionalInfo}</p>
       )}
       {message.messageNote && (
-        <p className="text-sm text-gray-700 mb-2"><strong>Message:</strong> {message.messageNote}</p>
+        <p className="text-sm text-gray-700 mb-2 break-words "><strong>Message:</strong> {message.messageNote}</p>
       )}
 
       {/* Image Placeholder */}
-      <div className="my-2 bg-gray-200 flex items-center justify-center rounded-lg" style={{ width: '100%', height: '200px' }}>
+      <div className="my-2 bg-gray-200 flex items-center justify-center rounded-lg w-full h-44">
         <span>200 x 200</span>
       </div>
 
-      <div className="p-3 mt-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200">
+      <div className="p-3 mt-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200 break-words">
         <h4 className="font-semibold mb-2">Booking Details:</h4>
         <ul className="space-y-1">
           <li><strong>Product:</strong> {message.formDetails?.productName || 'Sample Product'}</li>
-          <li><MdPeople className="inline-block text-lg" /><strong> Guests:</strong> {message.formDetails?.numberOfGuests || '2'}</li>
-          <li><MdEmail className="inline-block text-lg" /><strong> Email:</strong> {message.formDetails?.email || 'john.doe@example.com'}</li>
-          <li><MdPhone className="inline-block text-lg" /><strong> Phone:</strong> {message.formDetails?.phone || '123-456-7890'}</li>
+          <li><MdPeople className="inline-block text-lg" /> <strong> Guests:</strong> {message.formDetails?.numberOfGuests || '2'}</li>
+          <li><MdEmail className="inline-block text-lg" /> <strong> Email:</strong> {message.formDetails?.email || 'john.doe@example.com'}</li>
+          <li><MdPhone className="inline-block text-lg" /> <strong> Phone:</strong> {message.formDetails?.phone || '123-456-7890'}</li>
           {message.formDetails?.visitDate && (
             <>
-              <li><MdDateRange className="inline-block text-lg" /><strong> Activity Date:</strong> {message.formDetails.visitDate}</li>
+              <li><MdDateRange className="inline-block text-lg" /> <strong> Activity Date:</strong> {message.formDetails.visitDate}</li>
               <li><strong>Activity Time:</strong> {message.formDetails.activityTime}</li>
             </>
           )}
           {message.formDetails?.checkInOutDates && (
             <>
-              <li><MdDateRange className="inline-block text-lg" /><strong> Check-in:</strong> {message.formDetails.checkInOutDates.start}</li>
-              <li><MdDateRange className="inline-block text-lg" /><strong> Check-out:</strong> {message.formDetails.checkInOutDates.end}</li>
+              <li><MdDateRange className="inline-block text-lg" /> <strong> Check-in:</strong> {message.formDetails.checkInOutDates.start}</li>
+              <li><MdDateRange className="inline-block text-lg" /> <strong> Check-out:</strong> {message.formDetails.checkInOutDates.end}</li>
             </>
           )}
           {message.formDetails?.reservationDate && (
             <>
-              <li><MdDateRange className="inline-block text-lg" /><strong> Reservation Date:</strong> {message.formDetails.reservationDate}</li>
+              <li><MdDateRange className="inline-block text-lg" /> <strong> Reservation Date:</strong> {message.formDetails.reservationDate}</li>
               <li><strong>Reservation Time:</strong> {message.formDetails.reservationTime}</li>
             </>
           )}
@@ -118,6 +118,19 @@ const UserChatModal = ({ isOpen, onClose }) => {
           amount: '₱0'
         }
       },
+      // Additional sample messages
+      { 
+        id: 3, 
+        sender: 'You', 
+        text: 'Can I change the date of the activity?', 
+        time: '3:00 PM'
+      },
+      { 
+        id: 4, 
+        sender: 'Business One', 
+        text: 'Sure, please let us know the new date.', 
+        time: '3:05 PM'
+      },
     ],
     2: [
       { 
@@ -151,6 +164,19 @@ const UserChatModal = ({ isOpen, onClose }) => {
           specialRequests: 'Late check-in', 
           amount: '₱5000'
         }
+      },
+      // Additional sample messages
+      { 
+        id: 3, 
+        sender: 'You', 
+        text: 'Is breakfast included?', 
+        time: '3:30 PM'
+      },
+      { 
+        id: 4, 
+        sender: 'Business Two', 
+        text: 'Yes, breakfast is included in your booking.', 
+        time: '3:35 PM'
       },
     ],
     3: [
@@ -187,6 +213,19 @@ const UserChatModal = ({ isOpen, onClose }) => {
           specialRequests: 'Window seat', 
           amount: '₱2000'
         }
+      },
+      // Additional sample messages
+      { 
+        id: 3, 
+        sender: 'You', 
+        text: 'Can we add one more person to the reservation?', 
+        time: '4:00 PM'
+      },
+      { 
+        id: 4, 
+        sender: 'Business Three', 
+        text: 'Let me check the availability and get back to you.', 
+        time: '4:05 PM'
       },
     ],
   };
@@ -250,9 +289,9 @@ const UserChatModal = ({ isOpen, onClose }) => {
           </div>
         </ModalHeader>
 
-        <ModalBody className="flex flex-row gap-4 overflow-y-auto max-h-screen p-6 bg-gray-100 text-black">
+        <ModalBody className="flex flex-col lg:flex-row gap-4 overflow-y-auto max-h-screen p-6 bg-gray-100 text-black">
           {/* Sidebar for business list */}
-          <div className="w-1/4 bg-gray-200 p-4 rounded-lg">
+          <div className="w-full lg:w-1/4 bg-gray-200 p-4 rounded-lg">
             <h3 className="font-semibold mb-4">Available Businesses</h3>
             <ul className="space-y-3">
               {businesses.map((business) => (
@@ -273,45 +312,55 @@ const UserChatModal = ({ isOpen, onClose }) => {
           </div>
 
           {/* Main chat area */}
-          <div className="w-full bg-white rounded-lg p-6 flex flex-col justify-between">
+          <div className="flex flex-col justify-between w-full lg:w-3/4 h-full bg-white rounded-md p-4">
             {selectedBusiness ? (
               <>
-                <div className="flex-grow overflow-y-auto mb-4 space-y-3">
-                  <h3 className="font-semibold mb-4 text-black">Chat with {businesses.find(b => b.id === selectedBusiness).name}</h3>
+                <div className="flex flex-col space-y-3 overflow-y-auto scrollbar-custom">
+                  <h3 className="font-semibold mb-2 text-black">Chat with {businesses.find(b => b.id === selectedBusiness).name}</h3>
                   {messages[selectedBusiness].map((message) => (
-                    <div key={message.id} className={`p-3 rounded-lg ${message.sender === 'You' ? 'bg-color1 text-white ml-auto' : 'bg-gray-300 text-black'} max-w-md`}>
-                      {message.formDetails ? (
-                        <BookingDetailsCard message={message} />
-                      ) : (
-                        <>
-                          <div className="flex justify-between items-center">
-                            <strong>{message.sender}</strong>
-                            <span className="text-xs text-gray-500">{message.time}</span>
-                          </div>
-                          <p>{message.text}</p>
-                          {message.additionalInfo && (
-                            <p className="text-sm text-gray-700 mt-1">{message.additionalInfo}</p>
-                          )}
-                          {message.messageNote && (
-                            <p className="text-sm text-gray-700 mt-1"><strong>Message:</strong> {message.messageNote}</p>
-                          )}
-                        </>
-                      )}
+                    <div
+                      key={message.id}
+                      className={`flex ${message.sender === 'You' ? 'justify-end' : 'justify-start '}`}
+                    >
+                      <div
+                        className={`p-2 rounded-lg max-w-[70%] ${
+                          message.sender === 'You' ? 'bg-gray-300 text-black' : 'bg-color1 text-white max-w-[70%]'
+                        }`}
+                        
+                      >
+                        {message.formDetails ? (
+                          <BookingDetailsCard message={message} isSender={message.sender === 'You'} />
+                        ) : (
+                          <>
+                            <div className="flex justify-between items-center mb-1">
+                              <strong>{message.sender}</strong>
+                              <span className="text-xs text-gray-500 ml-3">{message.time}</span>
+                            </div>
+                            <p className="break-words ">{message.text}</p>
+                            {message.additionalInfo && (
+                              <p className="text-sm text-gray-700 mt-1 break-words ">{message.additionalInfo}</p>
+                            )}
+                            {message.messageNote && (
+                              <p className="text-sm text-gray-700 mt-1 break-words "><strong>Message:</strong> {message.messageNote}</p>
+                            )}
+                          </>
+                        )}
+                      </div>
                     </div>
                   ))}
                   <div ref={messageEndRef}></div>
                 </div>
 
-                {/* Input to send messages */}
-                <div className="flex items-center space-x-2">
-                  <Input
+                <div className="flex items-center space-x-2 mt-4 justify-between ">
+                  <textarea
                     value={messageInput}
                     onChange={(e) => setMessageInput(e.target.value)}
                     onKeyDown={handleKeyPress}
                     placeholder="Type a message..."
-                    className="flex-grow bg-white text-black rounded-l-lg focus:ring-2"
+                    className="w-full bg-white text-black rounded-lg border border-gray-300 focus:border-black focus:ring   resize-none p-2"
+                    rows="2" 
                   />
-                  <Button onClick={handleSendMessage} color="primary" className="rounded-r-lg"><FiSend /></Button>
+                  <Button onClick={handleSendMessage} color="primary" className="rounded-lg h-full max-w-[100px] w-full"><FiSend /></Button>
                 </div>
               </>
             ) : (

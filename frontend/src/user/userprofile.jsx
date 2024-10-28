@@ -23,11 +23,11 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
   return (
     <div className="p-6">
       <h3 className="text-2xl font-bold ">My Bookings</h3>
-      <Tabs aria-label="Booking Status" selectedKey={activeTab} onSelectionChange={setActiveTab}>
+      <Tabs aria-label="Booking Status" selectedKey={activeTab} onSelectionChange={setActiveTab} className='overflow-x-auto w-full'>
         <Tab key="active" title="Active">
           <div className="overflow-y-auto max-h-[450px] scrollbar-custom">
-            {filterBookings("active").map((booking, index) => (
-              <div key={index} className="bg-white shadow-lg p-4 rounded-lg mb-4">
+            {filterBookings("active").map((booking) => (
+              <div key={booking.id} className="bg-white shadow-lg p-4 rounded-lg mb-4">
                 <div className="p-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200">
                   <h4 className="font-semibold mb-2">Booking Details:</h4>
                   <ul className="space-y-1">
@@ -50,8 +50,8 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
         </Tab>
         <Tab key="completed" title="Completed">
           <div className="overflow-y-auto max-h-[500px] scrollbar-custom">
-            {filterBookings("completed").map((booking, index) => (
-              <div key={index} className="bg-white shadow-lg p-4 rounded-lg ">
+            {filterBookings("completed").map((booking) => (
+              <div key={booking.id} className="bg-white shadow-lg p-4 rounded-lg ">
                 <div className="p-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200">
                   <h4 className="font-semibold mb-2">Booking Details:</h4>
                   <ul className="space-y-1">
@@ -71,8 +71,8 @@ const MyBookingTab = ({ bookings, onCancelBooking }) => {
         </Tab>
         <Tab key="cancelled" title="Cancelled">
           <div className="overflow-y-auto max-h-[500px] scrollbar-custom">
-            {filterBookings("cancelled").map((booking, index) => (
-              <div key={index} className="bg-white shadow-lg p-4 rounded-lg ">
+            {filterBookings("cancelled").map((booking) => (
+              <div key={booking.id} className="bg-white shadow-lg p-4 rounded-lg ">
                 <div className="p-3 bg-gray-50 rounded-lg text-sm text-black border border-gray-200">
                   <h4 className="font-semibold mb-2">Booking Details:</h4>
                   <ul className="space-y-1">
@@ -472,9 +472,9 @@ const UserProfile = ({ activities = [] }) => {
         <Search />
       </div>
 
-      <div className='container max-h-screen  mx-auto flex flex-col md:flex-row mb-4 gap-4'>
+      <div className='container mx-auto flex flex-col md:flex-row mb-4 gap-4'>
         {/* Sidebar */}
-        <div className='max-h-[700px] bg-white p-4 w-full md:w-[300px] flex flex-col justify-between shadow-lg shadow-slate-800 rounded-md items-center'>
+        <div className='bg-white p-4 w-full md:w-1/4 flex flex-col justify-between shadow-lg rounded-md items-center'>
           <div className='flex flex-col items-center gap-2 flex-grow justify-center'>
             <div className='relative flex items-center w-28 h-28'>
               <Avatar className='w-full h-full object-cover rounded-full' 
@@ -494,20 +494,6 @@ const UserProfile = ({ activities = [] }) => {
             </div>
             <div className='text-2xl font-light'>
               {userData?.username ? userData.username : 'Loading...'}
-
-              {/* <div className='flex flex-col items-center gap-2 flex-grow'>
-            <Avatar 
-              className='h-[10rem] w-[10rem] mt-24' 
-              src={userData?.image_path 
-                ? `http://localhost:5000/${userData.image_path}` 
-                : `https://ui-avatars.com/api/?name=${firstLetter}`} 
-            />
-
-              <div className='text-2xl font-light'>
-                {userData?.username ? userData.username : 'Loading...'}
-              </div>
-          </div> */}
-
             </div>
           </div>
           {businessApplications.length > 0 ? (
@@ -565,12 +551,12 @@ const UserProfile = ({ activities = [] }) => {
         </div>
 
         {/* Main content */}
-        <div className=' w-full'>
-          <Tabs aria-label="Options" selectedKey={selected} onSelectionChange={setSelected}>
+        <div className='w-full md:w-3/4'>
+          <Tabs aria-label="Options" selectedKey={selected} onSelectionChange={setSelected} className='overflow-x-auto scrollbar-hide'>
             {/* Profile Tab */}
             <Tab key="profile" title="Profile">
               <Card>
-                <CardBody className='p-6 min-h-[600px] max-h-full'>
+                <CardBody className='p-6 min-h-[600px]'>
                   <div>
                     <h1 className='text-4xl font-bold mb-3'>User Profile</h1>
                     <div className='bg-gray-300 w-full h-[1px] mb-8'></div>
@@ -660,7 +646,7 @@ const UserProfile = ({ activities = [] }) => {
             {/* Liked Pages Tab */}
             <Tab key="likedPages" title="Liked Pages">
               <Card>
-                <CardBody className='p-6 min-h-[700px] max-h-full'>
+                <CardBody className='p-6 min-h-[700px]'>
                   <h1 className='text-4xl font-bold mb-3'>Liked Pages</h1>
                   <div className='bg-gray-300 w-full h-[1px] mb-8'></div>
 
@@ -765,7 +751,7 @@ const UserProfile = ({ activities = [] }) => {
             {/* My Booking Tab */}
             <Tab key="myBookings" title="My Bookings">
               <Card>
-                <CardBody className='p-6 min-h-[700px] max-h-full'>
+                <CardBody className='p-6 min-h-[700px]'>
                   <MyBookingTab bookings={acceptedBookings} onCancelBooking={handleCancelBooking} />
                 </CardBody>
               </Card>
