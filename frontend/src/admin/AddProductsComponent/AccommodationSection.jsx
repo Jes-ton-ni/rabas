@@ -160,6 +160,7 @@ const AccommodationSection = () => {
     if (accommodationName && pricing && pricingUnit && accommodationType) {
       // Construct the new accommodation object
       const newAccommodation = {
+        category: 'accommodation',
         type: accommodationType,
         name: accommodationName,
         price: pricing,
@@ -181,6 +182,7 @@ const AccommodationSection = () => {
       if (isEditing) {
         formData.append('product_id', editingAccommodationId); // Add the product_id for editing
       }
+      formData.append('category', newAccommodation.category);
       formData.append('type', newAccommodation.type);
       formData.append('name', newAccommodation.name);
       formData.append('price', newAccommodation.price);
@@ -579,14 +581,14 @@ const AccommodationSection = () => {
                       {/* Terms List */}
                       <ul className="mt-3 flex items-center flex-wrap gap-3 pl-5 text-sm">
                         {Array.isArray(termsList) && termsList.length > 0 ? (
-                          termsList.map((term, index) => (
-                            <li key={index} className="flex gap-3 items-center bg-light p-2 rounded-md">
+                          termsList.map((term) => (
+                            <li key={term.id} className="flex gap-3 items-center bg-light p-2 rounded-md">
                               {term.item}
                               <Button
                                 auto
                                 color="danger"
                                 size="sm"
-                                onClick={() => handleRemoveTerm(index)}
+                                onClick={() => handleRemoveTerm(term.id)}
                               >
                                 Remove
                               </Button>
@@ -620,14 +622,14 @@ const AccommodationSection = () => {
                     {/* Inclusions List */}
                     <ul className="mt-3 flex items-center flex-wrap gap-3 pl-5 text-sm">
                       {Array.isArray(inclusionList) && inclusionList.length > 0 ? (
-                        inclusionList.map((inclusion, index) => (
-                          <li key={index} className="flex gap-3 items-center bg-light p-2 rounded-md">
+                        inclusionList.map((inclusion) => (
+                          <li key={inclusion.id} className="flex gap-3 items-center bg-light p-2 rounded-md">
                             {inclusion.item}
                             <Button
                               auto
                               color="danger"
                               size="sm"
-                              onClick={() => handleRemoveInclusion(index)}
+                              onClick={() => handleRemoveInclusion(inclusion.id)}
                             >
                               Remove
                             </Button>

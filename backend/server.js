@@ -1273,14 +1273,15 @@ app.delete('/businessCoverPhoto/:id', (req, res) => {
 app.get('/getBusinessProduct', (req, res) => {
   // console.log('Session:', req.session);
   const userId = req.session?.user?.user_id;
+  const category = req.query.category;
 
   if (!userId) {
     return res.status(400).json({ success: false, message: 'User not logged in or user ID missing' });
   }
 
-  const sql = `SELECT * FROM products WHERE user_id = ?`;
+  const sql = `SELECT * FROM products WHERE user_id = ? AND product_category = ?`;
   
-  connection.query(sql, [userId], (err, results) => {
+  connection.query(sql, [userId, category], (err, results) => {
     if (err) {
       console.error('Error executing SQL query:', err);
       return res.status(500).json({ success: false, message: 'Internal server error' });
@@ -1295,7 +1296,7 @@ app.get('/getBusinessProduct', (req, res) => {
   });
 });
 app.post('/add-product', upload.array('productImages', 5), async (req, res) => { 
-  const { type, name, price, pricing_unit, booking_operation, inclusions, termsAndConditions } = req.body;
+  const { category, type, name, price, pricing_unit, booking_operation, inclusions, termsAndConditions } = req.body;
   const user_id = req.session?.user?.user_id;
 
   if (!user_id || !name || !price || !pricing_unit) {
@@ -1322,11 +1323,12 @@ app.post('/add-product', upload.array('productImages', 5), async (req, res) => {
       : [];
 
     const query = `
-      INSERT INTO products (user_id, type, name, price, pricing_unit, booking_operation, inclusions, termsAndConditions, images)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO products (product_category, user_id, type, name, price, pricing_unit, booking_operation, inclusions, termsAndConditions, images)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
+      category,
       user_id, 
       type, 
       name, 
@@ -1349,6 +1351,7 @@ app.post('/add-product', upload.array('productImages', 5), async (req, res) => {
         success: true,
         message: 'Product added successfully',
         product_id: results.insertId,
+        category,
         user_id,
         type,
         name,

@@ -7,6 +7,7 @@ export const fetchBusinessProducts = createAsyncThunk(
   async () => {
     try {
       const response = await axios.get('http://localhost:5000/getBusinessProduct', {
+        params: { category: 'accommodation' }, // Set category as 'accommodation'
         withCredentials: true,
       });
       return response.data.businessProducts || []; // Return an empty array if no products
@@ -16,7 +17,7 @@ export const fetchBusinessProducts = createAsyncThunk(
   }
 );
 
-// Async thunk to add a new accommodation product
+// Async thunk to add a new business product (accommodation)
 export const addProduct = createAsyncThunk(
   'business/addProduct',
   async (formData, { dispatch }) => {
@@ -31,6 +32,7 @@ export const addProduct = createAsyncThunk(
 
     const accommodationData = {
       id: product.product_id,
+      category: product.category,
       accommodationName: product.name,
       pricing: product.price,
       pricingUnit: product.pricing_unit,
@@ -76,6 +78,7 @@ export const handleUpdateAccommodation = createAsyncThunk(
 
       const accommodationData = {
         product_id: product.product_id,
+        category: product.category,
         accommodationName: product.name,
         pricing: product.price,
         pricingUnit: product.pricing_unit,
@@ -121,6 +124,7 @@ const accommodationSlice = createSlice({
       const newAccommodation = action.payload;
       state.accommodations.push({
         id: newAccommodation.id,
+        category: newAccommodation.category,
         accommodationName: newAccommodation.accommodationName || "N/A",
         pricing: newAccommodation.pricing || "0",
         pricingUnit: newAccommodation.pricingUnit || "per night",
