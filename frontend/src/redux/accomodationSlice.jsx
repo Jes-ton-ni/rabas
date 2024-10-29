@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Async thunk to fetch business products (accommodations)
 export const fetchBusinessProducts = createAsyncThunk(
-  'business/fetchBusinessProducts',
+  'business/fetchAccommodations',
   async () => {
     try {
       const response = await axios.get('http://localhost:5000/getBusinessProduct', {
@@ -32,7 +32,7 @@ export const addProduct = createAsyncThunk(
 
     const accommodationData = {
       id: product.product_id,
-      category: product.category,
+      category: product.product_category,
       accommodationName: product.name,
       pricing: product.price,
       pricingUnit: product.pricing_unit,
@@ -74,7 +74,6 @@ export const handleUpdateAccommodation = createAsyncThunk(
       if (!product || !product.product_id || !product.name) {
         throw new Error('Invalid accommodation data received from the server');
       }
-      console.log(formData, product);
 
       const accommodationData = {
         product_id: product.product_id,

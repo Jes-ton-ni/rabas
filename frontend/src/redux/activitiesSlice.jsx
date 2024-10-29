@@ -2,9 +2,8 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 // Async thunk to fetch business products (activities)
-
 export const fetchBusinessProducts = createAsyncThunk(
-  'business/fetchBusinessProducts',
+  'business/fetchActivities',
   async () => {
     try {
       const response = await axios.get('http://localhost:5000/getBusinessProduct', {
@@ -33,7 +32,7 @@ export const addProduct = createAsyncThunk(
 
     const activityData = {
       id: product.product_id,
-      category: product.category,
+      category: product.product_category,
       activityName: product.name,
       pricing: product.price,
       pricingUnit: product.pricing_unit,
@@ -51,7 +50,7 @@ export const addProduct = createAsyncThunk(
         path: image.path,
         title: image.title || '', // Handle title or default to an empty string
       })),
-      type: product.type || "Unknown",
+      activityType: product.type || "Unknown",
     };
 
     // console.log(activityData);
@@ -97,10 +96,10 @@ export const handleUpdateActivity = createAsyncThunk(
           path: image.path,
           title: image.title || '', // Handle title or default to an empty string
         })),
-        type: product.type || "Unknown",
+        activityType: product.type || "Unknown",        
       };
 
-      // console.log(activityData);
+      console.log('aaaaaaaaaaaaaaaa', activityData);
       // Dispatch action to update activity to the state
       dispatch(updateActivity(activityData));
 
@@ -143,7 +142,7 @@ const activitySlice = createSlice({
             path: img.path,
             title: img.title || '',
         })),
-        type: newActivity.type || "Unknown",
+        activityType: newActivity.activityType || "Unknown",
       });
     },
     updateActivity: (state, action) => {
@@ -155,30 +154,30 @@ const activitySlice = createSlice({
         activity => activity.id.toString() === updatedActivity.product_id.toString()
       );
 
-      console.log("Activity Index: ", activityIndex);
+      // console.log("Activity Index: ", activityIndex);
 
       if (activityIndex !== -1) {
         // Update the existing accommodation
         state.activities[activityIndex] = {
-          id: updateActivity.product_id,
-          activityName: updateActivity.activityName || "N/A",
-          pricing: updateActivity.pricing || "0",
-          pricingUnit: updateActivity.pricingUnit || "per night",
-          hasBooking: updateActivity.hasBooking || false,
-          inclusions: updateActivity.inclusions.map(inclusion => ({
+          id: updatedActivity.product_id,
+          activityName: updatedActivity.activityName || "N/A",
+          pricing: updatedActivity.pricing || "0",
+          pricingUnit: updatedActivity.pricingUnit || "per night",
+          hasBooking: updatedActivity.hasBooking || false,
+          inclusions: updatedActivity.inclusions.map(inclusion => ({
             id: inclusion.id,
             item: inclusion.item,
           })),
-          termsAndConditions: updateActivity.termsAndConditions.map(term => ({
+          termsAndConditions: updatedActivity.termsAndConditions.map(term => ({
             id: term.id,
             item: term.item,
           })),
-          images: updateActivity.images.map((img) => ({
+          images: updatedActivity.images.map((img) => ({
             id: img.id,
             path: img.path,
             title: img.title || '',
           })),
-          type: updateActivity.type || "Unknown",
+          activityType: updatedActivity.activityType || "Unknown",
         };
       }
     },
@@ -205,7 +204,7 @@ const activitySlice = createSlice({
           inclusions: product.inclusions || [],
           termsAndConditions: product.termsAndConditions || [],
           images: product.images || [],
-          type: product.type || "Unknown",
+          activityType: product.type || "Unknown",
         }));
       })
       .addCase(fetchBusinessProducts.rejected, (state, action) => {
@@ -240,82 +239,3 @@ const activitySlice = createSlice({
 // Export the action creators
 export const { addActivity, updateActivity, deleteActivities } = activitySlice.actions;
 export default activitySlice.reducer;
-
-// const initialState = {
-//   activities: [
-//     {
-//       id: nanoid(),
-//       activityName: "Mountain Hiking",
-//       pricing: "1500",
-//       pricingUnit: "per person",
-//       hasBooking: true,
-//       inclusions: ["Guide", "Lunch", "Transportation"],
-//       images: [
-//         { url: "https://via.placeholder.com/150", title: "Mountain View" },
-//         { url: "https://via.placeholder.com/150", title: "Trail" }
-//       ],
-//       activityType: "Outdoor",
-//     },
-//     {
-//       id: nanoid(),
-//       activityName: "Snorkeling Tour",
-//       pricing: "2000",
-//       pricingUnit: "per person",
-//       hasBooking: false,
-//       inclusions: ["Equipment", "Boat Ride"],
-//       images: [
-//         "https://via.placeholder.com/150",
-//         "https://via.placeholder.com/150"
-//       ],
-//       activityType: "Water Adventure",
-//     },
-//     {
-//       id: nanoid(),
-//       activityName: "City Tour",
-//       pricing: "800",
-//       pricingUnit: "per person",
-//       hasBooking: true,
-//       inclusions: ["Transportation", "Tour Guide", "Lunch"],
-//       images: [
-//         "https://via.placeholder.com/150",
-//         "https://via.placeholder.com/150"
-//       ],
-//       activityType: "Sightseeing",
-//     },
-//   ],
-// };
-
-// const activitiesSlice = createSlice({
-//   name: 'activities',
-//   initialState,
-//   reducers: {
-//     addActivity: {
-//       reducer(state, action) {
-//         state.activities.push(action.payload);
-//       },
-//       prepare(activity) {
-//         return {
-//           payload: {
-//             id: nanoid(),
-//             activityType: activity.activityType, // New field for activity type
-//             ...activity,
-//           },
-//         };
-//       },
-//     },
-//     updateActivity(state, action) {
-//       const { id, updatedData } = action.payload;
-//       const activityIndex = state.activities.findIndex((activity) => activity.id === id);
-//       if (activityIndex !== -1) {
-//         state.activities[activityIndex] = { ...state.activities[activityIndex], ...updatedData };
-//       }
-//     },
-//     deleteActivities(state, action) {
-//       const idsToDelete = action.payload;
-//       state.activities = state.activities.filter((activity) => !idsToDelete.includes(activity.id));
-//     },
-//   },
-// });
-
-// export const { addActivity, updateActivity, deleteActivities } = activitiesSlice.actions;
-// export default activitiesSlice.reducer;

@@ -64,10 +64,10 @@ const AccommodationSection = () => {
     }
   };
 
-  const handleRemoveInclusion = (index) => {
-    const updatedInclusionList = inclusionList.filter((_, i) => i !== index);
+  const handleRemoveInclusion = (id) => {
+    const updatedInclusionList = inclusionList.filter((inclusion) => inclusion.id !== id);
     setInclusionList(updatedInclusionList);
-  };
+  };  
 
   // Handlers for Terms and Conditions
   const handleAddTerm = () => {
@@ -87,23 +87,37 @@ const AccommodationSection = () => {
     }
   };
 
-  const handleRemoveTerm = (index) => {
-    const updatedTermsList = termsList.filter((_, i) => i !== index);
+  const handleRemoveTerm = (id) => {
+    const updatedTermsList = termsList.filter((terms) => terms.id !==id);
     setTermsList(updatedTermsList);
   };
 
   // Handlers for Image Upload
-  const handleImageUpload = (e) => {  
-    const files = Array.from(e.target.files);  
-    setImages((prevImages) => Array.isArray(prevImages) ? [...prevImages, ...files] : [...files]);  
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+
+    // Map each file into an object with the necessary properties
+    const newImages = files.map((file) => ({
+      id: "", 
+      path: "",
+      title: "", // Initialize title as empty
+      fileUrl: URL.createObjectURL(file), // Generate URL for preview
+      file: file // Store the file itself 
+    }));
+
+    // Update images state with previous images and new images
+    setImages((prevImages) =>
+      Array.isArray(prevImages) ? [...prevImages, ...newImages] : [...newImages]
+    );
   };
 
-  const handleImageTitleChange = (index, title) => {
-    setImages((prevImages) => {
-      const updatedImages = [...prevImages];
-      updatedImages[index].title = title;
-      return updatedImages;
-    });
+  // Handler for updating image title
+  const handleImageTitleChange = (index, newTitle) => {
+    setImages((prevImages) =>
+      prevImages.map((img, idx) =>
+        idx === index ? { ...img, title: newTitle } : img
+      )
+    );
   };
 
   const handleRemoveImage = (index) => {
@@ -142,7 +156,6 @@ const AccommodationSection = () => {
       console.log('No accommodations selected for deletion.');
     }
   };
-  
 
   // Handlers for Checkbox Changes
   const handleCheckboxChange = (id, isChecked) => {
@@ -168,14 +181,40 @@ const AccommodationSection = () => {
         booking_operation: hasBooking ? 1 : 0,
         inclusions: inclusionList,
         termsAndConditions: termsList,
-        images: Array.isArray(images)
-          ? images.map((file) =>
-              file instanceof File ? URL.createObjectURL(file) : file
-            )
-          : [], // Fallback to empty array if images is not an array
+        images: Array.isArray(images) ? images : [],
       };
 
-      console.log('asdasda', inclusionList);
+      const uploadedImagesPromises = images.map(async (file) => {
+        if (file.file instanceof File){
+          const imageFormData = new FormData();
+          imageFormData.append('productImage', file.file);
+          imageFormData.append('title', file.title || '');
+          try {
+            const response = await fetch('http://localhost:5000/upload-image-product', {
+              method: 'PUT',
+              body: imageFormData,
+            });
+            const result = await response.json();
+  
+            // Return the image object with id, path, and title
+            return result.image; // Assuming your API responds with the image object
+          } catch (error) {
+            console.error('Image upload failed:', error);
+            return null; // Handle error as needed
+          }
+        } else {
+          // console.log('existing imagesssssssssssssss: ', file);
+          return file // Already an object with id, path, title
+        }
+      });
+
+      // Wait for all uploads to complete
+      const preparedImages = await Promise.all(uploadedImagesPromises);
+
+      // console.log('prepared images: ', preparedImages);
+
+      // Assign preparedImages to newAccommodation.images
+      newAccommodation.images = preparedImages;
   
       // Create FormData for the accommodation and image upload
       const formData = new FormData();
@@ -189,7 +228,7 @@ const AccommodationSection = () => {
       formData.append('pricing_unit', newAccommodation.pricing_unit);
       formData.append('booking_operation', newAccommodation.booking_operation.toString());
   
-      // Append inclusions and terms and conditions
+      // Append inclusions
       if (Array.isArray(newAccommodation.inclusions)) {
         newAccommodation.inclusions.forEach((inclusion) => {
           formData.append('inclusions[]', JSON.stringify({
@@ -199,12 +238,23 @@ const AccommodationSection = () => {
         });
       }
 
+      //Append terms and condition
       if (Array.isArray(newAccommodation.termsAndConditions)) {
         newAccommodation.termsAndConditions.forEach((term) => {
           formData.append('termsAndConditions[]', JSON.stringify({
             id: term.id || '', // Ensure id is assigned or default to ''
             item: term.item // Assuming item is a property of term object
           })); // Append as JSON string
+        });
+      }
+
+      if (Array.isArray(newAccommodation.images)) {
+        newAccommodation.images.forEach((image) => {
+          formData.append('images[]', JSON.stringify({
+            id: image.id || '',
+            path: image.path,
+            title: image.title || ''
+          }));
         });
       }
   
@@ -229,26 +279,9 @@ const AccommodationSection = () => {
 
       formData.append('removedImages', JSON.stringify(removedImages)); // Send removed images
 
-      // Append existing images as { id, path, title } to FormData
-      existingImages.forEach((image) => {
-        formData.append('existingImages[]', JSON.stringify({
-          id: image.id,
-          path: image.path,
-          title: image.title || ''
-        }));
-      });      
-
       // console.log('existing images: ', existingImages);
+      // console.log('FormData: ', formData);
       
-      // console.log('remove images: ', removedImages);
-      // Separate the new files from existing image URLs
-      const newFiles = images.filter((file) => file instanceof File);
-  
-      // Append the new files to FormData for upload
-      newFiles.forEach((file) => {
-        formData.append('productImages', file); // Append each new image file
-      });
-  
       try {
         let result;
         // Check if we are in editing mode or adding a new accommodation
@@ -264,7 +297,7 @@ const AccommodationSection = () => {
         setModalOpen(false);
         resetForm();
       } catch (error) {
-        console.error('Failed to submit accommodation:', error);
+        // console.error('Failed to submit accommodation:', error);
         alert('An error occurred while saving the accommodation. Please try again.');
       }
     } else {
@@ -487,7 +520,6 @@ const AccommodationSection = () => {
           ))}
       </div>
 
-
       {/* Modal for Adding/Editing Accommodations */}
       <Modal isOpen={modalOpen} onOpenChange={setModalOpen} size="2xl">
         <ModalContent>
@@ -675,16 +707,16 @@ const AccommodationSection = () => {
                         <div key={`${image}-${index}`} className="flex flex-col gap-2 mb-2">
                           <img
                             src={
-                              typeof image.path === 'string'
-                                ? `http://localhost:5000/${image.path}` // If it's a string, construct the URL
-                                : URL.createObjectURL(image) // If it's an object (e.g., a file), create an object URL
+                              image.path
+                                ? `http://localhost:5000/${image.path}`
+                                : image.fileUrl || ''
                             }
                             alt={`Uploaded ${index + 1}`}
                             className="h-16 w-16 object-cover rounded-lg"
                           />
                           <Input
                             placeholder="Enter image title"
-                            value={image.title}
+                            value={image.title || ''}
                             onChange={(e) => handleImageTitleChange(index, e.target.value)}
                             fullWidth
                           />
@@ -699,7 +731,7 @@ const AccommodationSection = () => {
                         </div>
                       ))
                     ) : (
-                      <p>No images to display</p> // Optionally display a message if there are no images
+                      <p>No images to display</p>
                     )}
                   </div>
 

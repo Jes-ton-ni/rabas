@@ -119,7 +119,6 @@ app.post('/login', (req, res) => {
   });
 });
 
-
 // Endpoint for checking login status
 app.get('/check-login', (req, res) => {
   // Retrieve session data from the database
@@ -1295,22 +1294,57 @@ app.get('/getBusinessProduct', (req, res) => {
     }
   });
 });
+
+// handle upload image product
+app.put('/upload-image-product', upload.single('productImage'), async (req, res) => {
+  const { title } = req.body;
+
+  console.log(title);
+
+  // Log the uploaded file for debugging
+  console.log('Uploaded file:', req.file);
+
+  // Check if req.file exists and construct the image object
+  const uploadedProductImage = req.file
+    ? {
+        id: uuidv4(),
+        path: req.file.path,
+        title: title || ''
+      }
+    : null; // Return null if no file was uploaded
+
+  console.log('Uploaded image:', uploadedProductImage);
+
+  // Respond with the image object
+  res.json({ success: true, image: uploadedProductImage });
+});
+
+// Endpoint for adding product
 app.post('/add-product', upload.array('productImages', 5), async (req, res) => { 
-  const { category, type, name, price, pricing_unit, booking_operation, inclusions, termsAndConditions } = req.body;
+  const { 
+    category, 
+    type,
+    name, 
+    price, 
+    pricing_unit, 
+    booking_operation, 
+    inclusions, 
+    termsAndConditions,
+    images 
+  } = req.body;
   const user_id = req.session?.user?.user_id;
 
   if (!user_id || !name || !price || !pricing_unit) {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
 
-  // Handling the product images, assigning each an id and allowing for a title
-  const productImages = req.files && req.files.length > 0 
-    ? req.files.map((file) => ({
-        id: uuidv4(), // Example id generation; you could use a more robust id generation method
-        path: file.path,
-        title: '' // Default title if not provided
-      }))
-    : []; // Set to an empty array if no images are uploaded
+  // Parse Images
+  let parsedImages = [];
+  try {
+    parsedImages = images ? images.map(image => JSON.parse(image)) : [];
+  } catch (error) {
+    console.error('Error parsing images:', error);
+  }
 
   try {
     // Ensure inclusions is an array of objects
@@ -1337,7 +1371,7 @@ app.post('/add-product', upload.array('productImages', 5), async (req, res) => {
       parseInt(booking_operation) || 0,
       JSON.stringify(inclusionsArray), // Convert inclusions to JSON
       JSON.stringify(termsArray), // Convert termsAndConditions to JSON
-      JSON.stringify(productImages), // Store images as JSON array with id, path, and title
+      JSON.stringify(parsedImages), // Store images as JSON array with id, path, and title
     ];
 
     connection.query(query, values, (err, results) => {
@@ -1360,7 +1394,7 @@ app.post('/add-product', upload.array('productImages', 5), async (req, res) => {
         booking_operation: parseInt(booking_operation) || 0,
         inclusions: inclusionsArray, // Return the original array
         termsAndConditions: termsArray, // Return the original array
-        images: productImages, // Each image will have id, path, and title
+        images: parsedImages, // Each image will have id, path, and title
       };
       console.log(addedProduct);
       res.json(addedProduct);
@@ -1397,28 +1431,32 @@ app.get('/get-product-images/:product_id', (req, res) => {
 
 // Endpoint to update an existing product
 app.put('/update-product', upload.array('productImages', 5), async (req, res) => {
-  const { product_id, type, name, price, pricing_unit, booking_operation, inclusions, termsAndConditions, existingImages, removedImages } = req.body;
+  const { 
+    product_id, 
+    type, 
+    category,
+    name, 
+    price, 
+    pricing_unit, 
+    booking_operation, 
+    inclusions, 
+    termsAndConditions, 
+    removedImages, 
+    images 
+  } = req.body;
+  
   const user_id = req.session?.user?.user_id;
 
   if (!user_id || !product_id || !name || !price || !pricing_unit) {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
 
-  // Fetch newly uploaded image paths
-  const productImages = req.files && req.files.length > 0 
-    ? req.files.map((file) => ({
-        id: uuidv4(),
-        path: file.path,
-        title: '',
-      }))
-    : [];
-
-  // Parse existingImages
-  let parsedExistingImages = [];
+  // Parse Images
+  let parsedImages = [];
   try {
-    parsedExistingImages = existingImages ? existingImages.map(image => JSON.parse(image)) : [];
+    parsedImages = images ? images.map(image => JSON.parse(image)) : [];
   } catch (error) {
-    console.error('Error parsing existingImages:', error);
+    console.error('Error parsing images:', error);
   }
 
   // Parse removedImages
@@ -1429,12 +1467,6 @@ app.put('/update-product', upload.array('productImages', 5), async (req, res) =>
     console.error('Error parsing removedImages:', error);
     parsedRemovedImages = [];
   }
-
-  // Filter out images to be removed from the merged images
-  const mergedImages = [
-    ...parsedExistingImages,
-    ...productImages,
-  ].filter(image => !parsedRemovedImages.some(removedImage => removedImage.id === image.id));
 
   // Ensure inclusions is an array of objects
   const inclusionsArray = Array.isArray(inclusions) 
@@ -1459,7 +1491,7 @@ app.put('/update-product', upload.array('productImages', 5), async (req, res) =>
     parseInt(booking_operation) || 0,
     JSON.stringify(inclusionsArray), // Store inclusions as a JSON string
     JSON.stringify(termsAndConditionsArray), // Store terms and conditions as a JSON string
-    JSON.stringify(mergedImages), // Store merged images as a JSON string
+    JSON.stringify(parsedImages), // Store merged images as a JSON string
     product_id,
     user_id,
   ];
@@ -1505,13 +1537,14 @@ app.put('/update-product', upload.array('productImages', 5), async (req, res) =>
       product_id,
       user_id,
       type,
+      category,
       name,
       price,
       pricing_unit: pricing_unit || null,
       booking_operation: parseInt(booking_operation) || 0,
       inclusions: inclusionsArray,
       termsAndConditions: termsAndConditionsArray,
-      images: mergedImages,
+      images: parsedImages,
     };
 
     res.json(updatedProduct);
