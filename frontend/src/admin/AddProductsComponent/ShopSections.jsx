@@ -1,13 +1,12 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Modal, ModalContent, ModalHeader, ModalBody } from '@nextui-org/react';
 import { Input, Button, Checkbox } from '@nextui-org/react';
 import Slider from 'react-slick';
-import { addProduct, updateProduct, deleteProducts } from '@/redux/shopSlice';
+import { addProduct, handleUpdateShopProduct, deleteShopProducts, fetchBusinessProducts } from '@/redux/shopSlice';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaSearch, FaChevronLeft, FaChevronRight, FaImage } from 'react-icons/fa';
-import { nanoid } from '@reduxjs/toolkit';
 
 const ShopSections = () => {
   // State Management
@@ -15,94 +14,235 @@ const ShopSections = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingProductId, setEditingProductId] = useState(null);
   const [productName, setProductName] = useState('');
-  const [price, setPrice] = useState('');
-  const [category, setCategory] = useState('');
+  const [pricing, setPricing] = useState('');
   const [description, setDescription] = useState('');
-  const [imageList, setImageList] = useState([]);
-  const [selectedProducts, setSelectedProducts] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [images, setImages] = useState([]); // Updated to store objects with url and title
+  const [selectedShopProducts, setSelectedShopProducts] = useState([]);
+  const [productType, setProductType] = useState('');
+  const [selectedType, setSelectedType] = useState('');
 
   const dispatch = useDispatch();
-  const products = useSelector((state) => state.shop.products);
+  const products = useSelector((state) => state.shop.shopProducts);
+  const status = useSelector((state) => state.shop.status);
+  const error = useSelector((state) => state.shop.error);
   const sliderRefs = useRef({});
 
-  // Handlers for Image Upload
+  useEffect(() => {
+    // console.log('Fetching business products...');
+    dispatch(fetchBusinessProducts());
+  }, [dispatch]);
+
+  // useEffect(() => {
+    // console.log('Products from Redux state:', shopProducts);
+  // }, [shopProducts]);
+
+  if (status === 'loading') {
+    return <div>Loading shop products...</div>;
+  }
+
+  if (status === 'failed') {
+    return <div>Error: {error}</div>;
+  }
+
+  // Handler for Image Upload with limit check
   const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);  
+    const files = Array.from(e.target.files);
+
+    // Map each file into an object with the necessary properties
     const newImages = files.map((file) => ({
-      url: URL.createObjectURL(file),
-      title: '',
+      id: "", 
+      path: "",
+      title: "", 
+      fileUrl: URL.createObjectURL(file), 
+      file: file 
     }));
-    setImageList((prevImages) => [...prevImages, ...newImages]);
+
+    // Set a maximum image limit (5 images in this case)
+    setImages((prevImages) => {
+      const updatedImages = [...prevImages, ...newImages];
+      return updatedImages.slice(0, 5); // Limit to 5 images
+    });
+    e.target.value = null;
   };
 
-  const handleImageTitleChange = (index, title) => {
-    setImageList((prevImages) => {
-      const updatedImages = [...prevImages];
-      updatedImages[index].title = title;
-      return updatedImages;
-    });
+  // Handler for updating image title
+  const handleImageTitleChange = (index, newTitle) => {
+    setImages((prevImages) =>
+      prevImages.map((img, idx) =>
+        idx === index ? { ...img, title: newTitle } : img
+      )
+    );
   };
 
   const handleRemoveImage = (index) => {
-    const updatedImages = imageList.filter((_, i) => i !== index);
-    setImageList(updatedImages);
+    const updatedImages = images.filter((_, i) => i !== index);
+    setImages(updatedImages);
   };
 
   // Handlers for Deleting Selected Products
-  const handleDeleteSelected = () => {
-    if (selectedProducts.length > 0) {
-      dispatch(deleteProducts(selectedProducts));
-      setSelectedProducts([]);
+  const handleDeleteSelected = async () => {
+    if (selectedShopProducts.length > 0) {
+      try {
+        // Create a request to delete selected products
+        const response = await fetch('http://localhost:5000/delete-product', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ selectedProduct: selectedShopProducts }), // Pass selected products here
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Dispatch Redux action to remove products from the state
+          dispatch(deleteShopProducts(selectedShopProducts));
+          
+          // Optionally reset the selection
+          setSelectedShopProducts([]);
+        } else {
+          console.error('Failed to delete products:', data.message);
+        }
+      } catch (error) {
+        console.error('Error deleting products:', error);
+      }
+    } else {
+      console.log('No products selected for deletion.');
     }
   };
 
   // Handlers for Checkbox Changes
   const handleCheckboxChange = (id, isChecked) => {
     if (isChecked) {
-      setSelectedProducts((prev) => [...prev, id]); // Add product ID if checked
+      setSelectedShopProducts((prev) => [...prev, id]);
     } else {
-      setSelectedProducts((prev) => prev.filter((productId) => productId !== id)); // Remove product ID if unchecked
+      setSelectedShopProducts((prev) => prev.filter((productId) => productId !== id));
     }
   };
 
   // Handler for Form Submission (Add/Edit Product)
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (productName && price && category) {
-      const newProduct = {
-        id: isEditing ? editingProductId : nanoid(),
-        productName,
-        price,
-        category,
-        description,
-        images: imageList.map((image) => ({
-          url: image.url,
-          title: image.title,
-        })),
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent default form submission behavior
+  
+    // Check that all required fields are filled
+    if (productName && pricing && productType) {
+      // Construct the new shopProducts object
+      const newShopProduct = {
+        category: 'shop',
+        type: productType,
+        name: productName,
+        price: pricing,
+        description: description,
+        images: Array.isArray(images) ? images : [],
       };
 
-      if (isEditing) {
-        dispatch(updateProduct({ id: editingProductId, updatedData: newProduct }));
-      } else {
-        dispatch(addProduct(newProduct));
-      }
+      const uploadedImagesPromises = images.map(async (file) => {
+        if (file.file instanceof File){
+          const imageFormData = new FormData();
+          imageFormData.append('productImage', file.file);
+          imageFormData.append('title', file.title || '');
+          try {
+            const response = await fetch('http://localhost:5000/upload-image-product', {
+              method: 'PUT',
+              body: imageFormData,
+            });
+            const result = await response.json();
+  
+            // Return the image object with id, path, and title
+            return result.image; // responds with the image object
+          } catch (error) {
+            console.error('Image upload failed:', error);
+            return null; // Handle error as needed
+          }
+        } else {
+          // console.log('existing imagesssssssssssssss: ', file);
+          return file // Already an object with id, path, title
+        }
+      });
 
-      // Reset form
-      setModalOpen(false);
-      resetForm();
+      // Wait for all uploads to complete
+      const preparedImages = await Promise.all(uploadedImagesPromises);
+
+      // console.log('prepared images: ', preparedImages);
+
+      // Assign preparedImages to newShopProduct.images
+      newShopProduct.images = preparedImages;
+
+      // Create FormData for the product and image upload
+      const formData = new FormData();
+      if (isEditing) {
+        formData.append('product_id', editingProductId); // Add the product_id for editing
+      }
+      formData.append('category', newShopProduct.category);
+      formData.append('type', newShopProduct.type);
+      formData.append('name', newShopProduct.name);
+      formData.append('price', newShopProduct.price);
+      formData.append('description', newShopProduct.description);
+
+      if (Array.isArray(newShopProduct.images)) {
+        newShopProduct.images.forEach((image) => {
+          formData.append('images[]', JSON.stringify({
+            id: image.id || '',
+            path: image.path,
+            title: image.title || ''
+          }));
+        });
+      }
+  
+      // Fetch existing images if editing
+      let existingImages = [];
+      if (isEditing) {
+        try {
+          const response = await fetch(
+            `http://localhost:5000/get-product-images/${editingProductId}`
+          );
+          const data = await response.json();
+          existingImages = data.images || [];
+        } catch (error) {
+          console.error('Error fetching existing images:', error);
+        }
+      }    
+      
+      // Removed images array to pass to backend
+      const removedImages = existingImages.filter(existingImage => 
+        !images.some(newImage => newImage.path === existingImage.path)
+      );
+
+      formData.append('removedImages', JSON.stringify(removedImages)); // Send removed images
+
+      // console.log('existing images: ', existingImages);
+      // console.log('FormData: ', formData);
+      
+      try {
+        let result;
+        // Check if we are in editing mode or adding a new product
+        if (isEditing) {
+          result = dispatch(handleUpdateShopProduct(formData));
+          console.log('Product updated successfully:', result);
+        } else {
+          result = dispatch(addProduct(formData));
+          // console.log('Product added successfully:', result.payload);
+        }
+  
+        // Close modal and reset form after successful submission
+        setModalOpen(false);
+        resetForm();
+      } catch (error) {
+        // console.error('Failed to submit product:', error);
+        alert('An error occurred while saving the product. Please try again.');
+      }
     } else {
-      alert('Please fill in all required fields.');
+      alert('Please fill in all required fields.'); // Alert if required fields are missing
     }
-  };
+  };  
 
   // Reset Form Fields
   const resetForm = () => {
     setProductName('');
-    setPrice('');
-    setCategory('');
+    setPricing('');
+    setProductType('');
     setDescription('');
-    setImageList([]);
+    setImages([]);
     setIsEditing(false);
     setEditingProductId(null);
   };
@@ -110,27 +250,27 @@ const ShopSections = () => {
   // Handler for Editing a Product
   const handleEdit = (product) => {
     setProductName(product.productName);
-    setPrice(product.price);
-    setCategory(product.category);
+    setPricing(product.pricing);
+    setProductType(product.productType);
     setDescription(product.description);
-    setImageList(product.images);
+    setImages(product.images);
     setEditingProductId(product.id);
     setIsEditing(true);
     setModalOpen(true);
   };
 
- // Slider settings dynamically based on number of images
+  // Slider Settings for Image Carousel
   const getSliderSettings = (numImages) => ({
-    infinite: numImages > 1,  // Infinite scroll only if more than 1 image
+    infinite: numImages > 1,
     slidesToShow: 1,
     slidesToScroll: 1,
     speed: 500,
-    arrows: numImages > 1,  // Show next/prev buttons only if more than 1 image
+    arrows: numImages > 1,
   });
 
 
-  // Get Unique Categories for Tabs
-  const uniqueCategories = [...new Set(products.map((product) => product.category))];
+  // Get Unique Shop Product Type for Tabs
+  const uniqueShopProductTypes = [...new Set(products.map((product) => product.productType))];
 
   return (
     <div className="max-h-[620px] p-3 w-full h-full rounded-xl shadow-gray-400 shadow-lg bg-white">
@@ -150,7 +290,7 @@ const ShopSections = () => {
           <Button
             color="danger"
             onClick={handleDeleteSelected}
-            disabled={!selectedProducts.length} // Disable delete button if no products are selected
+            disabled={!selectedShopProducts.length} // Disable delete button if no products are selected
           >
             Delete Selected
           </Button>
@@ -167,26 +307,26 @@ const ShopSections = () => {
       {/* Tabs Section */}
       <div className="tabs flex justify-start gap-3 mb-4">
         <Button
-          onClick={() => setSelectedCategory('')}
+          onClick={() => setSelectedType('')}
           className={`border p-2 rounded-md transition duration-300 ease-in-out ${
-            selectedCategory === ''
+            selectedType === ''
               ? 'bg-color1 text-white'
               : 'bg-gray-200 text-gray-700 hover:bg-color2 hover:text-white'
           }`}
         >
           All
         </Button>
-        {uniqueCategories.map((category) => (
+        {uniqueShopProductTypes.map((type, index) => (
           <Button
-            key={category}
-            onClick={() => setSelectedCategory(category)}
+          key={`${type}-${index}`}
+            onClick={() => setSelectedType(type)}
             className={`border p-2 rounded-md transition duration-300 ease-in-out ${
-              selectedCategory === category
+              selectedType === type
                 ? 'bg-color1 text-white'
                 : 'bg-gray-200 text-gray-700 hover:bg-color2 hover:text-white'
             }`}
           >
-            {category}
+            {type}
           </Button>
         ))}
       </div>
@@ -194,7 +334,7 @@ const ShopSections = () => {
     {/* Products List */}
     <div className="border-2 max-h-[430px] h-full flex flex-wrap overflow-auto p-4 gap-4">
         {products
-          .filter((product) => !selectedCategory || product.category === selectedCategory)
+          .filter((product) => !selectedType || product.productType === selectedType)
           .map((product) => (
             <div
               key={product.id}
@@ -202,15 +342,11 @@ const ShopSections = () => {
             >
               {/* Product Header */}
               <div className="flex mb-3 items-center gap-2 justify-between">
-                <Button
-                  size="sm"
-                  color="success"
-                  onClick={() => handleEdit(product)}
-                >
+                <Button size="sm" color="success" onClick={() => handleEdit(product)}>
                   Edit
                 </Button>
                 <Checkbox
-                  checked={selectedProducts.includes(product.id)}
+                  checked={selectedShopProducts.includes(product.id)}
                   onChange={(e) => handleCheckboxChange(product.id, e.target.checked)}
                 />
               </div>
@@ -218,48 +354,68 @@ const ShopSections = () => {
               {/* Product Details */}
               <h2 className="text-sm font-bold">Product Name: {product.productName}</h2>
               <p className="text-sm">
-                <strong>Price:</strong> ₱{product.price}
+                <strong>Price:</strong> ₱{product.pricing}
               </p>
               <p className="text-sm">
                 <strong>Description:</strong> {product.description}
               </p>
 
               {/* Image Carousel */}
-              {product.images.length > 0 && (
-                <div className="relative mt-4">
-                  <Slider
-                    ref={(slider) => (sliderRefs.current[product.id] = slider)}
-                    {...getSliderSettings(product.images.length)}
-                  >
-                    {product.images.map((image, index) => (
-                      <div key={index}>
+              {product.images && Array.isArray(product.images) && product.images.length > 0 && (
+              <div className="relative mt-4">
+                {product.images.length === 1 ? (
+                  // Render a single image without the slider
+                  <div className="relative">
+                    <img
+                      src={`http://localhost:5000/${product.images[0].path}`} // Base URL to the image
+                      alt={`Product ${product.productName} Image`}
+                      className="w-full h-32 object-cover rounded-lg mt-2"
+                      onError={(e) => {
+                        // e.target.src = '/path/to/fallback/image.png'; // Fallback image
+                        e.target.onerror = null; // Prevents looping
+                      }}
+                    />
+                    <p className="text-xs text-center mt-1">{product.images.title}</p>
+                  </div>
+                ) : (
+                  // Render the slider if there are multiple images
+                  <Slider ref={(slider) => (sliderRefs.current[product.id] = slider)} {...getSliderSettings}>
+                    {product.images.map((image) => (
+                      <div key={`${image.id}`} className="relative">
                         <img
-                          src={image.url}
-                          alt={image.title || `Product ${index + 1}`}
+                          src={`http://localhost:5000/${image.path}`}  // Apply the base URL to the image
+                          alt={`Product ${product.productName} Image ${image.id}`}
                           className="w-full h-32 object-cover rounded-lg mt-2"
+                          onError={(e) => {
+                            e.target.onerror = null; // Prevents looping
+                            // e.target.src = '/path/to/fallback/image.png'; // Fallback image
+                          }}
                         />
                         <p className="text-xs text-center mt-1">{image.title}</p>
                       </div>
                     ))}
                   </Slider>
-
-                  {/* Show next/prev buttons only if more than 1 image */}
-                  {product.images.length > 1 && (
-                    <>
-                      <button
-                        className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow"
-                        onClick={() => sliderRefs.current[product.id].slickPrev()}
-                      >
-                        <FaChevronLeft />
-                      </button>
-                      <button
-                        className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow"
-                        onClick={() => sliderRefs.current[product.id].slickNext()}
-                      >
-                        <FaChevronRight />
-                      </button>
-                    </>
-                  )}
+                )}
+                
+                {/* Next and Previous buttons */}
+                {product.images.length > 1 && (
+                  <>
+                    <button
+                      className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow"
+                      onClick={() => sliderRefs.current[product.id].slickPrev()}
+                      aria-label="Previous image"
+                    >
+                      <FaChevronLeft />
+                    </button>
+                    <button
+                      className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow"
+                      onClick={() => sliderRefs.current[product.id].slickNext()}
+                      aria-label="Next image"
+                    >
+                      <FaChevronRight />
+                    </button>
+                  </>
+                )}
                 </div>
               )}
             </div>
@@ -277,13 +433,13 @@ const ShopSections = () => {
               <ModalBody>
                 {/* Add/Edit Product Form */}
                 <form className="space-y-4" onSubmit={handleSubmit}>
-                  {/* Category */}
+                  {/* Type */}
                   <div className="mb-4">
                     <Input
-                      label="Category"
-                      placeholder="Enter the category"
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value)}
+                      label="Type"
+                      placeholder="Enter the type of product"
+                      value={productType}
+                      onChange={(e) => setProductType(e.target.value)}
                       fullWidth
                       required
                     />
@@ -307,8 +463,8 @@ const ShopSections = () => {
                       label="Price"
                       placeholder="e.g. 300"
                       type="number"
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
+                      value={pricing}
+                      onChange={(e) => setPricing(e.target.value)}
                       fullWidth
                       required
                       min="0"
@@ -354,29 +510,37 @@ const ShopSections = () => {
                     </div>
                   {/* Uploaded Images Preview with Title Input and Remove Option */}
                   <div className="mb-4 flex flex-wrap gap-3">
-                    {imageList.map((image, index) => (
-                      <div key={index} className="flex flex-col gap-2 mb-2">
-                        <img
-                          src={image.url}
-                          alt={`Uploaded ${index + 1}`}
-                          className="h-16 w-16 object-cover rounded-lg"
-                        />
-                        <Input
-                          placeholder="Enter image title"
-                          value={image.title}
-                          onChange={(e) => handleImageTitleChange(index, e.target.value)}
-                          fullWidth
-                        />
-                        <Button
-                          auto
-                          color="danger"
-                          size="xs"
-                          onClick={() => handleRemoveImage(index)}
-                        >
-                          Remove
-                        </Button>
-                      </div>
-                    ))}
+                    {images && Array.isArray(images) && images.length > 0 ? (
+                      images.map((image, index) => (
+                        <div key={`${image}-${index}`} className="flex flex-col gap-2 mb-2">
+                          <img
+                            src={
+                              image.path
+                                ? `http://localhost:5000/${image.path}`
+                                : image.fileUrl || ''
+                            }
+                            alt={`Uploaded ${index + 1}`}
+                            className="h-16 w-16 object-cover rounded-lg"
+                          />
+                          <Input
+                            placeholder="Enter image title"
+                            value={image.title || ''}
+                            onChange={(e) => handleImageTitleChange(index, e.target.value)}
+                            fullWidth
+                          />
+                          <Button
+                            auto
+                            color="danger"
+                            size="xs"
+                            onClick={() => handleRemoveImage(index)}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No images to display</p>
+                    )}
                   </div>
 
                   {/* Submit Button */}

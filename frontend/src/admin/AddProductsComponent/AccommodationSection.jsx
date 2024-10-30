@@ -92,7 +92,7 @@ const AccommodationSection = () => {
     setTermsList(updatedTermsList);
   };
 
-  // Handlers for Image Upload
+  // Handler for Image Upload with limit check
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
 
@@ -100,15 +100,17 @@ const AccommodationSection = () => {
     const newImages = files.map((file) => ({
       id: "", 
       path: "",
-      title: "", // Initialize title as empty
-      fileUrl: URL.createObjectURL(file), // Generate URL for preview
-      file: file // Store the file itself 
+      title: "", 
+      fileUrl: URL.createObjectURL(file), 
+      file: file 
     }));
 
-    // Update images state with previous images and new images
-    setImages((prevImages) =>
-      Array.isArray(prevImages) ? [...prevImages, ...newImages] : [...newImages]
-    );
+    // Set a maximum image limit (5 images in this case)
+    setImages((prevImages) => {
+      const updatedImages = [...prevImages, ...newImages];
+      return updatedImages.slice(0, 5); // Limit to 5 images
+    });
+    e.target.value = null;
   };
 
   // Handler for updating image title

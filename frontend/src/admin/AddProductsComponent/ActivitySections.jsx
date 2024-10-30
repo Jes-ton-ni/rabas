@@ -92,7 +92,7 @@ const ActivitySections = () => {
     setTermsList(updatedTermsList);
   };
 
-  // Handlers for Image Upload
+  // Handler for Image Upload with limit check
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
 
@@ -100,15 +100,17 @@ const ActivitySections = () => {
     const newImages = files.map((file) => ({
       id: "", 
       path: "",
-      title: "", // Initialize title as empty
-      fileUrl: URL.createObjectURL(file), // Generate URL for preview
-      file: file // Store the file itself 
+      title: "", 
+      fileUrl: URL.createObjectURL(file), 
+      file: file 
     }));
 
-    // Update images state with previous images and new images
-    setImages((prevImages) =>
-      Array.isArray(prevImages) ? [...prevImages, ...newImages] : [...newImages]
-    );
+    // Set a maximum image limit (5 images in this case)
+    setImages((prevImages) => {
+      const updatedImages = [...prevImages, ...newImages];
+      return updatedImages.slice(0, 5); // Limit to 5 images
+    });
+    e.target.value = null;
   };
 
   // Handler for updating image title
@@ -125,23 +127,23 @@ const ActivitySections = () => {
     setImages(updatedImages);
   };
 
-  // Handlers for Deleting Selected Accommodations
+  // Handlers for Deleting Selected Activities
   const handleDeleteSelected = async () => {
     if (selectedActivities.length > 0) {
       try {
-        // Create a request to delete selected accommodations
+        // Create a request to delete selected activities
         const response = await fetch('http://localhost:5000/delete-product', {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ selectedProduct: selectedActivities }), // Pass selected accommodations here
+          body: JSON.stringify({ selectedProduct: selectedActivities }), // Pass selected activities here
         });
 
         const data = await response.json();
 
         if (data.success) {
-          // Dispatch Redux action to remove accommodations from the state
+          // Dispatch Redux action to remove activities from the state
           dispatch(deleteActivities(selectedActivities));
           
           // Optionally reset the selection
@@ -171,7 +173,7 @@ const ActivitySections = () => {
   
     // Check that all required fields are filled
     if (activityName && pricing && pricingUnit && activityType) {
-      // Construct the new accommodation object
+      // Construct the new activity object
       const newActivity = {
         category: 'activity',
         type: activityType,
@@ -197,7 +199,7 @@ const ActivitySections = () => {
             const result = await response.json();
   
             // Return the image object with id, path, and title
-            return result.image; // Assuming your API responds with the image object
+            return result.image; // responds with the image object
           } catch (error) {
             console.error('Image upload failed:', error);
             return null; // Handle error as needed
@@ -216,7 +218,7 @@ const ActivitySections = () => {
       // Assign preparedImages to newActivity.images
       newActivity.images = preparedImages;
 
-      // Create FormData for the accommodation and image upload
+      // Create FormData for the activity and image upload
       const formData = new FormData();
       if (isEditing) {
         formData.append('product_id', editingActivityId); // Add the product_id for editing
@@ -284,7 +286,7 @@ const ActivitySections = () => {
       
       try {
         let result;
-        // Check if we are in editing mode or adding a new accommodation
+        // Check if we are in editing mode or adding a new activity
         if (isEditing) {
           result = dispatch(handleUpdateActivity(formData));
           console.log('Activity updated successfully:', result);

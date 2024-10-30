@@ -92,7 +92,7 @@ const RestaurantSection = () => {
     setTermsList(updatedTermsList);
   };
 
-  // Handlers for Image Upload
+  // Handler for Image Upload with limit check
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
 
@@ -100,15 +100,17 @@ const RestaurantSection = () => {
     const newImages = files.map((file) => ({
       id: "", 
       path: "",
-      title: "", // Initialize title as empty
-      fileUrl: URL.createObjectURL(file), // Generate URL for preview
-      file: file // Store the file itself 
+      title: "", 
+      fileUrl: URL.createObjectURL(file), 
+      file: file 
     }));
 
-    // Update images state with previous images and new images
-    setImages((prevImages) =>
-      Array.isArray(prevImages) ? [...prevImages, ...newImages] : [...newImages]
-    );
+    // Set a maximum image limit (5 images in this case)
+    setImages((prevImages) => {
+      const updatedImages = [...prevImages, ...newImages];
+      return updatedImages.slice(0, 5); // Limit to 5 images
+    });
+    e.target.value = null;
   };
 
   // Handler for updating image title
@@ -427,7 +429,7 @@ const RestaurantSection = () => {
               </div>
 
               {/* Restaurant Service Details */}
-              <h2 className="text-sm font-bold">Restaurant Name: {restaurant.restaurantName}</h2>
+              <h2 className="text-sm font-bold">Restaurant Service Name: {restaurant.restaurantName}</h2>
               <p className="text-sm">
                 <strong>Price:</strong> ₱{restaurant.pricing} {restaurant.pricingUnit}
               </p>
@@ -533,8 +535,8 @@ const RestaurantSection = () => {
                   {/* Restaurant Type */}
                   <div className="mb-4">
                     <Input
-                      label="Restaurant Type"
-                      placeholder="Enter the type of activity"
+                      label="Restaurant Service Type"
+                      placeholder="Enter the type of services"
                       value={restaurantType}
                       onChange={(e) => setRestaurantType(e.target.value)}
                       fullWidth
@@ -545,8 +547,8 @@ const RestaurantSection = () => {
                   {/* Restaurant Name */}
                   <div className="mb-4">
                     <Input
-                      label="Restaurant Name"
-                      placeholder="Enter the name of the restaurant"
+                      label="Restaurant Service Name"
+                      placeholder="Enter the name of the restaurant service"
                       value={restaurantName}
                       onChange={(e) => setRestaurantName(e.target.value)}
                       fullWidth
@@ -586,7 +588,7 @@ const RestaurantSection = () => {
                       checked={hasBooking}
                       onChange={(e) => setHasBooking(e.target.checked)}
                     >
-                      Activity has booking option
+                      Restaurant Service has booking option
                     </Checkbox>
                   </div>
 
@@ -636,7 +638,7 @@ const RestaurantSection = () => {
                   <div className="mb-4">
                     <Input
                       label="Inclusions"
-                      placeholder="Enter an inclusion or details about the restaurant"
+                      placeholder="Enter an inclusion or details about the restaurant service"
                       value={inclusions}
                       onChange={(e) => setInclusions(e.target.value)}
                       fullWidth

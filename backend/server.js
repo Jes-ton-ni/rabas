@@ -1267,7 +1267,6 @@ app.delete('/businessCoverPhoto/:id', (req, res) => {
   });
 });
 
-
 // Endpoint to get business product
 app.get('/getBusinessProduct', (req, res) => {
   // console.log('Session:', req.session);
@@ -1325,6 +1324,7 @@ app.post('/add-product', upload.array('productImages', 5), async (req, res) => {
     category, 
     type,
     name, 
+    description,
     price, 
     pricing_unit, 
     booking_operation, 
@@ -1334,7 +1334,7 @@ app.post('/add-product', upload.array('productImages', 5), async (req, res) => {
   } = req.body;
   const user_id = req.session?.user?.user_id;
 
-  if (!user_id || !name || !price || !pricing_unit) {
+  if (!user_id || !name || !price) {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
 
@@ -1357,21 +1357,22 @@ app.post('/add-product', upload.array('productImages', 5), async (req, res) => {
       : [];
 
     const query = `
-      INSERT INTO products (product_category, user_id, type, name, price, pricing_unit, booking_operation, inclusions, termsAndConditions, images)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO products (product_category, user_id, type, name, description, price, pricing_unit, booking_operation, inclusions, termsAndConditions, images)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
-      category,
-      user_id, 
-      type, 
-      name, 
-      price, 
+      category || null,
+      user_id || null, 
+      type || null, 
+      name || null, 
+      description || null,
+      price || null, 
       pricing_unit || null,
       parseInt(booking_operation) || 0,
-      JSON.stringify(inclusionsArray), // Convert inclusions to JSON
-      JSON.stringify(termsArray), // Convert termsAndConditions to JSON
-      JSON.stringify(parsedImages), // Store images as JSON array with id, path, and title
+      JSON.stringify(inclusionsArray) || [], // Convert inclusions to JSON
+      JSON.stringify(termsArray) || [], // Convert termsAndConditions to JSON
+      JSON.stringify(parsedImages) || [], // Store images as JSON array with id, path, and title
     ];
 
     connection.query(query, values, (err, results) => {
@@ -1389,6 +1390,7 @@ app.post('/add-product', upload.array('productImages', 5), async (req, res) => {
         user_id,
         type,
         name,
+        description,
         price,
         pricing_unit: pricing_unit || '',
         booking_operation: parseInt(booking_operation) || 0,
@@ -1436,6 +1438,7 @@ app.put('/update-product', upload.array('productImages', 5), async (req, res) =>
     type, 
     category,
     name, 
+    description,
     price, 
     pricing_unit, 
     booking_operation, 
@@ -1447,7 +1450,7 @@ app.put('/update-product', upload.array('productImages', 5), async (req, res) =>
   
   const user_id = req.session?.user?.user_id;
 
-  if (!user_id || !product_id || !name || !price || !pricing_unit) {
+  if (!user_id || !product_id || !name || !price) {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
 
@@ -1479,13 +1482,14 @@ app.put('/update-product', upload.array('productImages', 5), async (req, res) =>
 
   const query = `
     UPDATE products 
-    SET type = ?, name = ?, price = ?, pricing_unit = ?, booking_operation = ?, inclusions = ?, termsAndConditions = ?, images = ?
+    SET type = ?, name = ?, description = ?, price = ?, pricing_unit = ?, booking_operation = ?, inclusions = ?, termsAndConditions = ?, images = ?
     WHERE product_id = ? AND user_id = ?
   `;
 
   const values = [
     type,
     name,
+    description,
     price,
     pricing_unit || null,
     parseInt(booking_operation) || 0,
@@ -1539,6 +1543,7 @@ app.put('/update-product', upload.array('productImages', 5), async (req, res) =>
       type,
       category,
       name,
+      description,
       price,
       pricing_unit: pricing_unit || null,
       booking_operation: parseInt(booking_operation) || 0,

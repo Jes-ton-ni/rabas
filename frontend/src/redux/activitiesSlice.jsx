@@ -74,7 +74,7 @@ export const handleUpdateActivity = createAsyncThunk(
       if (!product || !product.product_id || !product.name) {
         throw new Error('Invalid activity data received from the server');
       }
-      console.log(formData, product);
+      // console.log(formData, product);
 
       const activityData = {
         product_id: product.product_id,
@@ -99,7 +99,7 @@ export const handleUpdateActivity = createAsyncThunk(
         activityType: product.type || "Unknown",        
       };
 
-      console.log('aaaaaaaaaaaaaaaa', activityData);
+      // console.log('aaaaaaaaaaaaaaaa', activityData);
       // Dispatch action to update activity to the state
       dispatch(updateActivity(activityData));
 
@@ -157,7 +157,7 @@ const activitySlice = createSlice({
       // console.log("Activity Index: ", activityIndex);
 
       if (activityIndex !== -1) {
-        // Update the existing accommodation
+        // Update the existing product
         state.activities[activityIndex] = {
           id: updatedActivity.product_id,
           activityName: updatedActivity.activityName || "N/A",
