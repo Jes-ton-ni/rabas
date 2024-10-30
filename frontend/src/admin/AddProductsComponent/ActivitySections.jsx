@@ -28,8 +28,8 @@ const ActivitySections = () => {
 
   const dispatch = useDispatch();
   const activities = useSelector((state) => state.activities.activities);
-  const status = useSelector((state) => state.activities.activities);
-  const error = useSelector((state) => state.activities.activities);
+  const status = useSelector((state) => state.activities.status);
+  const error = useSelector((state) => state.activities.error);
   const sliderRefs = useRef({});
 
   useEffect(() => {
@@ -515,7 +515,6 @@ const ActivitySections = () => {
                 )}
                 </div>
               )}
-  
               </div>
             ))}
       </div>

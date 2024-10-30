@@ -38,7 +38,7 @@ const AccommodationSection = () => {
   }, [dispatch]);
 
   // useEffect(() => {
-    // console.log('Accommodations from Redux state:', accommodations);
+  //   console.log('Accommodations from Redux state:', accommodations);
   // }, [accommodations]);
 
   if (status === 'loading') {
@@ -515,7 +515,6 @@ const AccommodationSection = () => {
                 )}
               </div>
             )}
-
             </div>
           ))}
       </div>

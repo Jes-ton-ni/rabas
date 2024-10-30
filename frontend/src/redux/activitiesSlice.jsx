@@ -113,7 +113,7 @@ export const handleUpdateActivity = createAsyncThunk(
 );
 
 const activitySlice = createSlice({
-  name: 'activitiess',
+  name: 'activities',
   initialState: {
     activities: [],
     status: 'idle',
