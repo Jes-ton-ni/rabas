@@ -9,27 +9,6 @@ const shopDealsSlice = createSlice({
   name: 'shopDeals',
   initialState,
   reducers: {
-    addShopDeal: {
-      reducer(state, action) {
-        const today = new Date();
-        const newDeal = action.payload;
-        if (newDeal.expirationDate > today) {
-          state.activeDeals.push(newDeal);
-        } else {
-          state.expiredDeals.push(newDeal);
-        }
-      },
-      prepare(productId, discount, expirationDate) {
-        return {
-          payload: {
-            id: nanoid(),
-            productId,
-            discount,
-            expirationDate: new Date(expirationDate),
-          },
-        };
-      },
-    },
     deleteShopDeal(state, action) {
       const { dealId, isExpired } = action.payload;
       if (isExpired) {
@@ -53,5 +32,5 @@ const shopDealsSlice = createSlice({
   },
 });
 
-export const { addShopDeal, deleteShopDeal, updateShopDeal } = shopDealsSlice.actions;
+export const { deleteShopDeal, updateShopDeal } = shopDealsSlice.actions;
 export default shopDealsSlice.reducer;

@@ -120,7 +120,7 @@ const AccommodationBookingForm = ({ isOpen, onClose, product = {} }) => {
 
   return (
     <>
-      <Modal hideCloseButton isOpen={isOpen} onClose={onClose} className="max-w-2xl p-8 bg-white rounded-lg shadow-2xl">
+      <Modal hideCloseButton isOpen={isOpen} onClose={() => {}} className="max-w-2xl p-8 bg-white rounded-lg shadow-2xl">
         <ModalContent className="rounded-lg">
           <ModalHeader className="text-3xl font-bold text-gray-800 border-b pb-4">
             Accommodation Booking - {product.title}

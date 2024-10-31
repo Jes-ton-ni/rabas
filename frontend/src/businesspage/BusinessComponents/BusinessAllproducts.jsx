@@ -32,6 +32,7 @@ const mockData = {
       title: 'Hiking Adventure',
       description: 'Explore scenic mountain trails. Guide and equipment included.',
       price: 1500,
+      discount: 10, // 10% discount
       imageUrl: 'https://via.placeholder.com/200',
       rating: 4,
       type: 'Hiking',
@@ -41,6 +42,7 @@ const mockData = {
       title: 'Snorkeling Tour',
       description: 'Discover the underwater world with a guided snorkeling tour.',
       price: 1200,
+      discount: 5, // 5% discount
       imageUrl: 'https://via.placeholder.com/200',
       rating: 3,
       type: 'Water Sports',
@@ -52,6 +54,7 @@ const mockData = {
       title: 'Luxury Mountain Cabin',
       description: 'Stay in a cozy cabin with scenic views and modern amenities.',
       price: 5000,
+      discount: 10, // 10% discount
       imageUrl: 'https://via.placeholder.com/200',
       rating: 5,
       type: 'Cabins',
@@ -61,6 +64,7 @@ const mockData = {
       title: 'Beachfront Resort',
       description: 'Relax in a luxury resort right on the beach.',
       price: 8000,
+      discount: 5, // 5% discount
       imageUrl: 'https://via.placeholder.com/200',
       rating: 4,
       type: 'Resorts',
@@ -72,6 +76,7 @@ const mockData = {
       title: 'Mountain View Dining',
       description: 'Experience local cuisine with a view of the mountains.',
       price: 1000,
+      discount: 10, // 10% discount
       imageUrl: 'https://via.placeholder.com/200',
       rating: 2,
       type: 'Fine Dining',
@@ -81,6 +86,7 @@ const mockData = {
       title: 'Coastal Seafood Feast',
       description: 'Indulge in fresh seafood dishes by the shore.',
       price: 1500,
+      discount: 5, // 5% discount
       imageUrl: 'https://via.placeholder.com/200',
       rating: 4,
       type: 'Buffet',
@@ -92,6 +98,7 @@ const mockData = {
       title: 'Local Handicrafts',
       description: 'Shop unique handmade items from local artisans.',
       price: 500,
+      discount: 10, // 10% discount
       imageUrl: 'https://via.placeholder.com/200',
       rating: 3,
       type: 'Local Crafts',
@@ -101,6 +108,7 @@ const mockData = {
       title: 'Souvenir Shop',
       description: 'Get your souvenirs and take home memories of the trip.',
       price: 700,
+      discount: 5, // 5% discount
       imageUrl: 'https://via.placeholder.com/200',
       rating: 2,
       type: 'Souvenirs',
@@ -204,38 +212,58 @@ const ProductCard = ({ product, openBookingModal, onOpen }) => {
   const openReviewModal = () => setReviewModalOpen(true);
   const closeReviewModal = () => setReviewModalOpen(false);
 
+  const discountedPrice = product.price - (product.price * (product.discount || 0) / 100);
+
   return (
-    <Card variant="shadow" className="border-0 rounded-lg mb-4 transition-transform transform hover:scale-105">
-      <CardBody>
-        <div className="flex flex-col md:flex-row items-center h-full w-full">
-          <div className="relative w-full md:w-1/2">
-            <img
-              src={product.imageUrl}
-              alt={product.title}
-              className="object-cover w-full h-[250px] md:h-[300px] rounded-lg"
-            />
-            {/* View Images button with functionality */}
-            <Button size="sm" className="absolute bottom-2 right-2 text-white bg-color1" onClick={onOpen}>
-              View Images
-            </Button>
-          </div>
-          <div className="relative flex flex-col w-full h-full justify-between p-4">
-            <div className="flex justify-between items-start">
-              <div className="font-bold text-xl mb-2">{product.title}</div>
-              <div className="flex items-center gap-1">
-                <span className="text-black font-semibold">{product.rating}</span>
-                <AiFillStar className="text-yellow-500" />
-                <Tooltip content="Write a Review">
-                  <Button size="sm" className="bg-transparent" onClick={openReviewModal}>
-                    <MdRateReview className="text-lg cursor-pointer" />
-                  </Button>
-                </Tooltip>
+    <Card variant="shadow" className="border-0 rounded-lg mb-4 overflow-hidden">
+      <CardBody className="flex flex-col">
+        <div className="relative w-full h-[200px] md:h-[250px]">
+          <img
+            src={product.imageUrl}
+            alt={product.title}
+            className="object-cover w-full h-full rounded-t-lg"
+          />
+          {product.discount > 0 && (
+            <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+              {product.discount}% OFF
+            </div>
+          )}
+          <Button size="sm" className="absolute bottom-2 right-2 text-white bg-color1" onClick={onOpen}>
+            View Images
+          </Button>
+        </div>
+        <div className="p-4 flex flex-col justify-between flex-grow">
+          <div>
+            <div className="font-bold text-lg mb-1">{product.title}</div>
+            <div className="flex items-center gap-1 mb-2">
+              <span className="text-black font-semibold">{product.rating}</span>
+              <div className="flex">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <AiFillStar
+                    key={star}
+                    className={star <= product.rating ? 'text-yellow-500' : 'text-gray-300'}
+                  />
+                ))}
               </div>
+              <Tooltip content="Write a Review">
+                <Button size="sm" className="bg-transparent" onClick={openReviewModal}>
+                  <MdRateReview className="text-lg cursor-pointer" />
+                </Button>
+              </Tooltip>
             </div>
             <div className="text-gray-700 mb-4">{product.description}</div>
-            <div className="flex justify-between items-center mt-auto">
-              <div className="text-lg font-semibold">₱{product.price}</div>
-              <div className="flex gap-2">
+          </div>
+          <div className="flex justify-between items-center mt-auto">
+            <div className="text-lg font-semibold">
+              {product.discount ? (
+                <>
+                  <span className="line-through text-gray-500">₱{product.price}</span>
+                  <span className="text-red-500 ml-2">₱{discountedPrice}</span>
+                </>
+              ) : (
+                `₱${product.price}`
+              )}
+              <div className="flex mt-4 gap-2">
                 <Button color="primary">Inquire</Button>
                 <Button color="success" className="text-white" onClick={() => openBookingModal(product)}>
                   Book
@@ -373,6 +401,7 @@ const BusinessAllproducts = () => {
   const [activeModal, setActiveModal] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [previewIndex, setPreviewIndex] = useState(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const { isOpen, onOpen, onOpenChange } = useDisclosure(); // Ensure this is included
 
   const openBookingModal = (product) => {
@@ -437,11 +466,13 @@ const BusinessAllproducts = () => {
   const handleThumbnailClick = (index) => {
     setPreviewImage(images[index].url);
     setPreviewIndex(index);
+    setIsPreviewOpen(true);
   };
 
   const closePreview = () => {
     setPreviewImage(null);
     setPreviewIndex(null);
+    setIsPreviewOpen(false);
   };
 
   const goToPrevImage = () => {
@@ -463,7 +494,7 @@ const BusinessAllproducts = () => {
   }
 
   return (
-    <div className="min-h-screen container mx-auto p-4 md:p-6 bg-white rounded-md shadow-md mb-4">
+    <div className="min-h-screen container mx-auto p-4 md:p-6 bg-white  rounded-md shadow-md mb-4">
       <div className="text-3xl font-semibold mb-6 text-gray-800">What We Offer</div>
 
       <div className="flex flex-col lg:flex-row gap-8">
@@ -480,7 +511,7 @@ const BusinessAllproducts = () => {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex flex-col w-full bg-white p-6 rounded-lg shadow-md">
+        <div className="flex flex-col w-full bg-white  p-9 rounded-lg shadow-md">
           {/* Tabs */}
           <Tabs
             aria-label="Business Offerings"
@@ -497,7 +528,7 @@ const BusinessAllproducts = () => {
           </Tabs>
 
           {/* Content */}
-          <div className="p-4 max-h-[800px] overflow-y-auto scrollbar-custom">
+          <div className="p-4 max-h-[800px] overflow-y-auto  scrollbar-custom">
             {loading ? (
               <LoadingSpinner />
             ) : filteredData.length > 0 ? (
@@ -518,14 +549,13 @@ const BusinessAllproducts = () => {
         scrollBehavior="inside"
         size="5xl"
         className='max-h-[90vh]'
-        closeOnOverlayClick={false}
       >
         <ModalContent>
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">Image Gallery</ModalHeader>
               <ModalBody>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 cursor-pointer">
                   {images.map((image, index) => (
                     <div
                       key={index}
@@ -541,51 +571,62 @@ const BusinessAllproducts = () => {
                     </div>
                   ))}
                 </div>
-                {previewImage && (
-                  <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-                    <div className="relative max-w-full max-h-full">
-                      <img
-                        src={previewImage}
-                        alt="Preview"
-                        className="w-auto h-auto max-w-full max-h-full object-contain"
-                      />
-                      <div className="absolute bottom-4 left-0 right-0 text-center text-white text-lg font-semibold bg-black bg-opacity-50 py-2">
-                        {images[previewIndex].title}
-                      </div>
-                      <button
-                        className="absolute top-2 right-2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full p-2 transition-all duration-300"
-                        onClick={closePreview}
-                        aria-label="Close preview"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                      <button
-                        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full p-2 transition-all duration-300"
-                        onClick={goToPrevImage}
-                        aria-label="Previous image"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                      </button>
-                      <button
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full p-2 transition-all duration-300"
-                        onClick={goToNextImage}
-                        aria-label="Next image"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                )}
+              
               </ModalBody>
               <ModalFooter>
                 <Button onPress={onClose} color='danger'>Close</Button>
               </ModalFooter>
+
+               {/* Single Image Preview Modal */}
+      <Modal 
+        isOpen={isPreviewOpen} 
+        onOpenChange={setIsPreviewOpen}
+        hideCloseButton
+        size="full"
+        className='z-50 bg-black bg-opacity-75 flex justify-center items-center'
+      >
+        <ModalContent className="relative flex justify-center items-center">
+          <ModalBody className="relative max-w-full h-full flex justify-center items-center bg-color1 ">
+            <img
+              src={previewImage}
+              alt="Preview"
+              className="w-auto h-[80vh] object-contain rounded-md shadow-lg"
+            />
+            {previewIndex !== null && images[previewIndex] && (
+              <div className="absolute bottom-4 left-0 right-0 text-center text-white text-lg font-semibold py-2">
+                {images[previewIndex].title}
+              </div>
+            )}
+            <button
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-gray-800 bg-opacity-70 hover:bg-opacity-90 rounded-full p-3 transition-all duration-300"
+              onClick={goToPrevImage}
+              aria-label="Previous image"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-gray-800 bg-opacity-70 hover:bg-opacity-90 rounded-full p-3 transition-all duration-300"
+              onClick={goToNextImage}
+              aria-label="Next image"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+            <button
+              className="absolute top-4 right-4 bg-red-500  bg-opacity-70 hover:bg-opacity-90 rounded-full p-2 transition-all duration-300"
+              onClick={closePreview}
+              aria-label="Close preview"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
             </>
           )}
         </ModalContent>

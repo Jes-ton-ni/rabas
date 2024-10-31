@@ -414,7 +414,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
       </Button>  
     </ModalHeader>  
     <ModalBody className="p-4 overflow-y-auto max-h-[80vh]">  
-      <Progress value={(step / 4) * 100} className="mb-4" />  
+      <Progress value={(step / 4) * 100}  classNames={{ indicator: "bg-color2",}} />  
       {renderStep()}  
     </ModalBody>  
     <ModalFooter className="flex justify-between">  

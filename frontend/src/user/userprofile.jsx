@@ -451,12 +451,12 @@ const UserProfile = ({ activities = [] }) => {
           updatedPages.splice(index, 1); // Remove the unliked page
           return updatedPages;
         });
-
-        Swal.fire(
-          'Unliked!',
-          'Page unliked successfully!',
-          'success'
-        );
+        Swal.fire({
+          title: 'Unliked!',
+          text: 'Page unliked successfully!',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51',
+        });
       }
     });
   };
@@ -552,15 +552,15 @@ const UserProfile = ({ activities = [] }) => {
 
         {/* Main content */}
         <div className='w-full md:w-3/4'>
-          <Tabs aria-label="Options" selectedKey={selected} onSelectionChange={setSelected} className='overflow-x-auto scrollbar-hide'>
+          <Tabs aria-label="Options" selectedKey={selected} onSelectionChange={setSelected} className='overflow-y-auto scrollbar-hide'>
             {/* Profile Tab */}
             <Tab key="profile" title="Profile">
-              <Card>
+              <Card className='p-2'>
                 <CardBody className='p-6 min-h-[600px]'>
-                  <div>
+                
                     <h1 className='text-4xl font-bold mb-3'>User Profile</h1>
                     <div className='bg-gray-300 w-full h-[1px] mb-8'></div>
-
+                    
                     {/* Username field */}
                     <div className='mb-6'>
                       <h1 className='text-slate-500'>Username</h1>
@@ -597,7 +597,7 @@ const UserProfile = ({ activities = [] }) => {
                       </div>
                     </div> */}
 
-
+                    
                     {/* Email field */}
                     <div className='mb-6'>
                       <h1 className='text-slate-500'>Email</h1>
@@ -635,11 +635,10 @@ const UserProfile = ({ activities = [] }) => {
                         onChange={(e) => setPassword(e.target.value)}
                         type='password'
                       />
-                    </div>
-
-                    <Button className='bg-color1 text-white hover:bg-color2' onPress={handleUpdateProfile}>Update Profile</Button>
-                  </div>
+                    </div>      
+          
                 </CardBody>
+                <Button className='bg-color1 text-white hover:bg-color2' onPress={handleUpdateProfile}>Update Profile</Button>
               </Card>
             </Tab>
 

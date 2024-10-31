@@ -1,18 +1,17 @@
-import  { useState, useRef } from 'react'
-import Slider from 'react-slick'
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react"
-import 'slick-carousel/slick/slick.css'
-import 'slick-carousel/slick/slick-theme.css'
-
+import { useState, useRef } from 'react';
+import Slider from 'react-slick';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
 const BusinessHero = () => {
-  const [imageLoadError, setImageLoadError] = useState(false)
-  const [, setCurrentSlide] = useState(0)
-  const {isOpen, onOpen, onOpenChange} = useDisclosure()
-  const [previewImage, setPreviewImage] = useState(null) // New state for image preview
-  const [previewIndex, setPreviewIndex] = useState(0) // Track the index of the previewed image
-  const sliderRef = useRef(null)
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false) // New state for preview visibility
+  const [imageLoadError, setImageLoadError] = useState(false);
+  const [, setCurrentSlide] = useState(0);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure(); // For "View All Images" modal
+  const [previewImage, setPreviewImage] = useState(null);
+  const [previewIndex, setPreviewIndex] = useState(0);
+  const sliderRef = useRef(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false); // For single image preview modal
 
   const images = [
     { url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Sunset Over the Hills' },
@@ -21,7 +20,7 @@ const BusinessHero = () => {
     { url: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Forest Path' },
     { url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Ocean Waves' },
     { url: 'https://images.unsplash.com/photo-1497215842964-222b430dc094?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1600&h=900&q=80', title: 'Desert Dunes' },
-  ]
+  ];
 
   const settings = {
     dots: false,
@@ -33,51 +32,50 @@ const BusinessHero = () => {
     autoplaySpeed: 3000,
     beforeChange: (_, next) => setCurrentSlide(next),
     arrows: false,
-  }
-  
+  };
+
   const handleImageError = () => {
-    setImageLoadError(true)
-  }
+    setImageLoadError(true);
+  };
 
   const goToSlide = (index) => {
-    sliderRef.current.slickGoTo(index)
-  }
+    sliderRef.current.slickGoTo(index);
+  };
 
   const goToNextSlide = () => {
-    sliderRef.current.slickNext()
-  }
+    sliderRef.current.slickNext();
+  };
 
   const goToPrevSlide = () => {
-    sliderRef.current.slickPrev()
-  }
+    sliderRef.current.slickPrev();
+  };
 
   const handleThumbnailClick = (index) => {
-    setPreviewImage(images[index].url)
-    setPreviewIndex(index)
-    setIsPreviewOpen(true) // Open the preview
-  }
+    setPreviewImage(images[index].url);
+    setPreviewIndex(index);
+    setIsPreviewOpen(true);
+  };
 
   const closePreview = () => {
-    setPreviewImage(null)
-    setIsPreviewOpen(false) // Close the preview
-  }
+    setPreviewImage(null);
+    setIsPreviewOpen(false);
+  };
 
   const goToNextImage = () => {
-    const nextIndex = (previewIndex + 1) % images.length
-    setPreviewImage(images[nextIndex].url)
-    setPreviewIndex(nextIndex)
-  }
+    const nextIndex = (previewIndex + 1) % images.length;
+    setPreviewImage(images[nextIndex].url);
+    setPreviewIndex(nextIndex);
+  };
 
   const goToPrevImage = () => {
-    const prevIndex = (previewIndex - 1 + images.length) % images.length
-    setPreviewImage(images[prevIndex].url)
-    setPreviewIndex(prevIndex)
-  }
+    const prevIndex = (previewIndex - 1 + images.length) % images.length;
+    setPreviewImage(images[prevIndex].url);
+    setPreviewIndex(prevIndex);
+  };
 
   return (
     <div className="mx-auto container px-4 mt-3 sm:px-6 lg:px-8">
       <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
-        {/* Hero Carousel */}
         <div className="w-full lg:w-2/3 relative">
           {imageLoadError ? (
             <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] bg-gray-200 flex items-center justify-center rounded-lg">
@@ -116,7 +114,6 @@ const BusinessHero = () => {
                 </svg>
               </button>
               
-              {/* Business Name and View All Images button */}
               <div className="absolute bottom-0 left-0 right-0 flex justify-end items-center p-4 bg-gradient-to-t from-black to-transparent">
                 <Button 
                   auto 
@@ -130,14 +127,14 @@ const BusinessHero = () => {
           )}
         </div>
 
-        {/* Gallery Thumbnails (hidden on smaller screens) */}
-        <div className="w-full lg:w-1/3 mt-6 lg:mt-0 hidden lg:block">
-          <div className="grid grid-cols-2 gap-2 ">
+        {/* Thumbnail Gallery for Desktop View */}
+        <div className={`w-full lg:w-1/3 mt-6 lg:mt-0 hidden lg:block ${isPreviewOpen ? 'hidden' : ''}`}>
+          <div className="grid grid-cols-2 gap-2 cursor-pointer">
             {images.slice(0, 6).map((image, index) => (
               <div 
                 key={index} 
                 className="relative group overflow-hidden rounded-lg shadow-md aspect-square"
-                onClick={() => handleThumbnailClick(index)} // Update to handle click
+                onClick={() => handleThumbnailClick(index)}
               >
                 <img
                   src={image.url}
@@ -151,25 +148,25 @@ const BusinessHero = () => {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Modal for "View All Images" Button */}
       <Modal 
         isOpen={isOpen} 
         onOpenChange={onOpenChange}
         scrollBehavior="inside"
         size="5xl"
-        className='max-h-[90vh]'
+        className='max-h-[90vh] z-40'
       >
         <ModalContent>
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">Image Gallery</ModalHeader>
               <ModalBody>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 cursor-pointer">
                   {images.map((image, index) => (
                     <div 
                       key={index} 
                       className="relative group overflow-hidden rounded-lg shadow-md"
-                      onClick={() => handleThumbnailClick(index)} // Set preview image on click
+                      onClick={() => handleThumbnailClick(index)}
                     >
                       <img
                         src={image.url}
@@ -180,47 +177,6 @@ const BusinessHero = () => {
                     </div>
                   ))}
                 </div>
-                {isPreviewOpen && previewImage && ( // Check if preview is open
-                  <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-                    <div className="relative max-w-full max-h-full">
-                      <img
-                        src={previewImage}
-                        alt="Preview"
-                        className="w-auto h-auto max-w-full max-h-full object-contain"
-                      />
-                      <div className="absolute bottom-4 left-0 right-0 text-center text-white text-lg font-semibold bg-black bg-opacity-50 py-2">
-                        {images[previewIndex].title}
-                      </div>
-                      <button
-                        className="absolute top-2 right-2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full p-2 transition-all duration-300"
-                        onClick={closePreview}
-                        aria-label="Close preview"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                      <button
-                        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full p-2 transition-all duration-300"
-                        onClick={goToPrevImage}
-                        aria-label="Previous image"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                      </button>
-                      <button
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full p-2 transition-all duration-300"
-                        onClick={goToNextImage}
-                        aria-label="Next image"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                )}
               </ModalBody>
               <ModalFooter>
                 <Button color='danger' onPress={onClose}>Close</Button>
@@ -229,8 +185,57 @@ const BusinessHero = () => {
           )}
         </ModalContent>
       </Modal>
-    </div>
-  )
-}
 
-export default BusinessHero
+      {/* Single Image Preview Modal */}
+      <Modal 
+        isOpen={isPreviewOpen} 
+        onOpenChange={setIsPreviewOpen}
+        hideCloseButton
+        size="full"
+        className='z-50 bg-black bg-opacity-75 flex justify-center items-center'
+      >
+        <ModalContent className="relative flex justify-center items-center">
+          <ModalBody className="relative max-w-full h-full flex justify-center items-center bg-color1 ">
+            <img
+              src={previewImage}
+              alt="Preview"
+              className="w-auto h-[80vh] object-contain rounded-md shadow-lg"
+            />
+            <div className="absolute bottom-4 left-0 right-0 text-center text-white text-lg font-semibold py-2">
+              {images[previewIndex].title}
+            </div>
+            <button
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-gray-800 bg-opacity-70 hover:bg-opacity-90 rounded-full p-3 transition-all duration-300"
+              onClick={goToPrevImage}
+              aria-label="Previous image"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-gray-800 bg-opacity-70 hover:bg-opacity-90 rounded-full p-3 transition-all duration-300"
+              onClick={goToNextImage}
+              aria-label="Next image"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+            <button
+              className="absolute top-4 right-4 bg-red-500  bg-opacity-70 hover:bg-opacity-90 rounded-full p-2 transition-all duration-300"
+              onClick={closePreview}
+              aria-label="Close preview"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 text-white">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </div>
+  );
+};
+
+export default BusinessHero;

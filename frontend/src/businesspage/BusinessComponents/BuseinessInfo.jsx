@@ -80,7 +80,7 @@ const BusinessInfo = () => {
 
   return (
     <div className='container mx-auto mt-4 px-4'>
-      <Tabs aria-label="Business Information">
+      <Tabs aria-label="Business Information " className='max-w-full overflow-x-auto'>
         <Tab key="about-location" title="About Us">
           <Card>
             <CardBody>
@@ -169,26 +169,26 @@ const BusinessInfo = () => {
           <Card>
             <CardBody>
               <h2 className="text-2xl font-bold mb-4">Our Facilities & Amenities</h2>
-              <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className='h-auto flex flex-col items-center w-full p-4'>
-                  <p className='font-semibold text-md mb-2'>Swimming Pool</p>
-                  <ul>
+              <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className='h-auto flex flex-col items-center w-full p-4 bg-gray-100 rounded-lg shadow-md'>
+                  <p className='font-semibold text-lg mb-2'>Swimming Pool</p>
+                  <ul className='space-y-1'>
                     <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Heated pool</li>
                     <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Poolside bar</li>
                     <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Lifeguard on duty</li>
                   </ul>
                 </div>
-                <div className='h-auto flex flex-col items-center w-full p-4'>
-                  <p className='font-semibold text-md mb-2'>Gym</p>
-                  <ul>
+                <div className='h-auto flex flex-col items-center w-full p-4 bg-gray-100 rounded-lg shadow-md'>
+                  <p className='font-semibold text-lg mb-2'>Gym</p>
+                  <ul className='space-y-1'>
                     <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> 24/7 Access</li>
                     <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Personal trainers available</li>
                     <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Modern equipment</li>
                   </ul>
                 </div>
-                <div className='h-auto flex flex-col items-center w-full p-4'>
-                  <p className='font-semibold text-md mb-2'>Conference Rooms</p>
-                  <ul>
+                <div className='h-auto flex flex-col items-center w-full p-4 bg-gray-100 rounded-lg shadow-md'>
+                  <p className='font-semibold text-lg mb-2'>Conference Rooms</p>
+                  <ul className='space-y-1'>
                     <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> High-speed internet</li>
                     <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Audio/Visual equipment</li>
                     <li className='font-normal text-sm items-center gap-2 flex'><FaWifi /> Catering services</li>
@@ -248,10 +248,10 @@ const BusinessInfo = () => {
           <Card>
             <CardBody>
               <h2 className="text-2xl font-bold mb-4">Our Policies</h2>
-              <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className='h-auto flex flex-col items-center w-full p-4'>
-                  <p className='font-semibold text-md mb-2'>Cancellation Policy</p>
-                  <ul className='pl-5'>
+              <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className='h-auto flex flex-col items-center w-full p-4 bg-gray-100 rounded-lg shadow-md'>
+                  <p className='font-semibold text-lg mb-2'>Cancellation Policy</p>
+                  <ul className='pl-5 space-y-1'>
                     <li className='font-normal text-sm list-disc items-center gap-2'>
                       <span className='flex-grow'>Free cancellation up to 24 hours before check-in</span>
                     </li>
@@ -260,9 +260,9 @@ const BusinessInfo = () => {
                     </li>
                   </ul>
                 </div>
-                <div className='h-auto flex flex-col items-center w-full p-4'>
-                  <p className='font-semibold text-md mb-2'>Pet Policy</p>
-                  <ul className='pl-5'>
+                <div className='h-auto flex flex-col items-center w-full p-4 bg-gray-100 rounded-lg shadow-md'>
+                  <p className='font-semibold text-lg mb-2'>Pet Policy</p>
+                  <ul className='pl-5 space-y-1'>
                     <li className='font-normal text-sm list-disc items-center gap-2'>
                       <span className='flex-grow'>Pets allowed with prior notice</span>
                     </li>
@@ -271,9 +271,9 @@ const BusinessInfo = () => {
                     </li>
                   </ul>
                 </div>
-                <div className='h-auto flex flex-col items-center w-full p-4'>
-                  <p className='font-semibold text-md mb-2'>Check-in/Check-out</p>
-                  <ul className='pl-5'>
+                <div className='h-auto flex flex-col items-center w-full p-4 bg-gray-100 rounded-lg shadow-md'>
+                  <p className='font-semibold text-lg mb-2'>Check-in/Check-out</p>
+                  <ul className='pl-5 space-y-1'>
                     <li className='font-normal text-sm list-disc items-center gap-2'>
                       <span className='flex-grow'>Check-in: 3:00 PM</span>
                     </li>
