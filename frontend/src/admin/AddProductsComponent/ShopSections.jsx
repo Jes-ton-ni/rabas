@@ -15,6 +15,7 @@ const ShopSections = () => {
   const [editingProductId, setEditingProductId] = useState(null);
   const [productName, setProductName] = useState('');
   const [pricing, setPricing] = useState('');
+  const [pricingUnit, setPricingUnit] = useState('');
   const [description, setDescription] = useState('');
   const [images, setImages] = useState([]); // Updated to store objects with url and title
   const [selectedShopProducts, setSelectedShopProducts] = useState([]);
@@ -125,13 +126,14 @@ const ShopSections = () => {
     e.preventDefault(); // Prevent default form submission behavior
   
     // Check that all required fields are filled
-    if (productName && pricing && productType) {
+    if (productName && pricing && pricingUnit && productType) {
       // Construct the new shopProducts object
       const newShopProduct = {
         category: 'shop',
         type: productType,
         name: productName,
         price: pricing,
+        pricing_unit: pricingUnit,
         description: description,
         images: Array.isArray(images) ? images : [],
       };
@@ -177,6 +179,7 @@ const ShopSections = () => {
       formData.append('type', newShopProduct.type);
       formData.append('name', newShopProduct.name);
       formData.append('price', newShopProduct.price);
+      formData.append('pricing_unit', newShopProduct.pricing_unit);
       formData.append('description', newShopProduct.description);
 
       if (Array.isArray(newShopProduct.images)) {
@@ -240,6 +243,7 @@ const ShopSections = () => {
   const resetForm = () => {
     setProductName('');
     setPricing('');
+    setPricingUnit('');
     setProductType('');
     setDescription('');
     setImages([]);
@@ -251,6 +255,7 @@ const ShopSections = () => {
   const handleEdit = (product) => {
     setProductName(product.productName);
     setPricing(product.pricing);
+    setPricingUnit(product.pricingUnit);
     setProductType(product.productType);
     setDescription(product.description);
     setImages(product.images);
@@ -354,7 +359,7 @@ const ShopSections = () => {
               {/* Product Details */}
               <h2 className="text-sm font-bold">Product Name: {product.productName}</h2>
               <p className="text-sm">
-                <strong>Price:</strong> ₱{product.pricing}
+                <strong>Price:</strong> ₱{product.pricing} {product.pricingUnit}
               </p>
               <p className="text-sm">
                 <strong>Description:</strong> {product.description}
@@ -457,18 +462,30 @@ const ShopSections = () => {
                     />
                   </div>
 
-                  {/* Price */}
-                  <div className="mb-4">
-                    <Input
-                      label="Price"
-                      placeholder="e.g. 300"
-                      type="number"
-                      value={pricing}
-                      onChange={(e) => setPricing(e.target.value)}
-                      fullWidth
-                      required
-                      min="0"
-                    />
+                  {/* Pricing with Unit */}
+                  <div className="mb-4 flex space-x-2">
+                    <div className="w-1/2">
+                      <Input
+                        label="Pricing"
+                        placeholder="e.g. 300"
+                        type="number"
+                        value={pricing}
+                        onChange={(e) => setPricing(e.target.value)}
+                        fullWidth
+                        required
+                        min="0"
+                      />
+                    </div>
+                    <div className="w-1/2">
+                      <Input
+                        label="Pricing Unit"
+                        placeholder="per pax, per person, etc."
+                        value={pricingUnit}
+                        onChange={(e) => setPricingUnit(e.target.value)}
+                        fullWidth
+                        required
+                      />
+                    </div>
                   </div>
 
                   {/* Description */}

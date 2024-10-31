@@ -35,6 +35,7 @@ export const addProduct = createAsyncThunk(
       category: product.category,
       productName: product.name,
       pricing: product.price,
+      pricingUnit: product.pricing_unit,
       description: product.description,
       images: product.images.map(image => ({
         id: image.id,
@@ -76,6 +77,7 @@ export const handleUpdateShopProduct = createAsyncThunk(
         category: product.category,
         productName: product.name,
         pricing: product.price,
+        pricingUnit: product.pricing_unit,
         description: product.description,
         images: product.images.map(image => ({
           id: image.id,
@@ -113,6 +115,7 @@ const shopSlice = createSlice({
         category: newShopProduct.category,
         productName: newShopProduct.productName || "N/A",
         pricing: newShopProduct.pricing || "0",
+        pricingUnit: newShopProduct.pricingUnit || "per item",
         description: newShopProduct.description || "",
         images: newShopProduct.images.map((img) => ({
           id: img.id,
@@ -139,6 +142,7 @@ const shopSlice = createSlice({
           id: updatedShopProduct.product_id,
           productName: updatedShopProduct.productName || "N/A",
           pricing: updatedShopProduct.pricing || "0",
+          pricingUnit: updatedShopProduct.pricingUnit || "per item",
           description: updatedShopProduct.description || "",
           images: updatedShopProduct.images.map((img) => ({
             id: img.id,
@@ -167,6 +171,7 @@ const shopSlice = createSlice({
           id: product.product_id,
           productName: product.name,
           pricing: product.price,
+          pricingUnit: product.priceUnit,
           description: product.description,
           images: product.images || [],
           productType: product.type || "Unknown",
