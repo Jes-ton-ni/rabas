@@ -8,7 +8,7 @@ import { addRestaurantDeal, deleteRestaurantDeal, updateRestaurantDeal } from '@
 
 const RestaurantDeals = () => {
   const dispatch = useDispatch();
-  const services = useSelector((state) => state.restaurantServices.services);
+  const services = useSelector((state) => state.restaurantServices.restaurants);
   const activeDeals = useSelector((state) => state.restaurantDeals.activeDeals);
   const expiredDeals = useSelector((state) => state.restaurantDeals.expiredDeals);
 

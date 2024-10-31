@@ -8,7 +8,7 @@ import { addShopDeal, deleteShopDeal, updateShopDeal } from '@/redux/shopDealsSl
 
 const ShopDeals = () => {
   const dispatch = useDispatch();
-  const products = useSelector((state) => state.shop.products);
+  const products = useSelector((state) => state.shop.shopProducts);
   const activeDeals = useSelector((state) => state.shopDeals.activeDeals);
   const expiredDeals = useSelector((state) => state.shopDeals.expiredDeals);
 
