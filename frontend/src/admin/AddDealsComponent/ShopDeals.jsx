@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Swal from 'sweetalert2';
-import { Select, SelectSection, SelectItem } from "@nextui-org/select";
-import { Input } from "@nextui-org/input";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
+import { Input, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/react";
 import { deleteShopDeal, updateShopDeal } from '@/redux/shopDealsSlice';
 
 const ShopDeals = () => {
@@ -13,41 +11,26 @@ const ShopDeals = () => {
   const expiredDeals = useSelector((state) => state.shopDeals.expiredDeals);
 
   const [selectedProduct, setSelectedProduct] = useState('');
-  const [originalPrice, setOriginalPrice] = useState(0);
   const [discount, setDiscount] = useState('');
   const [expirationDate, setExpirationDate] = useState('');
   const [editingDeal, setEditingDeal] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const [newDeal, setNewDeal] = useState({
-    name: '',
-    description: '',
-    price: '',
-    pricingUnit: '',
-    expirationDate: '',
-    image: null,
-  });
+  const sampleActiveDeals = [
+    { id: '1', productId: '101', discount: 20, expirationDate: '2023-12-31' },
+  ];
 
-  const [newActiveDeals, setNewActiveDeals] = useState([]);
-  const [newExpiredDeals, setNewExpiredDeals] = useState([]);
-  const { isOpen: isNewDealOpen, onOpen: onNewDealOpen, onClose: onNewDealClose } = useDisclosure();
+  const sampleExpiredDeals = [
+    { id: '2', productId: '102', discount: 15, expirationDate: '2023-01-01' },
+  ];
 
   const showAlert = (message) => {
     Swal.fire({
       icon: 'error',
       title: 'Oops...',
-      text: message,
       confirmButtonColor:'#0BDA51',
+      text: message,
     });
-  };
-
-  const handleProductChange = (event) => {
-    const value = event.target.value;
-    setSelectedProduct(value);
-    const product = products.find(product => product.id === value);
-    if (product) {
-      setOriginalPrice(Number(product.price));
-    }
   };
 
   const handleAddDeal = () => {
@@ -85,9 +68,6 @@ const ShopDeals = () => {
     } else {
       // Add new deal logic here
     }
-
-    setDiscount('');
-    setExpirationDate('');
   };
 
   const handleEditDeal = (deal, isExpired) => {
@@ -107,7 +87,6 @@ const ShopDeals = () => {
       cancelButtonText: 'Cancel',
       confirmButtonColor:'#0BDA51',
       cancelButtonColor: '#D33736',
-
     }).then((result) => {
       if (result.isConfirmed) {
         dispatch(deleteShopDeal({ dealId, isExpired }));
@@ -117,82 +96,15 @@ const ShopDeals = () => {
           icon: 'success',
           confirmButtonColor: '#0BDA51',
         });
-        
       }
     });
   };
-
-  const handleNewDealChange = (e) => {
-    const { name, value } = e.target;
-    setNewDeal(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setNewDeal(prev => ({ ...prev, image: file }));
-  };
-
-  const handleEditNewDeal = (deal, isExpired) => {
-    setNewDeal(deal);
-    onNewDealOpen();
-  };
-
-  const handleDeleteNewDeal = (dealId, isExpired) => {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'Cancel',
-      confirmButtonColor:'#0BDA51',
-      cancelButtonColor: '#D33736'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        if (isExpired) {
-          setNewExpiredDeals(newExpiredDeals.filter(deal => deal.name !== dealId));
-        } else {
-          setNewActiveDeals(newActiveDeals.filter(deal => deal.name !== dealId));
-        }
-        Swal.fire({
-          title: 'Deleted!',
-          text: 'The deal has been deleted.',
-          icon: 'success',
-          confirmButtonColor: '#0BDA51',
-        });
-        
-        
-      }
-    });
-  };
-
-  const discountedPrice = originalPrice && discount ? (originalPrice - (originalPrice * (parseFloat(discount) / 100))).toFixed(2) : originalPrice;
 
   return (
     <div className="p-4 sm:p-8  w-full">
-    <div className="grid grid-cols-1  gap-8 max-w-7xl mx-auto">
-      <div className=" shadow-lg rounded-lg p-6 bg-white   ">
+      <div className="grid grid-cols-1  gap-8 max-w-7xl mx-auto">
+        <div className="shadow-lg rounded-lg p-6 bg-white">
           <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Manage Shop Deals</h2>
-          <Select
-            placeholder="Select Product"
-            onChange={handleProductChange}
-            className="w-full mb-4"
-          >
-            <SelectSection title="Products">
-              {products.map(product => (
-                <SelectItem key={product.id} value={product.id}>
-                  {product.productName}
-                </SelectItem>
-              ))}
-            </SelectSection>
-          </Select>
-
-          {selectedProduct && (
-            <div className="mb-4 text-center">
-              <p>Original Price: <span className="font-semibold text-green-600">₱{originalPrice}</span></p>
-              <p>Discounted Price: <span className="font-semibold text-red-600">₱{discountedPrice}</span></p>
-            </div>
-          )}
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
             <Input
               placeholder="Discount (%)"
@@ -207,21 +119,21 @@ const ShopDeals = () => {
               className="flex-1"
             />
           </div>
-          <Button onClick={handleAddDeal} className=" mb-6 rounded-md bg-color1 hover:bg-color2 text-white w-full">
-            {editingDeal ? "Update Deal" : "Add Deal"}
+          <Button onClick={handleAddDeal} className="mb-6 rounded-md bg-color1 hover:bg-color2 text-white w-full">
+            Add Deal
           </Button>
 
           <h3 className="text-xl font-semibold mb-4 text-gray-700">Active Deals</h3>
           <div className="grid grid-cols-1 gap-4 max-h-80 overflow-y-auto">
-            {activeDeals.map(deal => (
+            {sampleActiveDeals.map(deal => (
               <div key={deal.id} className="bg-white shadow-md rounded-lg p-4 hover:shadow-xl transition-shadow duration-300">
                 <div className="flex flex-col mb-2">
-                  <span className="font-bold text-gray-800">{products.find(product => product.id === deal.productId)?.productName}</span>
+                  <span className="font-bold text-gray-800">{products.find(product => product.id === deal.productId)?.productName || 'Sample Product'}</span>
                   <span className="text-sm text-gray-600">Discount: {deal.discount}%</span>
                   <span className="text-sm text-gray-600">Expiration: {new Date(deal.expirationDate).toLocaleDateString()}</span>
                 </div>
                 <div className="flex justify-between mt-4">
-                  <Button onClick={() => handleEditDeal(deal, false)} size="sm" className="bg-color1 hover:bg-color2 text-white ">Edit</Button>
+                  <Button onClick={() => handleEditDeal(deal, false)} size="sm" className="bg-color1 hover:bg-color2 text-white">Edit</Button>
                   <Button onClick={() => handleDeleteDeal(deal.id, false)} size="sm" className="bg-red-500 hover:bg-red-600 text-white">Delete</Button>
                 </div>
               </div>
@@ -230,10 +142,10 @@ const ShopDeals = () => {
 
           <h3 className="text-xl font-semibold mt-8 mb-4 text-gray-700">Expired Deals</h3>
           <div className="grid grid-cols-1 gap-4 max-h-80 overflow-y-auto">
-            {expiredDeals.map(deal => (
+            {sampleExpiredDeals.map(deal => (
               <div key={deal.id} className="bg-white shadow-md rounded-lg p-4 hover:shadow-xl transition-shadow duration-300">
                 <div className="flex flex-col mb-2">
-                  <span className="font-bold text-gray-800">{products.find(product => product.id === deal.productId)?.productName}</span>
+                  <span className="font-bold text-gray-800">{products.find(product => product.id === deal.productId)?.productName || 'Sample Product'}</span>
                   <span className="text-sm text-gray-600">Discount: {deal.discount}%</span>
                   <span className="text-sm text-gray-600">Expiration: {new Date(deal.expirationDate).toLocaleDateString()}</span>
                 </div>
@@ -264,7 +176,7 @@ const ShopDeals = () => {
           </ModalBody>
           <ModalFooter>
             <Button onClick={() => { onClose(); setEditingDeal(null); }} className="bg-red-500 hover:bg-red-600 text-white">Cancel</Button>
-            <Button onClick={handleAddDeal} className="bg-color1 hover:bg-color2 text-white ">Save</Button>
+            <Button onClick={handleAddDeal} className="bg-color1 hover:bg-color2 text-white">Save</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

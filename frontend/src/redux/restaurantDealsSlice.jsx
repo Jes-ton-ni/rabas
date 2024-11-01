@@ -1,4 +1,4 @@
-import { createSlice, nanoid } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   activeDeals: [],
@@ -18,7 +18,7 @@ const restaurantDealsSlice = createSlice({
       }
     },
     updateRestaurantDeal(state, action) {
-      const { dealId, discount, expirationDate, isExpired, hasBookingOption } = action.payload;
+      const { dealId, discount, expirationDate, isExpired } = action.payload;
       const dealList = isExpired ? state.expiredDeals : state.activeDeals;
       const dealIndex = dealList.findIndex(deal => deal.id === dealId);
       if (dealIndex !== -1) {
@@ -26,7 +26,6 @@ const restaurantDealsSlice = createSlice({
           ...dealList[dealIndex],
           discount,
           expirationDate: new Date(expirationDate),
-          hasBookingOption,
         };
       }
     },
