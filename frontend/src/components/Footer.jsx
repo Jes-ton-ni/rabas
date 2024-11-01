@@ -11,9 +11,9 @@ const Footer = () => {
           <div>
             <ul className="space-y-2 text-sm">
               <li><a href="/" className="hover:underline">My Profile</a></li>
-              <li><a href="/" className="hover:underline">Terms & Conditions</a></li>
+        
               <li><a href="/" className="hover:underline">Apply For Business Account</a></li>
-              <li><a href="/" className="hover:underline">FAQ</a></li>
+          
             </ul>
           </div>
 
@@ -21,13 +21,13 @@ const Footer = () => {
           <div>
             <ul className="space-y-2 text-sm">
               <li><a href="/" className="hover:underline">Home</a></li>
-              <li><a href="/" className="hover:underline">Attractions</a></li>
-              <li><a href="/" className="hover:underline">Accommodations</a></li>
-              <li><a href="/" className="hover:underline">Foods</a></li>
-              <li><a href="/" className="hover:underline">Deals</a></li>
-              <li><a href="/" className="hover:underline">Souvenir Shop</a></li>
-              <li><a href="/" className="hover:underline">Destinations</a></li>
-              <li><a href="/" className="hover:underline">Transportations</a></li>
+              <li><a href="/activities" className="hover:underline">Activities</a></li>
+              <li><a href="/accomodations" className="hover:underline">Accommodations</a></li>
+              <li><a href="/foodplaces" className="hover:underline">Food places</a></li>
+              <li><a href="/shops" className="hover:underline">Shops</a></li>
+              <li><a href="/destinations" className="hover:underline">Destinations</a></li>
+              <li><a href="/transportation" className="hover:underline">Transportations</a></li>
+              <li><a href="/about" className="hover:underline">About</a></li>
             </ul>
           </div>
 

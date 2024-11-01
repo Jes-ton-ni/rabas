@@ -139,7 +139,7 @@ const Nav = () => {
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="flex gap-1 text-color1 hover:text-gray-700 text-lg  cursor-pointer hover:font-semibold duration-100 font-light">
                   <GiPositionMarker />
-                 <a href='/destination'> Destinations</a>
+                 <a href='/destinations'> Destinations</a>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <NavigationMenuLink>
@@ -182,9 +182,9 @@ const Nav = () => {
                     <div className="w-max p-9 bg-light">
                       <ul className="text-dark text-sm space-y-3">
                       <a href='/activities'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Activities</li></a>
-                            <a href='/accomodation'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Accommodations</li></a>
-                            <a href='/food'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Food Places</li></a>       
-                            <a href='/shop'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Shops</li></a>                
+                            <a href='/accomodations'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Accommodations</li></a>
+                            <a href='/foodplaces'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Food Places</li></a>       
+                            <a href='/shops'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Shops</li></a>                
                       </ul>
                     </div>
                   </NavigationMenuLink>
@@ -215,7 +215,7 @@ const Nav = () => {
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="flex gap-1 text-color1 hover:text-gray-700 text-lg  cursor-pointer hover:font-semibold duration-100 font-light">
                   <GiPositionMarker />
-                 <a href='/destination'> Destinations</a>
+                 <a href='/destinations'> Destinations</a>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <NavigationMenuLink>
@@ -258,9 +258,9 @@ const Nav = () => {
                     <div className="w-max p-9 bg-light">
                       <ul className="text-dark text-sm space-y-3">
                       <a href='/activities'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Activities</li></a>
-                            <a href='/accomodation'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Accommodations</li></a>
-                            <a href='/food'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Food Places</li></a>       
-                            <a href='/shop'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Shops</li></a>                
+                            <a href='/accomodations'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Accommodations</li></a>
+                            <a href='/foodplaces'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Food Places</li></a>       
+                            <a href='/shops'><li className='hover:tracking-widest hover:font-semibold duration-100 cursor-pointer'>Shops</li></a>                
                       </ul>
                     </div>
                   </NavigationMenuLink>
@@ -270,9 +270,6 @@ const Nav = () => {
           </NavigationMenu>
               <div className="hover:text-gray-700 cursor-pointer hover:font-semibold duration-100 text-lg font-light text-color1 flex items-center gap-1">
                 <TbNotes/> <a href='/trip'>Trip</a>
-              </div>
-              <div className="hover:text-gray-700 cursor-pointer hover:font-semibold duration-100 text-lg font-light text-color1 flex items-center gap-1">
-                <IoPricetagsOutline/> <a href='/deals'>Deals</a>
               </div>
               <div className="hover:text-gray-700 cursor-pointer hover:font-semibold duration-100 text-lg font-light text-color1 flex items-center gap-1">
                 <PiJeep/> <a href='/transportation'>Transportation</a>
@@ -330,11 +327,6 @@ const Nav = () => {
          <Link to='/trip'>
            <div className="hover:text-gray-700 cursor-pointer hover:font-semibold duration-100 text-lg font-light text-color1 flex items-center gap-1">
             <TbNotes/>Trip
-          </div>
-          </Link>
-          <Link to='/deals'>
-          <div className="hover:text-gray-700 cursor-pointer hover:font-semibold duration-100 text-lg font-light text-color1 flex items-center gap-1">
-          <IoPricetagsOutline/>Deals
           </div>
           </Link>
           <Link to='/transportation'>

@@ -586,14 +586,14 @@ const BusinessAllproducts = () => {
         className='z-50 bg-black bg-opacity-75 flex justify-center items-center'
       >
         <ModalContent className="relative flex justify-center items-center">
-          <ModalBody className="relative max-w-full h-full flex justify-center items-center bg-color1 ">
+          <ModalBody className="relative max-w-full h-full flex justify-center items-center bg-white">
             <img
               src={previewImage}
               alt="Preview"
               className="w-auto h-[80vh] object-contain rounded-md shadow-lg"
             />
             {previewIndex !== null && images[previewIndex] && (
-              <div className="absolute bottom-4 left-0 right-0 text-center text-white text-lg font-semibold py-2">
+              <div className="absolute bottom-4 left-0 right-0 text-center text-black text-2xl font-semibold py-2">
                 {images[previewIndex].title}
               </div>
             )}

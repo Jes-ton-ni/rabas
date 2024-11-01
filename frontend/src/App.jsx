@@ -22,7 +22,6 @@ import SuperAdminReports from './admin/SuperAdmin/SuperAdminReports';
 import SuperAdminTransportation from './admin/SuperAdmin/SuperAdminTransportation';
 import Discover from './Mainpages/Discover';
 import Trip from './Mainpages/Trip';
-import DealsPage from './Mainpages/Deals';
 import Transportation from './Mainpages/Transportation';
 import About from './Mainpages/About';
 
@@ -34,11 +33,11 @@ function App() {
      
         <Routes>
           <Route path='/' element={<Home />} />
-          <Route path='/destination' element={<Destinations />} />
+          <Route path='/destinations' element={<Destinations />} />
           <Route path='/activities' element={<Activity />} />
-          <Route path='/accomodation' element={<Accomodation />} />
-          <Route path='/food' element={<Food />} />
-          <Route path='/shop' element={<Shop />} />
+          <Route path='/accomodations' element={<Accomodation />} />
+          <Route path='/foodplaces' element={<Food />} />
+          <Route path='/shops' element={<Shop />} />
           <Route path='/business' element={<Business />} />
           <Route path='/businessdashboardadmin' element={<Dashboard />} />
           <Route path='/businessprofileadmin' element={<Profile />} />
@@ -55,7 +54,6 @@ function App() {
           <Route path='/superadmintransportation' element={<SuperAdminTransportation />} />
           <Route path='/discover' element={<Discover/>}/>
           <Route path='/trip' element={<Trip/>}/>
-          <Route path='/deals' element={<DealsPage/>}/>
           <Route path='/transportation' element={<Transportation/>}/>
           <Route path='/about' element={<About/>}/>
     
