@@ -1588,6 +1588,171 @@ app.delete('/delete-product', (req, res) => {
   });
 });
 
+// Endpoint to get business deals
+app.get('/getDeals', (req, res) => {
+  // console.log('Session:', req.session);
+  const userId = req.session?.user?.user_id;
+  const category = req.query.category;
+
+  if (!userId) {
+    return res.status(400).json({ success: false, message: 'User not logged in or user ID missing' });
+  }
+
+  const sql = `SELECT * FROM deals WHERE user_id = ? AND category = ?`;
+  
+  connection.query(sql, [userId, category], (err, results) => {
+    if (err) {
+      console.error('Error executing SQL query:', err);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+
+    if (results.length > 0) {
+      return res.json({ success: true, deals: results });
+    } else {
+      // Return an empty string or an empty array instead of a 404 error
+      return res.json({ success: true, deals: [] });
+    }
+  });
+});
+
+// Endpoint to add new business deals
+app.post('/add-deals', async (req, res) => {
+  const { category, activityId, discount, expirationDate } = req.body;
+  const userId = req.session?.user?.user_id;
+
+  console.log('Request Body:', req.body);
+  console.log('User ID:', userId);
+
+
+  if(!userId || !category || !activityId || !discount || !expirationDate) {
+    return res.status(400).json({ success: false, message: 'Missing required fields' });
+  }
+
+  try {
+    const query = `
+      INSERT INTO deals ( category, user_id, product_id, discount, expirationDate)
+      VALUES (?,?,?,?,?)
+    `;
+    
+    const values = [
+      category,
+      userId,
+      activityId,
+      discount,
+      expirationDate
+    ]
+
+    connection.query(query, values, (err, result) => {
+      if (err) {
+        console.error('Error adding deals:', err);
+        return res.status(500).json({ success: false, message: 'Failed to add product' });
+      }
+
+      console.log('resulttttttt: ', result);
+
+      // Return all relevant data about the newly added product
+      const addedDeal = {
+        success: true,
+        message: 'Deals added successfully',
+        deal_id: result.insertId,
+        user_id: userId,
+        category,
+        activityId,
+        discount,
+        expirationDate
+      };
+      console.log('Added deal: ', addedDeal);
+      res.json(addedDeal);
+    });
+  } catch (error) {
+    console.error('Error adding deal:', error);
+    res.status(500).json({ success: false, message: 'Internal server error'});
+  }
+});
+
+// Endpoint to update existing business deals
+app.put('/update-deal', async (req, res) => {
+  console.log('Received update deal request:', req.body);
+  const { dealId, discount, expirationDate } = req.body; // Match the key names in the destructure
+  const userId = req.session?.user?.user_id; // Get user ID from the session
+
+  console.log('Request Body:', req.body);
+  console.log('User ID:', userId);
+
+  // Validate the incoming data
+  if (!userId || !dealId || discount === undefined || !expirationDate) {
+    return res.status(400).json({ success: false, message: 'Missing required fields' });
+  }
+
+  try {
+    const query = `
+      UPDATE deals
+      SET discount = ?, expirationDate = ?
+      WHERE deal_id = ? AND user_id = ?;
+    `;
+
+    const values = [discount, expirationDate, dealId, userId]; // Ensure the user is authorized to update the deal
+
+    connection.query(query, values, (err, result) => {
+      if (err) {
+        console.error('Error updating deal:', err);
+        return res.status(500).json({ success: false, message: 'Failed to update deal' });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ success: false, message: 'Deal not found or not authorized' });
+      }
+
+      // Return the updated deal information
+      const updatedDeal = {
+        success: true,
+        message: 'Deal updated successfully',
+        dealId, // Ensure we return the correct ID
+        discount,
+        expirationDate,
+      };
+
+      console.log('Updated deal:', updatedDeal);
+      res.json(updatedDeal); // Respond with the updated deal
+    });
+  } catch (error) {
+    console.error('Error updating deal:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// Endpoint to delete deals
+app.delete('/delete-deals/:dealId', async (req, res) => {
+  const dealId = req.params.dealId;
+
+  // Validate input
+  if (!dealId) {
+    return res.status(400).json({ success: false, message: 'No deal selected' });
+  }
+
+  try {
+    const query = `DELETE FROM deals WHERE deal_id = ? AND user_id = ?`;
+    const userId = req.session?.user?.user_id;
+
+    // Execute the query to delete the deal
+    connection.query(query, [dealId, userId], (err, result) => {
+      if (err) {
+        console.error('Error deleting deal:', err);
+        return res.status(500).json({ success: false, message: 'Failed to delete deal' });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ success: false, message: 'Deal not found or not authorized' });
+      }
+
+      res.json({ success: true, message: 'Deal deleted successfully', dealId });
+    });
+  } catch (error) {
+    console.error('Error processing delete request:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
 //Para sa pag display ng accomodations
 // Endpoint to fetch accomodations
 app.get('/accomodations', (req, res) => {
