@@ -25,7 +25,14 @@ import { Spinner } from '@nextui-org/react'; // Add this import
 
 
 const Destinations = () => {
+
   const [loading, setLoading] = useState(true);
+
+     // Title Tab
+     useEffect(() => {
+      document.title = 'RabaSorsogon | Destinations';
+    });
+  
 
   useEffect(() => {
     // Simulate data fetching

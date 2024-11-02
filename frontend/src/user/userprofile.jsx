@@ -691,12 +691,12 @@ const UserProfile = ({ activities = [] }) => {
                     ])
                   )}
 
-                  <div className='overflow-y-auto max-h-[500px] scrollbar-custom flex flex-col items-center'>
+                  <div className='overflow-y-auto max-h-[600px] scrollbar-custom flex flex-col items-center'>
                     {likedPages.length === 0 ? (
                       <p className='text-slate-500'>You haven't liked any pages yet.</p>
                     ) : (
                       likedPages.map((activity, index) => (
-                        <div key={index} className='bg-white max-w-[900px] w-full rounded-lg shadow-lg hover:shadow-slate-500 hover:scale-105 duration-300 mb-4'>
+                        <div key={index} className='bg-white max-w-[800px]  w-full rounded-lg shadow-lg hover:shadow-slate-500  duration-300 mb-4'>
                           <img
                             src={activity.image}
                             alt={activity.name}

@@ -18,6 +18,11 @@ const BusinessPage = () => {
   const [isLiked, setIsLiked] = useState(false);
   const averageRating = businessData.averageRating || 0;
   const [loading, setLoading] = useState(true);
+ 
+   // Title Tab
+  useEffect(() => {
+  document.title = 'RabaSorsogon | Business Name';
+  });
 
   useEffect(() => {
     // Simulate data fetching

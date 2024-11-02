@@ -22,7 +22,14 @@ const Shop = () => {
     const [priceRange, setPriceRange] = useState([0, 5000]); // Price range slider
     const [loading, setLoading] = useState(true);
     const [showFilters, setShowFilters] = useState(false);
+    const [selectedTags, setSelectedTags] = useState([]); // New state for selected tags
+    
+       // Title Tab
+  useEffect(() => {
+    document.title = 'RabaSorsogon | Shops';
+  });
 
+    
     // Custom hook to detect if the screen is large
     const useIsLargeScreen = () => {
         const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
@@ -51,7 +58,7 @@ const Shop = () => {
             name: 'Sample Souvenir Shop 1',
             description: 'A charming shop offering unique local souvenirs and handicrafts.',
             image: ShopImage,
-            tags: ['Souvenir Shop'],
+            tags: ['Souvenir Shop', 'Local'],
             category: 'Handicrafts',
             Amenities: ['Local Products', 'Gift Wrapping'],
             destination: 'Sorsogon City',
@@ -62,7 +69,7 @@ const Shop = () => {
             name: 'Sample Clothing Boutique 1',
             description: 'Trendy clothing store featuring both local and international fashion brands.',
             image: ShopImage,
-            tags: ['Clothing Store'],
+            tags: ['Clothing Store', 'Fashion'],
             category: 'Fashion',
             Amenities: ['Fitting Rooms', 'Seasonal Sales'],
             destination: 'Gubat',
@@ -73,7 +80,7 @@ const Shop = () => {
             name: 'Sample Bookstore',
             description: 'A quaint bookstore with a vast selection of local and international books.',
             image: ShopImage,
-            tags: ['Bookstore'],
+            tags: ['Bookstore', 'Literature'],
             category: 'Books',
             Amenities: ['Reading Areas', 'Custom Orders'],
             destination: 'Matnog',
@@ -84,7 +91,7 @@ const Shop = () => {
             name: 'Sample Electronics Store',
             description: 'A store with a variety of electronic devices and accessories.',
             image: ShopImage,
-            tags: ['Electronics Store'],
+            tags: ['Electronics Store', 'Gadgets'],
             category: 'Electronics',
             Amenities: ['Online Shopping', 'Custom Orders'],
             destination: 'Bulusan',
@@ -97,7 +104,7 @@ const Shop = () => {
         'All', 'Bulusan', 'Bulan', 'Barcelona', 'Casiguran', 'Castilla', 'Donsol', 'Gubat', 'Irosin', 'Juban', 'Magallanes', 'Matnog', 'Pilar', 'Prieto Diaz', 'Sta. Magdalena', 'Sorsogon City'
     ];
 
-    const shopTypes = ['Souvenir Shop', 'Clothing Store', 'Grocery Store', 'Electronics Store', 'Bookstore'];
+    const shopTypes = [...new Set(shopDetails.flatMap(shop => shop.tags))];
     const categories = ['Handicrafts', 'Fashion', 'Food', 'Electronics', 'Books', 'Home Decor'];
     const amenitiesList = ['Local Products', 'Gift Wrapping', 'Fitting Rooms', 'Seasonal Sales', 'Online Shopping', 'Custom Orders'];
 
@@ -131,17 +138,22 @@ const Shop = () => {
         setSelectedDestination(destination);
     };
 
+    const handleTagChange = (selected) => {
+        setSelectedTags(selected);
+    };
+
     // Filtering the shops based on selected filters
     const filteredShops = shopDetails.filter((shop) => {
         const matchType = selectedType.length === 0 || selectedType.every((type) => shop.tags.includes(type));
         const matchCategory = selectedCategory.length === 0 || selectedCategory.includes(shop.category);
-        const matchAmenities= selectedAmenities.length === 0 || selectedAmenities.every(f => shop.Amenities.includes(f));
+        const matchAmenities = selectedAmenities.length === 0 || selectedAmenities.every(amenity => shop.Amenities.includes(amenity));
         const matchRating = selectedRatings.length === 0 || selectedRatings.includes(shop.rating);
         const matchDestination = selectedDestination === 'All' || shop.destination === selectedDestination;
         const [minPrice, maxPrice] = shop.price.split('-').map(Number);
-        const matchPrice = minPrice >= priceRange[0] && maxPrice <= priceRange[1];
+        const matchPrice = minPrice <= priceRange[1] && maxPrice >= priceRange[0];
+        const matchTags = selectedTags.length === 0 || selectedTags.every(tag => shop.tags.includes(tag));
 
-        return matchType && matchCategory && matchAmenities&& matchRating && matchDestination && matchPrice;
+        return matchType && matchCategory && matchAmenities && matchRating && matchDestination && matchPrice && matchTags;
     });
 
     // Animation variants for the container
@@ -169,7 +181,9 @@ const Shop = () => {
         }
     };
 
+
     useEffect(() => {
+ 
         // Simulate data fetching
         setTimeout(() => setLoading(false), 1000);
     }, []);
@@ -309,6 +323,21 @@ const Shop = () => {
                                         ))}
                                     </div>
                                 </div>
+
+                                {/* Tags Filter */}
+                                <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
+                                    <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Tags</h3>
+                                    <CheckboxGroup
+                                        value={selectedTags}
+                                        onChange={handleTagChange}
+                                    >
+                                        {shopTypes.map((tag) => (
+                                            <Checkbox key={tag} value={tag}>
+                                                {tag}
+                                            </Checkbox>
+                                        ))}
+                                    </CheckboxGroup>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -337,7 +366,10 @@ const Shop = () => {
                                         <div className='flex justify-between items-center mb-2'>
                                             <div className='flex flex-wrap gap-2 mb-2'>
                                                 {shop.tags.map((tag, index) => (
-                                                    <span key={index} className='bg-color2 text-color3 text-xs px-2 py-1 rounded-full'>
+                                                    <span 
+                                                        key={index} 
+                                                        className={`text-xs px-2 py-1 rounded-full ${selectedType.includes(tag) ? 'bg-color2 text-white' : 'bg-gray-200 text-gray-700'}`}
+                                                    >
                                                         {tag}
                                                     </span>
                                                 ))}

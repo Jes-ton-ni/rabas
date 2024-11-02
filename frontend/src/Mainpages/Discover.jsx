@@ -145,6 +145,12 @@ const Discover = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
 
+     // Title Tab
+     useEffect(() => {
+      document.title = 'RabaSorsogon | Discover';
+    });
+  
+
   const initialState = {
     priceRange: [0, 5000],
     selectedType: [],
@@ -197,8 +203,8 @@ const Discover = () => {
   };
 
   const renderFilters = (filters, setFilters, types, additionalFilters = null, isAllTab = false) => (
-    <div className="w-full lg:w-1/4">
-      <div className="bg-white p-6 rounded-lg shadow-md">
+    <div className="w-full lg:w-1/4  ">
+      <div className="bg-white p-4 rounded-lg shadow-md max-h-screen overflow-y-auto scrollbar-custom">
         <h2 className="text-xl font-semibold mb-4">Filters</h2>
         
         {/* Destination Dropdown */}
@@ -248,7 +254,7 @@ const Discover = () => {
               </CheckboxGroup>
             </div>
 
-            <div className="mb-6 max-h-[230px] overflow-auto scrollbar-custom">
+            <div className="mb-6 max-h-[230px] overflow-auto scrollbar-custom ">
               <h3 className="text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2">Food Type</h3>
               <CheckboxGroup
                 value={filters.selectedType}
@@ -476,7 +482,7 @@ const Discover = () => {
           )}
 
           {/* Content Section */}
-          <div className="w-full lg:w-3/4">
+          <div className="w-full lg:w-3/4  max-h-screen overflow-y-auto scrollbar-custom p-2 ">
             <motion.div 
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
               variants={containerVariants}
@@ -543,6 +549,14 @@ const Discover = () => {
                 ))
               )}
             </motion.div>
+          </div>
+        </div>
+
+         {/* Map Placeholder */}
+         <div className="mt-8 bg-gray-200 rounded-lg shadow-md p-4">
+          <h2 className="text-lg font-semibold mb-4">Locations</h2>
+          <div className="w-full h-64 bg-gray-300 flex items-center justify-center">
+            <span className="text-gray-600">Map will be here</span>
           </div>
         </div>
       </div>

@@ -54,10 +54,18 @@ const Trip = () => {
       }
     }
   ]); // State to store submitted trips
+
+    // Title Tab
+  useEffect(() => {
+    document.title = 'RabaSorsogon | Trip';
+  });
+
   const [selectedLocations, setSelectedLocations] = useState({
     "Tuesday, Oct 15": 'Set Location',
     "Wednesday, Oct 16": 'Set Location'
   });
+
+
   let [value, setValue] = useState({
     start: today(getLocalTimeZone()),
     end: today(getLocalTimeZone()).add({ weeks: 1 }),

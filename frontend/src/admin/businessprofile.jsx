@@ -36,6 +36,12 @@ const BusinessProfile = () => {
   const businessData = useSelector((state) => state.business);
   const businessCard = useSelector((state) => state.business.businessCard);
 
+    // Title Tab
+    useEffect(() => {
+      document.title = 'BusinessName | Admin profile';
+      });
+
+
   const [isIconModalOpen, setIsIconModalOpen] = useState(false);
   const [currentEditingField, setCurrentEditingField] = useState(null);
 
@@ -1340,6 +1346,15 @@ const BusinessProfile = () => {
                 <Button onClick={() => handleSavePolicies()} className="mt-2 bg-color1 text-white hover:bg-color2 transition">
                   Save
                 </Button>
+              </CardBody>
+            </Card>
+          </Tab>
+
+          <Tab key="Location" title="Location">
+            <Card>
+              <CardBody>
+               
+               
               </CardBody>
             </Card>
           </Tab>

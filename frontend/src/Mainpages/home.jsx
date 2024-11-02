@@ -11,7 +11,14 @@ import { Spinner } from '@nextui-org/react';
 const Home = () => {
   const [loading, setLoading] = useState(true);
 
+     // Title Tab
+     useEffect(() => {
+      document.title = 'RabaSorsogon | Home';
+    });
+  
+
   useEffect(() => {
+
     // Simulate data fetching
     setTimeout(() => setLoading(false), 1000);
   }, []);

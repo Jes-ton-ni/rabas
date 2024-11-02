@@ -23,7 +23,7 @@ import SuperAdminTransportation from './admin/SuperAdmin/SuperAdminTransportatio
 import Discover from './Mainpages/Discover';
 import Trip from './Mainpages/Trip';
 import Transportation from './Mainpages/Transportation';
-import About from './Mainpages/About';
+import About from './Mainpages/About'
 
 
 

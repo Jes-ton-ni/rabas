@@ -21,16 +21,21 @@ const Food = () => {
     const [priceRange, setPriceRange] = useState([0, 5000]); // Price range slider
     const [loading, setLoading] = useState(true);
     const [showFilters, setShowFilters] = useState(false);
+    const [selectedTags, setSelectedTags] = useState([]);
   
+       // Title Tab
+  useEffect(() => {
+    document.title = 'RabaSorsogon | Food Places';
+  });
 
-
+  
     // Mock Food Details
     const foodDetails = [
         {
-            name: 'Sample Restaurant 1',
-            description: 'A popular Filipino restaurant offering traditional dishes.',
+            name: 'Sample Restaurant & Bar',
+            description: 'A popular spot offering both dining and nightlife.',
             image: Antonio,
-            tags: ['Restaurant'],
+            tags: ['Restaurant', 'Bar'],
             cuisine: 'Filipino',
             amenities: ['Wi-Fi', 'Outdoor Seating'],
             destination: 'Sorsogon City',
@@ -38,10 +43,21 @@ const Food = () => {
             price: '1000-2000',
         },
         {
-            name: 'Sample Bar 1',
-            description: 'A lively bar with international food and live music.',
+            name: 'Sample Cafe',
+            description: 'A cozy cafe with Japanese-inspired decor.',
             image: Antonio,
-            tags: ['Bar'],
+            tags: ['Cafe'],
+            cuisine: 'Japanese',
+            amenities: ['Wi-Fi', 'Family-Friendly'],
+            destination: 'Matnog',
+            rating: 3,
+            price: '800-1200',
+        },
+        {
+            name: 'Sample Bar & Grill',
+            description: 'A lively bar with a grill offering international food.',
+            image: Antonio,
+            tags: ['Bar', 'Restaurant'],
             cuisine: 'International',
             amenities: ['Live Music', 'Happy Hour'],
             destination: 'Gubat',
@@ -58,17 +74,6 @@ const Food = () => {
             destination: 'Bulusan',
             rating: 5,
             price: '1500-3000',
-        },
-        {
-            name: 'Sample Cafe 1',
-            description: 'A cozy cafe with Japanese-inspired decor.',
-            image: Antonio,
-            tags: ['Cafe'],
-            cuisine: 'Japanese',
-            amenities: ['Wi-Fi', 'Family-Friendly'],
-            destination: 'Matnog',
-            rating: 3,
-            price: '800-1200',
         },
     ];
 
@@ -100,6 +105,7 @@ const Food = () => {
 
     const handleTypeChange = (selected) => {
         setSelectedType(selected);
+        setSelectedTags(selected);
     };
 
     const handleCuisineChange = (selected) => {
@@ -335,31 +341,33 @@ const Food = () => {
                                         />
                                         <div className='p-4'>
                                             <div className='flex justify-between items-center mb-2'>
-                                            <div className='flex flex-wrap gap-2 '>
-                                                {food.tags.map((tag, index) => (
-                                                    <span key={index} className='bg-color2 text-color3 text-xs px-2 py-1 rounded-full'>
-                                                        {tag}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                            <div className='flex items-center gap-1'>
-                                               <span className='text-[12px]'>{food.rating}</span> <span className='text-yellow-500'>{'★'.repeat(food.rating)}{'☆'.repeat(5 - food.rating)}</span>
-                                            </div>
+                                                <div className='flex flex-wrap gap-2'>
+                                                    {food.tags.map((tag, index) => (
+                                                        <span 
+                                                            key={index} 
+                                                            className={`text-xs px-2 py-1 rounded-full ${selectedTags.includes(tag) ? 'bg-color2 text-white' : 'bg-gray-200 text-gray-700'}`}
+                                                        >
+                                                            {tag}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                                <div className='flex items-center gap-1'>
+                                                    <span className='text-[12px]'>{food.rating}</span> 
+                                                    <span className='text-yellow-500'>{'★'.repeat(food.rating)}{'☆'.repeat(5 - food.rating)}</span>
+                                                </div>
                                             </div>
                                             <h2 className='text-lg font-semibold mb-2'>{food.name}</h2>
                                             <div className='text-xs text-gray-500 mb-2 flex items-center'>
                                                 <GiPositionMarker className="mr-1" />{food.destination}
                                             </div>
-                                            <div className=' flex mb-2  max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom  flex-col '>
-                                            <p className='text-sm text-gray-600 mb-2'>{food.description}</p>
-                                            </div>                  
-                                             <p className='text-md mb-2 font-semibold'>₱{food.price}</p>
-                                           
-                                          
+                                            <div className='flex mb-2 max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom flex-col'>
+                                                <p className='text-sm text-gray-600 mb-2'>{food.description}</p>
+                                            </div>
+                                            <p className='text-md mb-2 font-semibold'>₱{food.price}</p>
                                             <Link to='/business' target='_blank'>
-                                            <Button  className='w-full bg-color1 text-color3 hover:bg-color2'>
-                                                Explore More
-                                            </Button>
+                                                <Button className='w-full bg-color1 text-color3 hover:bg-color2'>
+                                                    Explore More
+                                                </Button>
                                             </Link>
                                         </div>
                                     </motion.div>

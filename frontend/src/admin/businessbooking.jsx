@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { addChatMessage, markBookingAsCompleted, updateWalkInCustomerStatus, markWalkInAsCompleted } from '@/redux/bookingSlice';
 import {
@@ -231,6 +231,12 @@ const BusinessBooking = () => {
   const [walkInAccommodationSearchQuery, setWalkInAccommodationSearchQuery] = useState('');
   const [walkInTableReservationSearchQuery, setWalkInTableReservationSearchQuery] = useState('');
   const [walkInActivitiesSearchQuery, setWalkInActivitiesSearchQuery] = useState('');
+
+    // Title Tab
+    useEffect(() => {
+      document.title = 'BusinessName | Admin booking';
+      });
+    
 
   const openChatModal = (booking) => {
     setCurrentBookingDetails(booking);

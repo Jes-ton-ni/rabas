@@ -10,24 +10,23 @@ const Footer = () => {
           {/* Left Column */}
           <div>
             <ul className="space-y-2 text-sm">
-              <li><a href="/" className="hover:underline">My Profile</a></li>
-        
-              <li><a href="/" className="hover:underline">Apply For Business Account</a></li>
-          
+             
+            <li><a href="/" className="hover:underline">Home</a></li>
+            <li><a href="/destinations" className="hover:underline">Destinations</a></li>
+            <li><a href="/trip" className="hover:underline">Trip</a></li>
+            <li><a href="/transportation" className="hover:underline">Transportations</a></li>
+            <li><a href="/about" className="hover:underline">About</a></li>
             </ul>
           </div>
 
           {/* Middle Column */}
           <div>
             <ul className="space-y-2 text-sm">
-              <li><a href="/" className="hover:underline">Home</a></li>
               <li><a href="/activities" className="hover:underline">Activities</a></li>
               <li><a href="/accomodations" className="hover:underline">Accommodations</a></li>
               <li><a href="/foodplaces" className="hover:underline">Food places</a></li>
               <li><a href="/shops" className="hover:underline">Shops</a></li>
-              <li><a href="/destinations" className="hover:underline">Destinations</a></li>
-              <li><a href="/transportation" className="hover:underline">Transportations</a></li>
-              <li><a href="/about" className="hover:underline">About</a></li>
+           
             </ul>
           </div>
 
@@ -47,23 +46,7 @@ const Footer = () => {
                 ➔
               </button>
             </form>
-            <div className="flex space-x-4 text-xl">
-              <a href="/" className="hover:text-gray-400">
-                <FaPhoneAlt />
-              </a>
-              <a href="/" className="hover:text-gray-400">
-                <FaEnvelope />
-              </a>
-              <a href="/" className="hover:text-gray-400">
-                <FaFacebookF />
-              </a>
-              <a href="/" className="hover:text-gray-400">
-                <FaInstagram />
-              </a>
-              <a href="/" className="hover:text-gray-400">
-                <FaYoutube />
-              </a>
-            </div>
+           
           </div>
         </div>
 

@@ -102,8 +102,8 @@ const Hero = () => {
       </Slider>
       <div className="absolute bottom-[8rem] left-0 right-0 flex justify-center">
         <a
-          href='/destination'
-          className="mt-4 flex items-center bg-light text-black font-semibold py-3 px-6 rounded-full transform transition-all duration-300 hover:translate-x-2 hover:bg-color1 hover:text-light animate-slideUp animation-delay-600"
+          href='/destinations'
+          className="mt-4 flex items-center bg-light text-black font-semibold py-3 px-6 rounded-full transform transition-all duration-300 hover:translate-x-2 animate-slideUp animation-delay-600"
         >
           Explore <FiChevronRight className="ml-2" size={20} />
         </a>

@@ -15,6 +15,7 @@ import Search from '@/components/Search';
 const useIsLargeScreen = () => {
   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
 
+
   useEffect(() => {
     const handleResize = () => {
       setIsLargeScreen(window.innerWidth >= 1024);
@@ -37,6 +38,12 @@ const Activities = () => {
   const [budgetRange, setBudgetRange] = useState([0, 10000]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
+
+     // Title Tab
+     useEffect(() => {
+      document.title = 'RabaSorsogon | Activities';
+    });
+  
 
   const isLargeScreen = useIsLargeScreen();
 
@@ -103,7 +110,7 @@ const Activities = () => {
       rating: 4,
       destination: 'Bulusan',
       budget: '250-3000',
-      category: 'Adventure',
+     
     },
     {
       name: 'Cultural Tour',
@@ -114,7 +121,7 @@ const Activities = () => {
       rating: 4,
       destination: 'Sorsogon City',
       budget: '30-1500',
-      category: 'Tour',
+    
     },
     {
       name: 'Snorkeling Expedition',
@@ -125,7 +132,7 @@ const Activities = () => {
       rating: 5,
       destination: 'Matnog',
       budget: '500-3500',
-      category: 'Adventure',
+    
     },
     {
       name: 'Camping Retreat',
@@ -136,31 +143,23 @@ const Activities = () => {
       rating: 4,
       destination: 'Bulan',
       budget: '40-800',
-      category: 'Adventure',
+      
     },
     // Add more mock activities here...
   ];
 
-  // Filtering Logic
+  // Define the activity types based on the tags used in your activity data
+  const activityTypes = ['Swimming', 'Surfing', 'Hiking', 'Camping', 'Tour', 'History', 'Snorkeling'];
+
+  // Filtering logic
   const filteredActivities = activityDetails.filter((activity) => {
-    const matchesActivityType =
-      selectedActivities.length === 0 || selectedActivities.every((type) => activity.tags.includes(type));
-
-    const matchesAmenities =
-      selectedAmenities.length === 0 || selectedAmenities.every((amenity) => activity.amenities.includes(amenity));
-
-    const matchesRating =
-      selectedRatings.length === 0 || selectedRatings.includes(activity.rating);
-
-    const matchesDestination =
-      selectedDestination === 'All' || activity.destination === selectedDestination;
-
-    const matchesCategory =
-      selectedCategories.length === 0 || selectedCategories.includes(activity.category);
-
+    const matchesActivityType = selectedActivities.length === 0 || selectedActivities.every((selected) => activity.tags.includes(selected));
+    const matchesAmenities = selectedAmenities.length === 0 || selectedAmenities.some((amenity) => activity.amenities.includes(amenity));
+    const matchesRating = selectedRatings.length === 0 || selectedRatings.includes(activity.rating);
+    const matchesDestination = selectedDestination === 'All' || activity.destination === selectedDestination;
+    const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(activity.category);
     const [minBudget, maxBudget] = activity.budget.split('-').map(Number);
-    const matchesBudget =
-      minBudget >= budgetRange[0] && maxBudget <= budgetRange[1];
+    const matchesBudget = minBudget <= budgetRange[1] && maxBudget >= budgetRange[0];
 
     return matchesActivityType && matchesAmenities && matchesRating && matchesDestination && matchesCategory && matchesBudget;
   });
@@ -170,7 +169,7 @@ const Activities = () => {
     'All', 'Bulusan', 'Bulan', 'Barcelona', 'Casiguran', 'Castilla', 'Donsol', 'Gubat', 'Irosin', 'Juban', 'Magallanes', 'Matnog', 'Pilar', 'Prieto Diaz', 'Sta. Magdalena', 'Sorsogon City',
   ];
 
-  const categories = ['Adventure', 'Tour', 'Relaxation', 'Water Sports', 'Cultural', 'Nature'];
+ 
 
   // Animation Variants
   const containerVariants = {
@@ -218,84 +217,99 @@ const Activities = () => {
             <div className='w-full lg:w-1/4'>
               <div className='bg-white p-6 rounded-lg shadow-md'>
                 <h2 className='text-xl font-semibold mb-4'>Filters</h2>
-                {/* Filter components go here */}
-                <CheckboxGroup
-                  label="Activity Type"
-                  value={selectedActivities}
-                  onChange={handleActivityChange}
-                >
-                  {categories.map((category) => (
-                    <Checkbox key={category} value={category}>
-                      {category}
-                    </Checkbox>
-                  ))}
-                </CheckboxGroup>
-
-                <CheckboxGroup
-                  label="Amenities"
-                  value={selectedAmenities}
-                  onChange={handleAmenitiesChange}
-                >
-                  {['Parking', 'Restrooms', 'Guides'].map((amenity) => (
-                    <Checkbox key={amenity} value={amenity}>
-                      {amenity}
-                    </Checkbox>
-                  ))}
-                </CheckboxGroup>
-
-                <Select
-                  label="Destination"
-                  value={selectedDestination}
-                  onChange={handleDestinationChange}
-                >
-                  {destinations.map((destination) => (
-                    <SelectItem key={destination} value={destination}>
-                      {destination}
-                    </SelectItem>
-                  ))}
-                </Select>
-
-                <Slider
-                  label="Budget Range"
-                  step={100}
-                  minValue={0}
-                  maxValue={10000}
-                  value={budgetRange}
-                  onChange={setBudgetRange}
-                  formatOptions={{ style: 'currency', currency: 'PHP' }}
-                />
-                <div className='flex justify-between text-xs'>
-                  <span>₱{budgetRange[0]}</span>
-                  <span>₱{budgetRange[1]}+</span>
+                
+                {/* Destination Dropdown */}
+                <div className='mb-6'>
+                    <h3 className='text-sm font-medium text-gray-700 mb-2'>Destination</h3>
+                    <Select
+                        placeholder="Select Destination"
+                        selectedKeys={[selectedDestination]}
+                        onSelectionChange={(value) => handleDestinationChange(value.currentKey)}
+                    >
+                        {destinations.map((destination) => (
+                            <SelectItem key={destination} value={destination}>
+                                {destination}
+                            </SelectItem>
+                        ))}
+                    </Select>
                 </div>
 
+                {/* Activity Type Filter */}
+                <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
+                    <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Activity Type</h3>
+                    <CheckboxGroup
+                        value={selectedActivities}
+                        onChange={handleActivityChange}
+                    >
+                        {activityTypes.map((type) => (
+                            <Checkbox key={type} value={type}>
+                                {type}
+                            </Checkbox>
+                        ))}
+                    </CheckboxGroup>
+                </div>
+
+                {/* Amenities Filter */}
+                <div className='mb-6 max-h-[230px] overflow-auto scrollbar-custom'>
+                    <h3 className='text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2'>Amenities</h3>
+                    <CheckboxGroup
+                        value={selectedAmenities}
+                        onChange={handleAmenitiesChange}
+                    >
+                        {['Parking', 'Restrooms', 'Guides'].map((amenity) => (
+                            <Checkbox key={amenity} value={amenity}>
+                                {amenity}
+                            </Checkbox>
+                        ))}
+                    </CheckboxGroup>
+                </div>
+
+                {/* Budget Range Filter */}
+                <div className='mb-6'>
+                    <h3 className='text-sm font-medium text-gray-700 mb-2'>Budget Range (PHP)</h3>
+                    <Slider
+                        step={100}
+                        minValue={0}
+                        maxValue={10000}
+                        value={budgetRange}
+                        onChange={setBudgetRange}
+                        formatOptions={{ style: 'currency', currency: 'PHP' }}
+                        className="max-w-md flex"
+                    />
+                    <div className='flex justify-between text-xs'>
+                        <span>₱{budgetRange[0]}</span>
+                        <span>₱{budgetRange[1]}+</span>
+                    </div>
+                </div>
+
+                {/* Ratings Filter */}
                 <div>
-                  <h3 className='text-sm font-medium text-gray-700 mb-2'>Ratings</h3>
-                  <div className='space-y-2'>
-                    <label className='flex items-center'>
-                      <input
-                        type='checkbox'
-                        onChange={() => handleRatingClick('All')}
-                        checked={selectedRatings.length === 0}
-                        className='form-checkbox text-color2'
-                      />
-                      <span className='ml-2 text-sm'>All Ratings</span>
-                    </label>
-                    {[5, 4, 3, 2, 1].map((star) => (
-                      <label key={star} className='flex items-center'>
-                        <input
-                          type='checkbox'
-                          onChange={() => handleRatingClick(star)}
-                          checked={selectedRatings.includes(star)}
-                          className='form-checkbox text-color2'
-                        />
-                        <span className='ml-2 text-sm flex items-center'>
-                          {'★'.repeat(star)}{'☆'.repeat(5 - star)}
-                          <span className='ml-1'>{star} Star{star > 1 ? 's' : ''}</span>
-                        </span>
-                      </label>
-                    ))}
-                  </div>
+                    <h3 className='text-sm font-medium text-gray-700 mb-2'>Ratings</h3>
+                    <div className='space-y-2'>
+                        <label className='flex items-center'>
+                            <input
+                                type='checkbox'
+                                onChange={() => handleRatingClick('All')}
+                                checked={selectedRatings.length === 0}
+                                className='form-checkbox text-color2'
+                            />
+                            <span className='ml-2 text-sm'>All Ratings</span>
+                        </label>
+                        {[5, 4, 3, 2, 1].map((star) => (
+                            <label key={star} className='flex items-center'>
+                                <input
+                                    type='checkbox'
+                                    onChange={() => handleRatingClick(star)}
+                                    checked={selectedRatings.includes(star)}
+                                    className='form-checkbox text-color2'
+                                />
+                                <span className='ml-2 text-sm flex items-center'>
+                                    {'★'.repeat(star)}{'☆'.repeat(5 - star)}
+                                    <span className='ml-1'>{star} Star{star > 1 ? 's' : ''}</span>
+                                </span>
+                            </label>
+                        ))}
+                    </div>
                 </div>
               </div>
             </div>
@@ -323,12 +337,18 @@ const Activities = () => {
                     />
                     <div className='p-4'>
                       <div className='flex items-center justify-between gap-2'>
-                        {/* Category Badge */}
-                        <div className='mb-2'>
-                          <span className='inline-block bg-color2 text-white text-xs px-2 py-1 rounded-full'>
-                            {activity.category}
+                          {/* tags */}
+                      <div className='flex flex-wrap gap-2 mb-2'>
+                        {activity.tags.map((tag, index) => (
+                          <span 
+                            key={index} 
+                            className={`text-xs px-2 py-1 rounded-full ${selectedActivities.includes(tag) ? 'bg-color2 text-white' : 'bg-gray-200 text-gray-700'}`}
+                          >
+                            {tag}
                           </span>
-                        </div>
+                        ))}
+                      </div>
+                       
                         <div className='flex items-center gap-2'>
                           <div className='flex items-center gap-1 '>
                             <span className='text-black text-[12px] '>{activity.rating}</span> 
@@ -342,7 +362,8 @@ const Activities = () => {
                       <div className='text-xs text-gray-500 mb-2 flex items-center'>
                         <GiPositionMarker/> {activity.destination}
                       </div>
-                      <div className=' flex mb-2  max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom  flex-col '>      
+                      
+                      <div className='flex mb-2 max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom flex-col'>      
                         <p className='text-sm text-gray-600 mb-2'>{activity.description}</p>
                       </div>
                       <p className='font-semibold text-md mb-2'>₱{activity.budget}</p>

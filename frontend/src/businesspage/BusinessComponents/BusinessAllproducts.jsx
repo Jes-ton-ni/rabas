@@ -37,6 +37,7 @@ const mockData = {
       rating: 4,
       type: 'Hiking',
       images: ['https://via.placeholder.com/600', 'https://via.placeholder.com/601', 'https://via.placeholder.com/602', 'https://via.placeholder.com/603'],
+      expiration: '10/4/2024', // Added expiration date
     },
     {
       title: 'Snorkeling Tour',
@@ -47,6 +48,7 @@ const mockData = {
       rating: 3,
       type: 'Water Sports',
       images: ['https://via.placeholder.com/600', 'https://via.placeholder.com/601', 'https://via.placeholder.com/602', 'https://via.placeholder.com/603'],
+      expiration: '10/4/2024', // Added expiration date
     },
   ],
   accommodations: [
@@ -59,6 +61,7 @@ const mockData = {
       rating: 5,
       type: 'Cabins',
       images: ['https://via.placeholder.com/600', 'https://via.placeholder.com/601', 'https://via.placeholder.com/602', 'https://via.placeholder.com/603'],
+      expiration: '12/31/2024', // Added expiration date
     },
     {
       title: 'Beachfront Resort',
@@ -69,6 +72,7 @@ const mockData = {
       rating: 4,
       type: 'Resorts',
       images: ['https://via.placeholder.com/600', 'https://via.placeholder.com/601', 'https://via.placeholder.com/602', 'https://via.placeholder.com/603'],
+      expiration: '12/31/2024', // Added expiration date
     },
   ],
   restaurant: [
@@ -81,6 +85,7 @@ const mockData = {
       rating: 2,
       type: 'Fine Dining',
       images: ['https://via.placeholder.com/600', 'https://via.placeholder.com/601', 'https://via.placeholder.com/602', 'https://via.placeholder.com/603'],
+      expiration: '10/4/2024', // Added expiration date
     },
     {
       title: 'Coastal Seafood Feast',
@@ -91,6 +96,7 @@ const mockData = {
       rating: 4,
       type: 'Buffet',
       images: ['https://via.placeholder.com/600', 'https://via.placeholder.com/601', 'https://via.placeholder.com/602', 'https://via.placeholder.com/603'],
+      expiration: '10/4/2024', // Added expiration date
     },
   ],
   shop: [
@@ -103,6 +109,7 @@ const mockData = {
       rating: 3,
       type: 'Local Crafts',
       images: ['https://via.placeholder.com/600', 'https://via.placeholder.com/601', 'https://via.placeholder.com/602', 'https://via.placeholder.com/603'],
+      expiration: '10/4/2024', // Added expiration date
     },
     {
       title: 'Souvenir Shop',
@@ -113,6 +120,7 @@ const mockData = {
       rating: 2,
       type: 'Souvenirs',
       images: ['https://via.placeholder.com/600', 'https://via.placeholder.com/601', 'https://via.placeholder.com/602', 'https://via.placeholder.com/603'],
+      expiration: '10/4/2024', // Added expiration date
     },
   ],
 };
@@ -263,6 +271,9 @@ const ProductCard = ({ product, openBookingModal, onOpen }) => {
               ) : (
                 `₱${product.price}`
               )}
+              {product.expiration && (
+              <p className="text-xs text-red-500 mt-1">Discount expires on: {product.expiration}</p>
+            )}
               <div className="flex mt-4 gap-2">
                 <Button color="primary">Inquire</Button>
                 <Button color="success" className="text-white" onClick={() => openBookingModal(product)}>

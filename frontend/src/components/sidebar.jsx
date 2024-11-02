@@ -80,12 +80,16 @@ const Sidebar = () => {
         </div>
              {/* Buttons */}
              <div className="flex flex-col gap-2 mt-9 items-center ">
+             <Link to='/business' target='_blank'>
           <Button className="bg-color3 text-black font-medium w-full flex items-center justify-center gap-2">
             <TbWorld /> Go to Business Page
           </Button>
+          </Link>
+          <Link to='/'>
           <Button className="bg-red-500 text-white font-medium w-full flex items-center justify-center gap-2">
             <CgLogOut /> Logout
           </Button>
+          </Link>
         </div>
       
       </div>

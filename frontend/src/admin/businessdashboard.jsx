@@ -1,4 +1,4 @@
-import React from 'react';
+import {useEffect} from 'react';
 import Sidebar from '../components/sidebar';
 import PropTypes from 'prop-types';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
@@ -104,6 +104,13 @@ const reviewData = [
 ];
 
 const BusinessDashboard = () => {
+
+  
+    // Title Tab
+    useEffect(() => {
+      document.title = 'BusinessName | Admin dashboard';
+      });
+
   return (
     <div className="flex min-h-screen bg-gray-50 font-sans">
       <Sidebar />

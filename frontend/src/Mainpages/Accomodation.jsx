@@ -20,6 +20,13 @@ const Accomodation = () => {
     const [budgetRange, setBudgetRange] = useState([0, 10000]); // Budget range slider
     const [loading, setLoading] = useState(true);
     const [showFilters, setShowFilters] = useState(false);
+    const [selectedTags, setSelectedTags] = useState([]); // New state for selected tags
+
+       // Title Tab
+  useEffect(() => {
+    document.title = 'RabaSorsogon | Accomodations';
+  });
+
 
     // Custom hook to detect if the screen is large
     const useIsLargeScreen = () => {
@@ -119,6 +126,7 @@ const Accomodation = () => {
 
     const handleAccommodationTypeChange = (selected) => {
         setSelectedAccommodation(selected);
+        setSelectedTags(selected); // Sync selected tags with accommodation types
     };
 
     const handleAmenitiesChange = (selected) => {
@@ -135,23 +143,15 @@ const Accomodation = () => {
 
     // Filtering the accommodations based on selected filters
     const filteredAccommodations = accommodationDetails.filter((accommodation) => {
-        const matchesType =
-            selectedAccommodation.length === 0 || selectedAccommodation.every((type) => accommodation.tags.includes(type));
-
-        const matchesAmenities =
-            selectedAmenities.length === 0 || selectedAmenities.every((amenity) => accommodation.amenities.includes(amenity));
-
-        const matchesRating =
-            selectedRatings.length === 0 || selectedRatings.includes(accommodation.rating);
-
-        const matchesDestination =
-            selectedDestination === 'All' || accommodation.destination === selectedDestination;
-
+        const matchesType = selectedAccommodation.length === 0 || selectedAccommodation.every((type) => accommodation.tags.includes(type));
+        const matchesAmenities = selectedAmenities.length === 0 || selectedAmenities.every((amenity) => accommodation.amenities.includes(amenity));
+        const matchesRating = selectedRatings.length === 0 || selectedRatings.includes(accommodation.rating);
+        const matchesDestination = selectedDestination === 'All' || accommodation.destination === selectedDestination;
         const [minPrice, maxPrice] = accommodation.price.split('-').map(Number);
-        const matchesBudget =
-            minPrice >= budgetRange[0] && maxPrice <= budgetRange[1];
+        const matchesBudget = minPrice >= budgetRange[0] && maxPrice <= budgetRange[1];
+        const matchesTags = selectedTags.length === 0 || selectedTags.every(tag => accommodation.tags.includes(tag)); // Match all selected tags
 
-        return matchesType && matchesAmenities && matchesRating && matchesDestination && matchesBudget;
+        return matchesType && matchesAmenities && matchesRating && matchesDestination && matchesBudget && matchesTags;
     });
 
     // Animation variants (same as Activities.jsx)
@@ -200,6 +200,7 @@ const Accomodation = () => {
                         <div className='w-full lg:w-1/4'>
                             <div className='bg-white p-6 rounded-lg shadow-md'>
                                 <h2 className='text-xl font-semibold mb-4'>Filters</h2>
+                                
                                 {/* Destination Dropdown */}
                                 <div className='mb-6'>
                                     <h3 className='text-sm font-medium text-gray-700 mb-2'>Destination</h3>
@@ -319,27 +320,33 @@ const Accomodation = () => {
                                         />
                                         <div className='p-4'>
                                             <div className='flex justify-between items-center mb-4'>
-                                            <div className='flex flex-wrap gap-2 '>
-                                                {accommodation.tags.map((tag, index) => (
-                                                    <span key={index} className='bg-color2 text-color3 text-xs px-2 py-1 rounded-full'>
-                                                        {tag}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                            <div className='flex items-center gap-1 '>
-                                               <span className='text-[12px]'>{accommodation.rating}</span> <span className='text-yellow-500'>{'★'.repeat(accommodation.rating)}{'☆'.repeat(5 - accommodation.rating)}</span>
-                                            </div>
+                                                <div className='flex flex-wrap gap-2'>
+                                                    {accommodation.tags.map((tag, index) => (
+                                                        <span 
+                                                            key={index} 
+                                                            className={`text-xs px-2 py-1 rounded-full ${selectedTags.includes(tag) ? 'bg-color2 text-white' : 'bg-gray-200 text-gray-700'}`}
+                                                        >
+                                                            {tag}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                                <div className='flex items-center gap-1'>
+                                                    <span className='text-[12px]'>{accommodation.rating}</span> 
+                                                    <span className='text-yellow-500'>{'★'.repeat(accommodation.rating)}{'☆'.repeat(5 - accommodation.rating)}</span>
+                                                </div>
                                             </div>
                                             <h2 className='text-lg font-semibold mb-2'>{accommodation.name}</h2>
-                                            <div className='text-xs text-gray-500 mb-2 flex items-center'><GiPositionMarker/>{accommodation.destination}</div>
-                                            <div className=' flex mb-2  max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom  flex-col '>
-                                            <p className='text-sm text-gray-600 '>{accommodation.description}</p>
+                                            <div className='text-xs text-gray-500 mb-2 flex items-center'>
+                                                <GiPositionMarker className="mr-1" />{accommodation.destination}
                                             </div>
-                                            <p className='mb-2 text-md font-semibold '>₱{accommodation.price}</p>
+                                            <div className='flex mb-2 max-w-[500px] max-h-[5rem] overflow-y-auto scrollbar-custom flex-col'>
+                                                <p className='text-sm text-gray-600'>{accommodation.description}</p>
+                                            </div>
+                                            <p className='text-md mb-2 font-semibold'>₱{accommodation.price}</p>
                                             <Link to='/business' target='_blank'>
-                                            <Button  className='w-full bg-color1 text-color3 hover:bg-color2'>
-                                                Explore More
-                                            </Button>
+                                                <Button className='w-full bg-color1 text-color3 hover:bg-color2'>
+                                                    Explore More
+                                                </Button>
                                             </Link>
                                         </div>
                                     </motion.div>
@@ -353,8 +360,6 @@ const Accomodation = () => {
             </div>
 
             <Footer />
-
-           
         </div>
     );
 };

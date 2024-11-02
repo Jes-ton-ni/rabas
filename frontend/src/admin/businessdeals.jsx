@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/sidebar';
 import { Switch } from '@nextui-org/react';
 import ActivityDeals from '@/admin/AddDealsComponent/ActivityDeals';
@@ -11,6 +11,12 @@ const BusinessDeals = () => {
   const [showAccommodation, setShowAccommodation] = useState(false);
   const [showRestaurantServices, setShowRestaurantServices] = useState(false);
   const [showShop, setShowShop] = useState(false);
+
+  
+    // Title Tab
+    useEffect(() => {
+      document.title = 'BusinessName | Admin deals';
+      });
 
   return (
     <div className="flex flex-col lg:flex-row bg-light font-sans min-h-screen">
