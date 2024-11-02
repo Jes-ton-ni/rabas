@@ -10,7 +10,7 @@ export const fetchDeals = createAsyncThunk(
         params: { category: 'activity' },
         withCredentials: true,
       });
-      console.log('response', response.data.deals);
+      // console.log('response', response.data.deals);
       return response.data.deals || [];
     } catch (error) {
       console.error('Error fetching deals:', error);
@@ -24,7 +24,7 @@ export const addActivityDeals = createAsyncThunk(
   async (dealData, { dispatch }) => {
     try {
       // Log the data being sent for verification
-      console.log('Sending deal data:', dealData);
+      // console.log('Sending deal data:', dealData);
 
       const response = await axios.post('http://localhost:5000/add-deals', dealData, {
         withCredentials: true,
@@ -38,7 +38,7 @@ export const addActivityDeals = createAsyncThunk(
       const dealsData = {
         id: deals.deal_id,
         category: 'activity',
-        activityId: deals.activityId,
+        productId: deals.productId,
         discount: deals.discount,
         expirationDate: new Date(deals.expirationDate).getTime(), // Ensure expirationDate is a timestamp
       };
@@ -93,7 +93,7 @@ const activityDealsSlice = createSlice({
       const newDeal = action.payload;
       state.deals.push({
         id: newDeal.id,
-        activityId: newDeal.activityId,
+        productId: newDeal.productId,
         discount: newDeal.discount,
         expirationDate: newDeal.expirationDate,
       });
@@ -129,7 +129,7 @@ const activityDealsSlice = createSlice({
         state.status = 'succeeded';
         state.deals = action.payload.map((deal) => ({
           id: deal.deal_id,
-          activityId: deal.product_id,
+          productId: deal.product_id,
           discount: deal.discount,
           expirationDate: new Date(deal.expirationDate).getTime(),
         }));

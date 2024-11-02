@@ -21,8 +21,6 @@ const ActivityDeals = () => {
   const activeDeals = deals.filter((deal) => deal.expirationDate > currentDate);
   const expiredDeals = deals.filter((deal) => deal.expirationDate <= currentDate);
 
-  console.log('expired deals', deals);
-
   const [selectedActivity, setSelectedActivity] = useState('');
   const [originalPrice, setOriginalPrice] = useState(0);
   const [discount, setDiscount] = useState(''); // For adding new deals
@@ -86,7 +84,6 @@ const ActivityDeals = () => {
   };
 
   const handleAddDeal = () => {
-    
     // If editing an existing deal
     if (editingDeal) {
       if (!selectedEditActivity || !editDiscount || !editExpirationDate) {
@@ -144,8 +141,8 @@ const ActivityDeals = () => {
       
       // Create JSON payload 
       const dealData = {
-        category: 'activity', // Add the category here if it’s always "activity"
-        activityId: selectedActivity,
+        category: 'activity', 
+        productId: selectedActivity,
         discount: discountValue,
         expirationDate: expirationDate,
       };
@@ -154,7 +151,7 @@ const ActivityDeals = () => {
       dispatch(addActivityDeals(dealData));
       
       // Clear selectedActivity and price values
-      console.log("Before Reset:", selectedActivity);
+      // console.log("Before Reset:", selectedActivity);
       resetForm();
       
       Swal.fire({
@@ -170,14 +167,14 @@ const ActivityDeals = () => {
     setEditingDeal({ ...deal, isExpired });
     
     // Update selectedActivity to the activity related to this deal
-    setSelectedEditActivity(deal.activityId);
+    setSelectedEditActivity(deal.productId);
     
     // Set the editing-specific values
     setEditDiscount(deal.discount.toString()); // Set the discount for editing
     setEditExpirationDate(new Date(deal.expirationDate).toISOString().split('T')[0]); // Set the expiration date for editing
   
     // Find the activity and set the original price
-    const activity = activities.find(activity => activity.id === parseInt(deal.activityId));
+    const activity = activities.find(activity => activity.id === parseInt(deal.productId));
     if (activity && activity.pricing) {
       setOriginalPrice(parseFloat(activity.pricing) || 0);
     } else {
@@ -237,7 +234,6 @@ const ActivityDeals = () => {
     });
   };
   
-
   const discountedPrice = originalPrice && discount ? (originalPrice - (originalPrice * (parseFloat(discount) / 100))).toFixed(2) : originalPrice;
 
   return (
@@ -296,9 +292,9 @@ const ActivityDeals = () => {
           <h3 className="text-xl font-semibold mb-4 text-gray-700">Active Deals</h3>
           <div className="grid grid-cols-1 gap-4 max-h-80 overflow-y-auto">
             {activeDeals.map(deal => {
-              const activity = activities.find(activity => activity.id === parseInt(deal.activityId));
+              const activity = activities.find(activity => activity.id === parseInt(deal.productId));
               return (
-                <div key={`${deal.id}-${deal.activityId}`} className="bg-white shadow-md rounded-lg p-4 hover:shadow-xl transition-shadow duration-300">
+                <div key={`${deal.id}-${deal.productId}`} className="bg-white shadow-md rounded-lg p-4 hover:shadow-xl transition-shadow duration-300">
                   <div className="flex justify-between items-center">
                     <h4 className="font-semibold text-lg">{activity?.activityName}</h4>
                     <div className="flex space-x-2">
@@ -317,9 +313,9 @@ const ActivityDeals = () => {
           <h3 className="text-xl font-semibold mb-4 text-gray-700">Expired Deals</h3>
           <div className="grid grid-cols-1 gap-4 max-h-80 overflow-y-auto">
             {expiredDeals.map(deal => {
-              const activity = activities.find(activity => activity.id === parseInt(deal.activityId));
+              const activity = activities.find(activity => activity.id === parseInt(deal.productId));
               return (
-                <div key={`${deal.id}-${deal.activityId}`} className="bg-white shadow-md rounded-lg p-4 hover:shadow-xl transition-shadow duration-300">
+                <div key={`${deal.id}-${deal.productId}`} className="bg-white shadow-md rounded-lg p-4 hover:shadow-xl transition-shadow duration-300">
                   <div className="flex justify-between items-center">
                     <h4 className="font-semibold text-lg">{activity?.activityName}</h4>
                     <div className="flex space-x-2">
@@ -344,7 +340,7 @@ const ActivityDeals = () => {
           </ModalHeader>
           <ModalBody>
             <div className="mb-4">
-              <p className="font-semibold">Activity Name: {activities.find(activity => activity.id === parseInt(editingDeal?.activityId))?.activityName}</p>
+              <p className="font-semibold">Activity Name: {activities.find(activity => activity.id === parseInt(editingDeal?.productId))?.activityName}</p>
               <div className="mb-4 text-center">
                 <p>Original Price: ₱{originalPrice}</p>
                 <p>Discounted Price: ₱{(originalPrice - (originalPrice * (parseFloat(editDiscount) / 100))).toFixed(2)}</p>

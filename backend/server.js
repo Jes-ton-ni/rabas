@@ -1617,14 +1617,14 @@ app.get('/getDeals', (req, res) => {
 
 // Endpoint to add new business deals
 app.post('/add-deals', async (req, res) => {
-  const { category, activityId, discount, expirationDate } = req.body;
+  const { category, productId, discount, expirationDate } = req.body;
   const userId = req.session?.user?.user_id;
 
   console.log('Request Body:', req.body);
   console.log('User ID:', userId);
 
 
-  if(!userId || !category || !activityId || !discount || !expirationDate) {
+  if(!userId || !category || !productId || !discount || !expirationDate) {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
 
@@ -1637,7 +1637,7 @@ app.post('/add-deals', async (req, res) => {
     const values = [
       category,
       userId,
-      activityId,
+      productId,
       discount,
       expirationDate
     ]
@@ -1657,7 +1657,7 @@ app.post('/add-deals', async (req, res) => {
         deal_id: result.insertId,
         user_id: userId,
         category,
-        activityId,
+        productId,
         discount,
         expirationDate
       };
