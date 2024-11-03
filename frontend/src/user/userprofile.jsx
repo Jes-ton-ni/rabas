@@ -115,6 +115,12 @@ const UserProfile = ({ activities = [] }) => {
   const [businessData, setBusinessData] = useState(null); // State
   const [loading, setLoading] = useState(true);
 
+  
+     // Title Tab
+     useEffect(() => {
+      document.title = 'RabaSorsogon | Profile';
+    });
+
   // Updated initialBookings with three samples for each status
   const initialBookings = {
     1: [
@@ -276,11 +282,12 @@ const UserProfile = ({ activities = [] }) => {
       if (result.isConfirmed) {
         // Implement cancellation logic here
         console.log(`Booking with ID ${bookingId} has been cancelled.`);
-        Swal.fire(
-          'Cancelled!',
-          'Your booking has been cancelled.',
-          'success'
-        );
+        Swal.fire({
+          title: 'Cancelled!',
+          text: 'Your booking has been cancelled.',
+          icon: 'success',
+          confirmButtonColor: '#0BDA51'
+        });
       }
     });
   };
