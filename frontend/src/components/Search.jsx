@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaSearch, FaTimes, FaHiking, FaBed, FaUtensils, FaShoppingBag, FaMapMarkerAlt } from 'react-icons/fa';
 import { Tabs, Tab } from '@nextui-org/react';
+import { motion } from 'framer-motion';
 
 const Search = () => {
   const [activeTab, setActiveTab] = useState('all');
@@ -185,21 +186,28 @@ const Search = () => {
       </div>
 
       <div className="relative w-full">
-        <div className="absolute w-full max-h-[500px] z-10 overflow-y-auto scrollbar-custom bg-white shadow-lg rounded-lg">
-          {searchResults.map((result, index) => (
-            <div key={index} className="flex items-center p-2 hover:bg-gray-200 cursor-pointer">
-              {result.image ? (
-                <img src={result.image} alt={result.name} className="w-12 h-12 rounded-full mr-3" />
-              ) : (
-                <FaMapMarkerAlt className="w-12 h-12 text-gray-500 mr-3" />
-              )}
-              <div>
-                <h3 className="text-md font-semibold">{result.name}</h3>
-                {result.destination && <p className="text-sm text-gray-500">{result.destination}</p>}
+        {searchResults.length > 0 && (
+          <motion.div
+            className="absolute w-full max-h-[500px] z-10 overflow-y-auto scrollbar-custom bg-white shadow-lg rounded-lg"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {searchResults.map((result, index) => (
+              <div key={index} className="flex items-center p-2 hover:bg-gray-200 cursor-pointer">
+                {result.image ? (
+                  <img src={result.image} alt={result.name} className="w-12 h-12 rounded-full mr-3" />
+                ) : (
+                  <FaMapMarkerAlt className="w-12 h-12 text-gray-500 mr-3" />
+                )}
+                <div>
+                  <h3 className="text-md font-semibold">{result.name}</h3>
+                  {result.destination && <p className="text-sm text-gray-500">{result.destination}</p>}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </motion.div>
+        )}
       </div>
     </div>
   );

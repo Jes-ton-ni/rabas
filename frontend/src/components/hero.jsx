@@ -35,7 +35,7 @@ const Hero = () => {
     return (
       <button
         {...buttonProps}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-black hover:bg-color3 hover:text-dark duration-300 bg-opacity-50 text-white p-2 rounded-full focus:outline-none"
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 md:bg-black hover:bg-color3 hover:text-dark duration-300 md:bg-opacity-50 text-transparent md:text-white p-2 rounded-full focus:outline-none"
         onClick={onClick}
       >
         <FiChevronLeft size={24} />
@@ -48,7 +48,7 @@ const Hero = () => {
     return (
       <button
         {...buttonProps}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-black hover:bg-color3 hover:text-dark duration-300 bg-opacity-50 text-white p-2 rounded-full focus:outline-none"
+        className="absolute  right-4  top-1/2 transform -translate-y-1/2 z-20 md:bg-black  hover:bg-color3 hover:text-dark duration-300 md:bg-opacity-50 text-transparent md:text-white p-2 rounded-full focus:outline-none"
         onClick={onClick}
       >
         <FiChevronRight size={24} />
@@ -89,8 +89,8 @@ const Hero = () => {
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
-              <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-bold mb-4 animate-fadeIn">
+            <div className="absolute  inset-0 flex flex-col items-center justify-center text-center p-4">
+              <h1 className="text-white text-2xl md:text-5xl lg:text-6xl font-bold mb-4 animate-fadeIn">
                 {greetings[index].title}
               </h1>
               <p className="text-white text-lg md:text-xl max-w-2xl mb-8 animate-fadeIn animation-delay-300">
