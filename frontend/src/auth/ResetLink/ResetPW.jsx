@@ -74,7 +74,7 @@ const ResetPW = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex justify-center items-center min-h-screen bg-light">
       <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-xl">
         <div className='w-full flex justify-center'><img className='w-42 h-40' src={Logo2} alt="Logo" /></div>
         <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">Reset Your Password</h2>
