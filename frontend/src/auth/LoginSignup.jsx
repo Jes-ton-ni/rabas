@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Tabs, Tab, Button, Input, Link } from "@nextui-org/react";
+import { Tabs, Tab, Button, Input} from "@nextui-org/react";
 import { FaEye, FaEyeSlash, FaGoogle, FaEnvelope, FaArrowLeft } from 'react-icons/fa';
 import Logo2 from '../assets/Rabas.png';
 import Swal from 'sweetalert2'; // Change import to sweetalert2
+import { Link } from 'react-router-dom';
 
 const LoginSignup = () => {
   const [view, setView] = useState("initial"); // initial, email, signup, forgotPassword
@@ -12,6 +13,8 @@ const LoginSignup = () => {
   const [loginPassword, setLoginPassword] = useState('');
 
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Add state to track login status
+
+  const [email, setEmail] = useState(''); // Add state to manage email for forgot password
 
   useEffect(() => {
     document.title = 'Login/Signup - Spa-ntaneous';
@@ -189,9 +192,46 @@ const LoginSignup = () => {
     }
   };  
 
-  const handleForgotPassword = (e) => {
+  const handleForgotPassword = async (e) => {
     e.preventDefault();
-    // Handle forgot password logic here
+    try {
+      const response = await fetch('http://localhost:5000/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email }) // Send email in the request body
+      });
+      const data = await response.json();
+      if (data.success) {
+        Swal.fire({
+          title: 'Email Sent!',
+          text: 'Check your email for the password reset link.',
+          icon: 'success',
+          showConfirmButton: true, // Show confirm button
+          confirmButtonColor: '#0BDA51', // Set confirm button color
+        }).then(() => {
+          window.open('/resetpassword', '_blank'); // Open the reset password page in a new tab
+        });
+      } else {
+        Swal.fire({
+          title: 'Error!',
+          text: data.error || 'Failed to send reset link.',
+          icon: 'error',
+          showConfirmButton: true, // Show confirm button
+          confirmButtonColor: '#0BDA51', // Set confirm button color
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      Swal.fire({
+        title: 'Error!',
+        text: 'An error occurred while sending the reset link. Please try again later.',
+        icon: 'error',
+        showConfirmButton: true, // Show confirm button
+        confirmButtonColor: '#0BDA51', // Set confirm button color
+      });
+    }
   };
 
   const renderInitialView = () => (
@@ -235,7 +275,7 @@ const LoginSignup = () => {
       >
         <Tab key="login" title="Login">
           <form onSubmit={handleLogin} className="flex flex-col gap-4  ">
-          <h1 className='font-font1 text-center text-2xl mb-2'>Welcome Back, Tara Rabas kita !</h1>
+          <h1 className='font-font1 text-center text-2xl mb-2'>Tara, Rabas kita sa Sorsogon !</h1>
             <Input
               label="Email/username"
               type="text"
@@ -276,7 +316,7 @@ const LoginSignup = () => {
                 <Link
                   className="cursor-pointer hover:text-color2"
                   size="sm"
-                  onPress={() => setSelected("signup")}
+                  onClick={() => setSelected("signup")}
                 >
                   Sign up
                 </Link>
@@ -391,7 +431,7 @@ const LoginSignup = () => {
   );
 
   const renderForgotPasswordForm = () => (
-    <div className="flex flex-col  gap-4">
+    <div className="flex flex-col gap-4">
       <button
         className="flex items-center text-gray-500 hover:text-black transition-all mb-4"
         onClick={() => setView("email")}
@@ -411,7 +451,6 @@ const LoginSignup = () => {
         <Button type="submit" color="primary" className="hover:bg-color2" fullWidth>
           Send Password Reset Link
         </Button>
-        
       </form>
     </div>
   );

@@ -3,7 +3,6 @@ import Logo from '../assets/rabas.png';
 import Logo2 from '../assets/Rabasorso.png'
 import { Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Badge } from "@nextui-org/react";
 import { CiSquareInfo } from "react-icons/ci";
-import { IoPricetagsOutline } from "react-icons/io5";
 import { TbNotes } from "react-icons/tb";
 import LoginSignup from '@/auth/loginSignup';
 import { PiJeep } from "react-icons/pi";
@@ -19,7 +18,7 @@ import { FaHome, FaBars, FaTimes } from 'react-icons/fa';
 import { GiPositionMarker } from "react-icons/gi";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { FaPersonWalking } from "react-icons/fa6";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
+import { Modal, ModalContent,  ModalBody,  useDisclosure } from "@nextui-org/react";
 import { Link } from 'react-router-dom'; // Assuming this is already imported or added
 import UserChatModal from '@/user/userChatSystem/UserChatModal'; // Import the UserChatModal component
 
@@ -390,11 +389,7 @@ const Nav = () => {
         backdrop="opaque"
         isOpen={isOpen}
         onOpenChange={onOpenChange}
-        classNames={{
-          backdrop: "bg-gray-900/50 backdrop-opacity-40",
-          body: "p-6",
-          closeButton: "  ",
-        }}
+        isDismissable={false}
         className='max-h-full w-full max-w-[600px] overflow-auto scrollbar-custom'
       >
         <ModalContent>
