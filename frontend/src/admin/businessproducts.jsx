@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from '../components/sidebar';
 import { Switch } from "@nextui-org/react";
 import ActivitySections from './AddProductsComponent/ActivitySections';
@@ -11,6 +11,34 @@ const BusinessProducts = () => {
   const [showAccommodation, setShowAccommodation] = useState(false);
   const [showRestaurantServices, setShowRestaurantServices] = useState(false);
   const [showShop, setShowShop] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+
+  // Function to check login status
+  const checkLoginStatus = useCallback(async () => {
+    try {
+      const response = await fetch('http://localhost:5000/check-login', {
+        method: 'GET',
+        credentials: 'include' // Include cookies
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setIsLoggedIn(data.isLoggedIn); // Set login status
+
+        if (!data.isLoggedIn) {
+          window.location.href = '/';
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Error checking login status:', error);
+    }
+  }, []);
+  
+  useEffect(() => {
+    checkLoginStatus();
+  }, [checkLoginStatus]);
+
     // Title Tab
     useEffect(() => {
       document.title = 'BusinessName | Admin products';

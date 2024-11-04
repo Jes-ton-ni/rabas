@@ -295,6 +295,10 @@ const UserProfile = ({ activities = [] }) => {
       if (response.ok) {
         const data = await response.json();
         setIsLoggedIn(data.isLoggedIn); // Set login status
+
+        if (!data.isLoggedIn) {
+          window.location.href = '/';
+        }
       } else {
         setIsLoggedIn(false);
       }

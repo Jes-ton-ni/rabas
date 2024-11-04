@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Sidebar from '../components/sidebar';
 import { Switch } from "@nextui-org/react";
@@ -66,6 +66,33 @@ const BusinessProfile = () => {
   const MySwal = withReactContent(Swal);
   const fileInputRef = useRef(null);
   const heroImagesInputRef = useRef(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+
+  // Function to check login status
+  const checkLoginStatus = useCallback(async () => {
+    try {
+      const response = await fetch('http://localhost:5000/check-login', {
+        method: 'GET',
+        credentials: 'include' // Include cookies
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setIsLoggedIn(data.isLoggedIn); // Set login status
+
+        if (!data.isLoggedIn) {
+          window.location.href = '/';
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Error checking login status:', error);
+    }
+  }, []);
+  
+  useEffect(() => {
+    checkLoginStatus();
+  }, [checkLoginStatus]);
 
   // Fetching business data from the backend and updating Redux
   const fetchBusinessData = async () => {
