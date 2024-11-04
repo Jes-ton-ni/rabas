@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Modal, ModalContent } from "@nextui-org/modal";
 import { ModalHeader, ModalBody, ModalFooter } from "@nextui-org/modal";
-import { Input, Button, Progress } from "@nextui-org/react";
-import { Select, SelectItem } from "@nextui-org/select";
+import { Input, Button, Progress, CheckboxGroup, Checkbox,Select, SelectItem } from "@nextui-org/react";
 import { FaCheck, FaPlus, FaMapMarkerAlt, FaTimes } from "react-icons/fa";
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
@@ -19,7 +18,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
     certificateNo: "",
     businessScope: "",
     businessType: "",
-    category: "",
+    category: [],
     customCategory: "",
     location: "",
   });
@@ -31,7 +30,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
       { label: "Relaxation", value: "relaxation" },
       { label: "Water Sports", value: "water_sports" },
       { label: "Nature", value: "nature" },
-      { label: "Others", value: "others" },
+      { label: "Add Category", value: "others" },
     ],
     accommodations: [
       { label: "Hotel", value: "hotel" },
@@ -39,18 +38,18 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
       { label: "Lodge", value: "lodge" },
       { label: "Resort", value: "resort" },
       { label: "Condominium", value: "condominium" },
-      { label: "Others", value: "others" },
+      { label: "Add Category", value: "others" },
     ],
     food: [
       { label: "Restaurant", value: "restaurant" },
       { label: "Bar", value: "bar" },
       { label: "Café", value: "cafe" },
-      { label: "Others", value: "others" },
+      { label: "Add Category", value: "others" },
     ],
     shops: [
       { label: "Souvenir Shop", value: "souvenir_shop" },
       { label: "Clothing Shop", value: "clothing_shop" },
-      { label: "Others", value: "others" },
+      { label: "Add Category", value: "others" },
     ],
   });
 
@@ -60,15 +59,15 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
   };
 
   const handleBusinessTypeChange = (value) => {
-    setFormData({ ...formData, businessType: value, category: "", customCategory: "" });
+    setFormData({ ...formData, businessType: value, category: [], customCategory: "" });
   };
 
-  const handleCategoryChange = (value) => {
-    setFormData({ ...formData, category: value, customCategory: "" });
+  const handleCategoryChange = (selectedValues) => {
+    setFormData({ ...formData, category: selectedValues });
   };
 
   const businessTypeOptions = [
-    { label: "Attractions and Activities", value: "attractions" },
+    { label: "Activities", value: "attractions" },
     { label: "Accommodations", value: "accommodations" },
     { label: "Food Places", value: "food" },
     { label: "Shops", value: "shops" },
@@ -90,7 +89,7 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
       }));
       setFormData(prevData => ({
         ...prevData,
-        category: newCategory.value,
+        category: [...prevData.category, newCategory.value],
         customCategory: "",
       }));
     }
@@ -208,23 +207,24 @@ const BusinessApplicationModal = ({ isBusinessOpen, onBusinessOpenChange, userDa
               ))}
             </Select>
             {formData.businessType && (
-              <Select
+              <CheckboxGroup
                 label={formData.businessType === "accommodations" ? "Property Type" : 
                        formData.businessType === "food" ? "Restaurant Type" :
                        formData.businessType === "shops" ? "Shop Type" : "Category"}
-                placeholder="Select category"
+                value={formData.category}
+                onChange={handleCategoryChange}
                 className="mt-4"
-                onChange={(e) => handleCategoryChange(e.target.value)}
-                required
               >
-                {categoryOptions[formData.businessType].map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </Select>
+                {categoryOptions[formData.businessType]
+                  .filter(option => option.value !== "others")
+                  .map((option) => (
+                    <Checkbox key={option.value} value={option.value}>
+                      {option.label}
+                    </Checkbox>
+                  ))}
+              </CheckboxGroup>
             )}
-            {formData.category === "others" && (
+            {formData.businessType && (
               <div className="mt-4 flex items-center">
                 <Input
                   clearable
