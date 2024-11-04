@@ -14,18 +14,18 @@ const Home = () => {
      // Title Tab
      useEffect(() => {
       document.title = 'RabaSorsogon | Home';
-    });
+    }, []);
   
 
-  useEffect(() => {
+    useEffect(() => {
 
-    // Simulate data fetching
-    setTimeout(() => setLoading(false), 1000);
-  }, []);
-
-  if (loading) {
-    return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
-  }
+      // Simulate data fetching
+      setTimeout(() => setLoading(false), 1000);
+    }, []);
+  
+    if (loading) {
+      return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
+    }
 
   return (  
     <div className='mx-auto min-h-screen bg-light font-sans '>

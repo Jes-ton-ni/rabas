@@ -25,8 +25,6 @@ import {
   removeContactInfo,
   updateContactIcon,
   updateBusinessCard,
-  fetchBusinessData,
-  addHeroImage,
   updateHeroImageTitle,
   removeHeroImage
 } from '../redux/businessSlice';

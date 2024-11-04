@@ -24,6 +24,7 @@ import Discover from './Mainpages/Discover';
 import Trip from './Mainpages/Trip';
 import Transportation from './Mainpages/Transportation';
 import About from './Mainpages/About'
+import ResetPW from './auth/ResetLink/ResetPW';
 
 
 
@@ -56,6 +57,7 @@ function App() {
           <Route path='/trip' element={<Trip/>}/>
           <Route path='/transportation' element={<Transportation/>}/>
           <Route path='/about' element={<About/>}/>
+          <Route path='/resetpassword' element={<ResetPW/>}/>
     
         </Routes>
      

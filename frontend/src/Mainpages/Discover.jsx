@@ -3,13 +3,14 @@ import { motion } from 'framer-motion';
 import Nav from '@/components/nav';
 import Hero from '@/components/herodiscover';
 import Footer from '@/components/Footer';
-import { Button, Checkbox, CheckboxGroup, Select, SelectItem, Slider, Tabs, Tab } from '@nextui-org/react';
+import { Button, Checkbox, CheckboxGroup, Select, SelectItem, Slider, Tabs, Tab, Spinner} from '@nextui-org/react';
 import { GiPositionMarker } from 'react-icons/gi';
 import { Link } from 'react-router-dom';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import TopRated from '@/components/TopRated'; // Import the new component
 import Search from '@/components/Search';
+
 
 
 
@@ -117,6 +118,7 @@ const mockData = {
   ],
 };
 
+
 // Animation Variants
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -142,6 +144,7 @@ const cardVariants = {
 };
 
 const Discover = () => {
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
 
@@ -409,6 +412,15 @@ const Discover = () => {
   const toggleFilters = () => {
     setShowFilters(!showFilters);
   };
+  useEffect(() => {
+
+    // Simulate data fetching
+    setTimeout(() => setLoading(false), 1000);
+  }, []);
+
+  if (loading) {
+    return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
+  }
 
   return (
     <div className="mx-auto bg-light min-h-screen font-sans">
