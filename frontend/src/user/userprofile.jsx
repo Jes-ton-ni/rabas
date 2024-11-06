@@ -333,28 +333,6 @@ const UserProfile = ({ activities = [] }) => {
     }
   };
 
-  const fetchBusinessData = async () => {
-    try {
-      // Fetch business data
-      const response = await fetch('http://localhost:5000/get-businessData', {
-        method: 'GET',
-        credentials: 'include',
-      });
-      const data = await response.json();
-      
-      if (response.ok) {
-        setBusinessData(data.businessData[0]);
-        
-        // Check if there are business applications
-        if (data.businessData[0].hasApplications) {
-          await fetchBusinessApplications();
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching business data:', error);
-    }
-  };
-  
   // Fetching business applications for the logged-in user
   const fetchBusinessApplications = async () => {
     try {
@@ -366,14 +344,33 @@ const UserProfile = ({ activities = [] }) => {
       
       if (response.ok) {
         setBusinessApplications(data.business_applications); // Set fetched applications
-        console.log('Fetched Business Applications:', data);
+
+        // Check if there's any application with status 1
+        const approvedApplication = data.business_applications.find(application => application.status === 1);
+        
+        if (approvedApplication) {
+          // Fetch business data if there's an approved application
+          try {
+            const response = await fetch('http://localhost:5000/get-businessData', {
+              method: 'GET',
+              credentials: 'include',
+            });
+            const businessData = await response.json();
+            
+            if (response.ok) {
+              setBusinessData(businessData.businessData[0]);
+            }
+          } catch (error) {
+            console.error('Error fetching business data:', error);
+          }
+        }
       } else {
         console.error('Failed to fetch business applications:', data.message);
       }
     } catch (error) {
       console.error('Error fetching business applications:', error);
     }
-  };  
+  };
 
   useEffect(() => {
     checkLoginStatus(); // Check login status when component mounts
@@ -387,7 +384,7 @@ const UserProfile = ({ activities = [] }) => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      Promise.all([fetchUserData(), fetchBusinessData(), fetchBusinessApplications()])
+      Promise.all([fetchUserData(), fetchBusinessApplications()])
         .then(() => setLoading(false)) // Set loading to false when all data is fetched
         .catch((error) => console.error('Error fetching initial data:', error));
     }
