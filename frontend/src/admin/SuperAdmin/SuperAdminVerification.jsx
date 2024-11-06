@@ -158,7 +158,9 @@ const VerificationTable = ({ data, title, onUpdateStatus }) => {
               <td className="py-3 px-6">{item.businessName}</td>
               <td className="py-3 px-6">{`${item.firstName} ${item.lastName}`}</td>
               <td className="py-3 px-6">{item.businessType}</td>
-              <td className="py-3 px-6">{item.category}</td>
+              <td className="py-3 px-6">
+                {Array.isArray(item.category) ? item.category.join(', ') : item.category}
+              </td>
               <td className="py-3 px-6">{item.certNumber}</td>
               <td className="py-3 px-6">{item.location}</td>
               <td className="py-3 px-6">
@@ -215,7 +217,7 @@ const VerificationTable = ({ data, title, onUpdateStatus }) => {
                     <p><strong>Business Name:</strong> {selectedItem.businessName}</p>
                     <p><strong>Owner:</strong> {`${selectedItem.firstName} ${selectedItem.lastName}`}</p>
                     <p><strong>Business Type:</strong> {selectedItem.businessType}</p>
-                    <p><strong>Category:</strong> {selectedItem.category}</p>
+                    <p><strong>Category:</strong> {Array.isArray(selectedItem.category) ? selectedItem.category.join(', ') : selectedItem.category}</p>
                     <p><strong>Certificate No:</strong> {selectedItem.certNumber}</p>
                     <p><strong>Location:</strong> {selectedItem.location}</p>
                     <p><strong>Submission Date:</strong> 
@@ -289,10 +291,11 @@ const SuperAdminVerification = () => {
   };
 
   // Derived counts
-  const appliedAttractions = verificationData.filter(item => item.category === 'Attraction').length;
-  const appliedAccommodations = verificationData.filter(item => item.category === 'Accommodation').length;
-  const appliedFoods = verificationData.filter(item => item.category === 'Food').length;
-  const totalPending = verificationData.filter(item => item.status === 'Pending').length;
+  const appliedActivities = verificationData.filter(item => item.businessType === 'activities').length;
+  const appliedAttractions = verificationData.filter(item => item.businessType === 'attraction').length;
+  const appliedAccommodations = verificationData.filter(item => item.businessType === 'accommodation').length;
+  const appliedFoods = verificationData.filter(item => item.businessType === 'food').length;
+  const totalPending = verificationData.filter(item => item.status === 0).length;
 
   // Filter function
   const filterData = (data, searchTerm) => {
@@ -316,7 +319,8 @@ const SuperAdminVerification = () => {
       <div className="flex-1 p-8 max-h-screen overflow-y-auto">
         <h1 className="text-3xl font-bold mb-6">Verification</h1>
 
-        <div className="grid grid-cols-4 gap-6 mb-8 text-center">
+        <div className="grid grid-cols-5 gap-6 mb-8 text-center">
+          <SummaryCard title="Applied for Activities" count={appliedActivities} color="bg-red-400" />
           <SummaryCard title="Applied for Attraction" count={appliedAttractions} color="bg-red-400" />
           <SummaryCard title="Applied for Accommodation" count={appliedAccommodations} color="bg-teal-400" />
           <SummaryCard title="Applied for Food Places" count={appliedFoods} color="bg-purple-400" />

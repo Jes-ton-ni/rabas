@@ -635,6 +635,9 @@ app.post('/submitBusinessApplication', async (req, res) => {
     unique = await isApplicationIdUnique(application_id);
   }
 
+  // Convert category array to JSON string
+  const categoryJSON = JSON.stringify(category);
+
   try {
     // SQL query to insert business application data into the database, including application_id
     const sql = `
@@ -648,7 +651,7 @@ app.post('/submitBusinessApplication', async (req, res) => {
     // Execute the SQL query
     connection.query(
       sql, 
-      [application_id, user_id, firstName, lastName, businessName, businessTerritory, certificateNo, businessScope, businessType, category, location],
+      [application_id, user_id, firstName, lastName, businessName, businessTerritory, certificateNo, businessScope, businessType, categoryJSON, location],
       (err, results) => {
         if (err) {
           console.error('Error executing SQL query:', err);
@@ -1948,8 +1951,8 @@ app.put('/updateStatus-businessApplications/:id', async (req, res) => {
           // Prepare to insert into businesses table
           const insertQuery = `
             INSERT INTO businesses 
-            (user_id, application_id, businessName, businessType, businessLogo, businessCard, heroImages, aboutUs, facilities, policies, contactInfo, openingHours) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            (user_id, application_id, businessName, businessType, category, businessLogo, businessCard, heroImages, aboutUs, facilities, policies, contactInfo, openingHours) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
           // Set default values for the new business entry
           const insertValues = [
@@ -1957,6 +1960,7 @@ app.put('/updateStatus-businessApplications/:id', async (req, res) => {
             application_id,
             businessName,
             businessType,
+            JSON.stringify(category),
             null, // businessLogo, you can update this later
             JSON.stringify({ category, location, cardImage: '', priceRange: '', description: '' }), // businessCard
             null, // heroImages, you can update later
