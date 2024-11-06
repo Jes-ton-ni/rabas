@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ModalContent, ModalHeader, ModalBody, ModalFooter, Modal } from "@nextui-org/modal";
 import { Button, Avatar, Textarea } from '@nextui-org/react';
-import { FiSend } from "react-icons/fi";
+import { FiSend, FiDownload, FiImage } from "react-icons/fi";
 import { RangeCalendar, TimeInput } from "@nextui-org/react";
 import { Time } from "@internationalized/date";
 import { today, isWeekend, getLocalTimeZone } from "@internationalized/date";
@@ -248,6 +248,33 @@ const ChatModal = ({ isOpen, onClose }) => {
   const messageEndRef = useRef(null);
   const [isAvailabilityModalOpen, setAvailabilityModalOpen] = useState(false);
   const [currentBookingDetails, setCurrentBookingDetails] = useState(null);
+  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+
+  // Handle image selection
+  const handleImageChange = (event) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      setImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  // Handle image removal
+  const handleImageRemove = () => {
+    setImage(null);
+    setImagePreview(null);
+  };
+
+  // Function to download the image
+  const handleImageDownload = (imageUrl) => {
+    const link = document.createElement('a');
+    link.href = imageUrl;
+    link.download = 'downloaded-image.jpg';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Scroll chat to the bottom when new messages arrive
   useEffect(() => {
@@ -273,25 +300,22 @@ const ChatModal = ({ isOpen, onClose }) => {
 
   // Handle sending messages
   const handleSendMessage = () => {
-    if (messageInput.trim() !== '') {
+    if ((messageInput.trim() !== '' || image) && selectedUser !== null) {
       const currentMessages = messages[selectedUser] || [];
       const newMessage = {
         id: currentMessages.length + 1,
         sender: 'You',
         text: messageInput,
-        time: formatTime(new Date())
+        time: formatTime(new Date()),
+        image: imagePreview
       };
       setMessages({
         ...messages,
         [selectedUser]: [...currentMessages, newMessage]
       });
       setMessageInput('');
-
-      // Increment unread message count for the selected user
-      setUnreadMessages({
-        ...unreadMessages,
-        [selectedUser]: unreadMessages[selectedUser] + 1
-      });
+      setImage(null);
+      setImagePreview(null);
     }
   };
 
@@ -414,6 +438,23 @@ const ChatModal = ({ isOpen, onClose }) => {
                             <span className="text-xs text-gray-500 ml-2">{message.time}</span>
                           </div>
                           <p className="break-words">{message.text}</p>
+                          {message.image && (
+                            <div className="relative">
+                              <img
+                                src={message.image}
+                                alt="Sent"
+                                className="mt-2 rounded-md max-w-full cursor-pointer"
+                                style={{ maxHeight: '400px', objectFit: 'cover' }}
+                                onClick={() => handleImageClick(message.image)}
+                              />
+                              <button
+                                onClick={() => handleImageDownload(message.image)}
+                                className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md"
+                              >
+                                <FiDownload size={16} className="text-black" />
+                              </button>
+                            </div>
+                          )}
                         </>
                       )}
                     </div>
@@ -431,8 +472,34 @@ const ChatModal = ({ isOpen, onClose }) => {
                     className="w-full bg-white text-black rounded-lg border border-gray-300 focus:border-black focus:ring resize-none p-2"
                     rows="2"
                   />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                    id="image-upload"
+                  />
+                  <label htmlFor="image-upload" className="cursor-pointer">
+                    <FiImage size={24} className="text-gray-500 hover:text-black" />
+                  </label>
                   <Button onClick={handleSendMessage} color="primary" className="rounded-lg h-full max-w-[100px] w-full"><FiSend /></Button>
                 </div>
+                {imagePreview && (
+                  <div className="mt-2 relative">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="rounded-md max-w-full"
+                      style={{ maxHeight: '200px', objectFit: 'cover' }}
+                    />
+                    <button
+                      onClick={handleImageRemove}
+                      className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md"
+                    >
+                      <span className="text-black">✖</span>
+                    </button>
+                  </div>
+                )}
               </>
             ) : (
               <div className="flex flex-grow items-center justify-center text-gray-500">

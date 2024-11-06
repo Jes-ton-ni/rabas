@@ -70,6 +70,56 @@
   }
 }
 
+/* Custom styles for Swiper arrow buttons */
+.swiper-button-next,
+.swiper-button-prev {
+  @apply text-color3 bg-color1 w-10 h-10 flex items-center justify-center rounded-full shadow-md;
+  font-size: 16px; /* Adjust the font size for better visibility */
+  transition: transform 0.3s ease, background-color 0.3s ease; /* Smooth transition for hover effects */
+  position: absolute; /* Position them absolutely */
+  top: 50%; /* Center vertically */
+/* Adjust for centering */
+  z-index: 50; /* Ensure they are above other elements */
+}
+
+.swiper-button-next {
+  right: 1; /* Position at the rightmost edge */
+}
+
+.swiper-button-prev {
+  left: 1; /* Position at the leftmost edge */
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  @apply bg-color2; /* Change background color on hover */
+  transform: scale(1.1); /* Slightly enlarge the button on hover */
+}
+
+.swiper-button-next:after,
+.swiper-button-prev:after {
+  font-size: 20px; /* Adjust icon size */
+  color: inherit; /* Use the inherited text color */
+}
+
+
+/* Custom styles for Swiper pagination dots */
+.swiper-pagination-bullet {
+  @apply bg-gray-400 w-2 h-2 opacity-100 mt-32;
+}
+
+.swiper-pagination-bullet-active {
+  @apply bg-color2   ;
+}
+
+/* Move pagination dots below the Swiper */
+.swiper-pagination {
+  @apply mt-6; /* Adds margin to move pagination further down */
+  position: relative;
+  bottom: -20px; /* Adjust as needed to move pagination further below */
+}
+
+
 /* Custom Scrollbar Styles */  
 
 .scrollbar-custom::-webkit-scrollbar {  

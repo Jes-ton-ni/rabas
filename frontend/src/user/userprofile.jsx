@@ -10,6 +10,7 @@ import {Spinner} from "@nextui-org/react";
 import { AiOutlineLike } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { motion } from 'framer-motion'; // Import Framer Motion
 
 
 // Simplified component for the "My Booking" tab
@@ -114,12 +115,35 @@ const UserProfile = ({ activities = [] }) => {
   const [businessApplications, setBusinessApplications] = useState([]);
   const [businessData, setBusinessData] = useState(null); // State
   const [loading, setLoading] = useState(true);
+  const [showButton, setShowButton] = useState(false); // State to show/hide button
 
   
      // Title Tab
      useEffect(() => {
       document.title = 'RabaSorsogon | Profile';
     });
+    useEffect(() => {
+
+      // Simulate data fetching
+      setTimeout(() => setLoading(false), 1000);
+
+      // Show button when scrolled down
+      const handleScroll = () => {
+        if (window.scrollY > 300) {
+          setShowButton(true);
+        } else {
+          setShowButton(false);
+        }
+      };
+
+      window.addEventListener('scroll', handleScroll);
+      return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+  
+    const scrollToTop = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
 
   // Updated initialBookings with three samples for each status
   const initialBookings = {
@@ -779,6 +803,24 @@ const UserProfile = ({ activities = [] }) => {
        
 
       <Footer />
+
+      {showButton && (
+        <motion.button
+           className="fixed bottom-5 right-2 p-3 rounded-full shadow-lg z-10"
+          onClick={scrollToTop}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          animate={{ y: [0, -10, 0] }}
+          transition={{ duration: 0.6, repeat: Infinity, repeatType: "loop" }}
+          style={{
+            background: 'linear-gradient(135deg, #688484  0%, #092635 100%)', // Gradient color
+            color: 'white',
+          }}
+        >
+          ↑
+        </motion.button>
+      )}
+
     </div>
   );
 };

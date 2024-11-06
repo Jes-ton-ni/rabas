@@ -2,8 +2,9 @@ import Slider from 'react-slick';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import hall from '../assets/hall.jpeg';
 import bulusan from '../assets/bulusan.jpg';
-import subic from '../assets/Subic.jpeg';
+import subic from '../assets/subic.webp'
 import dancalan from '../assets/dancalan.png';
+
 
 // Import Slick CSS files
 import "slick-carousel/slick/slick.css";

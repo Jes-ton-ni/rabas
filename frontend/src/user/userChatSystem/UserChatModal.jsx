@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ModalContent, ModalHeader, ModalBody, Modal } from "@nextui-org/modal";
 import { Button, Input, Avatar } from '@nextui-org/react';
-import { FiSend } from "react-icons/fi";
+import { FiSend, FiImage, FiDownload } from "react-icons/fi";
 import { toast } from 'react-toastify';
 import { MdDateRange, MdPeople, MdEmail, MdPhone } from "react-icons/md";
 
@@ -68,6 +68,21 @@ const UnreadBadge = ({ count }) => (
   ) : null
 );
 
+// Add a new component for the product card
+const ProductCard = ({ product }) => (
+  <div className="flex flex-col sm:flex-row items-center p-4 bg-white shadow-md rounded-lg border border-gray-200">
+    <img 
+      src={product.imageUrl} 
+      alt={product.productName} 
+      className="w-full sm:w-32 h-32 rounded-md mb-4 sm:mb-0 sm:mr-4 object-cover" 
+    />
+    <div className="text-center sm:text-left">
+      <h4 className="font-bold text-lg">{product.productName}</h4>
+      <p className="text-gray-700">₱{product.price}</p>
+    </div>
+  </div>
+);
+
 // User Chat Modal Component
 const UserChatModal = ({ isOpen, onClose }) => {
   const [messageInput, setMessageInput] = useState('');
@@ -75,6 +90,8 @@ const UserChatModal = ({ isOpen, onClose }) => {
   const [selectedBusiness, setSelectedBusiness] = useState(null);
   const [unreadMessages, setUnreadMessages] = useState({ 1: 3, 2: 2, 3: 1 }); // Keep track of unread message counts
   const messageEndRef = useRef(null);
+  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const businesses = [
     { id: 1, name: 'Business One', status: 'online', avatarUrl: 'https://i.pravatar.cc/150?u=business1' },
@@ -122,8 +139,13 @@ const UserChatModal = ({ isOpen, onClose }) => {
       { 
         id: 3, 
         sender: 'You', 
-        text: 'Can I change the date of the activity?', 
-        time: '3:00 PM'
+        text: 'Is this still available?', 
+        time: '3:00 PM',
+        formDetails: {
+          productName: 'Hiking Adventure', // Example product name
+          price: 1500, // Example price
+          imageUrl: 'https://via.placeholder.com/200' // Example image placeholder
+        }
       },
       { 
         id: 4, 
@@ -241,23 +263,56 @@ const UserChatModal = ({ isOpen, onClose }) => {
     }
   }, [messages, selectedBusiness]);
 
+  // Handle image selection
+  const handleImageChange = (event) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      setImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  // Add a function to handle image removal
+  const handleImageRemove = () => {
+    setImage(null);
+    setImagePreview(null);
+  };
+
   // Handle sending messages
   const handleSendMessage = () => {
-    if (messageInput.trim() !== '' && selectedBusiness !== null) {
+    if ((messageInput.trim() !== '' || image) && selectedBusiness !== null) {
       const currentMessages = messages[selectedBusiness] || [];
       const newMessage = {
         id: currentMessages.length + 1,
         sender: 'You',
         text: messageInput,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        image: imagePreview
       };
       setMessages({
         ...messages,
         [selectedBusiness]: [...currentMessages, newMessage]
       });
       setMessageInput('');
+      setImage(null);
+      setImagePreview(null);
       toast.success('Message sent!');
     }
+  };
+
+  // Function to handle image click for preview
+  const handleImageClick = (imageUrl) => {
+    window.open(imageUrl, '_blank');
+  };
+
+  // Function to download the image
+  const handleImageDownload = (imageUrl) => {
+    const link = document.createElement('a');
+    link.href = imageUrl;
+    link.download = 'downloaded-image.jpg';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   // Handle key press in the input field
@@ -326,24 +381,30 @@ const UserChatModal = ({ isOpen, onClose }) => {
                         className={`p-2 rounded-lg max-w-[70%] ${
                           message.sender === 'You' ? 'bg-gray-300 text-black' : 'bg-color1 text-white max-w-[70%]'
                         }`}
-                        
                       >
-                        {message.formDetails ? (
+                        <p className="break-words ">{message.text}</p>
+                        {message.image && (
+                          <div className="relative">
+                            <img
+                              src={message.image}
+                              alt="Sent"
+                              className="mt-2 rounded-md max-w-full cursor-pointer"
+                              style={{ maxHeight: '400px', objectFit: 'cover' }}
+                              onClick={() => handleImageClick(message.image)}
+                            />
+                            <button
+                              onClick={() => handleImageDownload(message.image)}
+                              className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md"
+                            >
+                              <FiDownload size={16} className="text-black" />
+                            </button>
+                          </div>
+                        )}
+                        {message.id === 3 && message.formDetails && (
+                          <ProductCard product={message.formDetails} />
+                        )}
+                        {message.id !== 3 && message.formDetails && (
                           <BookingDetailsCard message={message} isSender={message.sender === 'You'} />
-                        ) : (
-                          <>
-                            <div className="flex justify-between items-center mb-1">
-                              <strong>{message.sender}</strong>
-                              <span className="text-xs text-gray-500 ml-3">{message.time}</span>
-                            </div>
-                            <p className="break-words ">{message.text}</p>
-                            {message.additionalInfo && (
-                              <p className="text-sm text-gray-700 mt-1 break-words ">{message.additionalInfo}</p>
-                            )}
-                            {message.messageNote && (
-                              <p className="text-sm text-gray-700 mt-1 break-words "><strong>Message:</strong> {message.messageNote}</p>
-                            )}
-                          </>
                         )}
                       </div>
                     </div>
@@ -357,11 +418,37 @@ const UserChatModal = ({ isOpen, onClose }) => {
                     onChange={(e) => setMessageInput(e.target.value)}
                     onKeyDown={handleKeyPress}
                     placeholder="Type a message..."
-                    className="w-full bg-white text-black rounded-lg border border-gray-300 focus:border-black focus:ring   resize-none p-2"
+                    className="w-full bg-white text-black rounded-lg border border-gray-300 focus:border-black focus:ring resize-none p-2"
                     rows="2" 
                   />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                    id="image-upload"
+                  />
+                  <label htmlFor="image-upload" className="cursor-pointer">
+                    <FiImage size={24} className="text-gray-500 hover:text-black" />
+                  </label>
                   <Button onClick={handleSendMessage} color="primary" className="rounded-lg h-full max-w-[100px] w-full"><FiSend /></Button>
                 </div>
+                {imagePreview && (
+                  <div className="mt-2 relative">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="rounded-md max-w-full"
+                      style={{ maxHeight: '200px', objectFit: 'cover' }}
+                    />
+                    <button
+                      onClick={handleImageRemove}
+                      className="absolute top-2 right-2 bg-white p-1 rounded-full shadow-md"
+                    >
+                      <span className="text-black">✖</span>
+                    </button>
+                  </div>
+                )}
               </>
             ) : (
               <div className="flex flex-grow items-center justify-center text-gray-500">

@@ -36,6 +36,7 @@ const Trip = () => {
   const [destination, setDestination] = useState(null);
   const [tripName, setTripName] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showButton, setShowButton] = useState(false); // State to show/hide button
   const [trips, setTrips] = useState([
     {
       tripName: "Sample Trip to Sorsogon",
@@ -74,8 +75,27 @@ const Trip = () => {
   const [selectedTrip, setSelectedTrip] = useState(null);
 
   useEffect(() => {
+
+    // Simulate data fetching
     setTimeout(() => setLoading(false), 1000);
+
+    // Show button when scrolled down
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowButton(true);
+      } else {
+        setShowButton(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -222,6 +242,24 @@ const Trip = () => {
 
       <Footer />
 
+      {showButton && (
+        <motion.button
+           className="fixed bottom-5 right-2 p-3 rounded-full shadow-lg z-10"
+          onClick={scrollToTop}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          animate={{ y: [0, -10, 0] }}
+          transition={{ duration: 0.6, repeat: Infinity, repeatType: "loop" }}
+          style={{
+            background: 'linear-gradient(135deg, #688484  0%, #092635 100%)', // Gradient color
+            color: 'white',
+          }}
+        >
+          ↑
+        </motion.button>
+      )}
+
+
       <Modal hideCloseButton isOpen={isOpen} onClose={() => {}} className="rounded-lg shadow-lg mx-auto p-3 max-h-screen max-w-[1200px]">
         <ModalContent className="rounded-lg overflow-y-auto scrollbar-custom">
           <ModalHeader className="bg-primary text-white p-4 rounded-t-lg">
@@ -360,6 +398,8 @@ const Trip = () => {
         trip={selectedTrip}
         onUpdateTrip={updateTripDetails}
       />
+
+      
     </div>
   );
 };

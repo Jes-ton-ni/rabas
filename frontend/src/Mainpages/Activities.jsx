@@ -38,6 +38,9 @@ const Activities = () => {
   const [budgetRange, setBudgetRange] = useState([0, 10000]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
+  
+const [showButton, setShowButton] = useState(false); // State to show/hide button
+
 
      // Title Tab
      useEffect(() => {
@@ -48,9 +51,29 @@ const Activities = () => {
   const isLargeScreen = useIsLargeScreen();
 
   useEffect(() => {
+
     // Simulate data fetching
     setTimeout(() => setLoading(false), 1000);
+
+    // Show button when scrolled down
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowButton(true);
+      } else {
+        setShowButton(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+
+
 
   if (loading) {
     return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
@@ -386,6 +409,24 @@ const Activities = () => {
       </div>
 
       <Footer />
+
+      {showButton && (
+        <motion.button
+         className="fixed bottom-5 right-2 p-3 rounded-full shadow-lg z-10"
+          onClick={scrollToTop}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          animate={{ y: [0, -10, 0] }}
+          transition={{ duration: 0.6, repeat: Infinity, repeatType: "loop" }}
+          style={{
+            background: 'linear-gradient(135deg, #688484  0%, #092635 100%)', // Gradient color
+            color: 'white',
+          }}
+        >
+          ↑
+        </motion.button>
+      )}
+
     </div>
   );
 };

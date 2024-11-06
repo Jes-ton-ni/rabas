@@ -8,8 +8,9 @@ import { GiPositionMarker } from 'react-icons/gi';
 import { Link } from 'react-router-dom';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import TopRated from '@/components/TopRated'; // Import the new component
 import Search from '@/components/Search';
+
+
 
 
 
@@ -147,6 +148,9 @@ const Discover = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
+  const [showButton, setShowButton] = useState(false); // State to show/hide button
+
+
 
      // Title Tab
      useEffect(() => {
@@ -416,7 +420,26 @@ const Discover = () => {
 
     // Simulate data fetching
     setTimeout(() => setLoading(false), 1000);
+
+    // Show button when scrolled down
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowButton(true);
+      } else {
+        setShowButton(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+
+
 
   if (loading) {
     return <Spinner className='flex justify-center items-center h-screen' size='lg' label="Loading..." color="primary" />;
@@ -572,10 +595,27 @@ const Discover = () => {
           </div>
         </div>
       </div>
-
-      <TopRated />
+   
 
       <Footer />
+
+      {showButton && (
+        <motion.button
+          className="fixed bottom-5 right-2 p-3 rounded-full shadow-lg z-10"
+          onClick={scrollToTop}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          animate={{ y: [0, -10, 0] }}
+          transition={{ duration: 0.6, repeat: Infinity, repeatType: "loop" }}
+          style={{
+            background: 'linear-gradient(135deg, #688484  0%, #092635 100%)', // Gradient color
+            color: 'white',
+          }}
+        >
+          ↑
+        </motion.button>
+      )}
+
     </div>
   );
 };

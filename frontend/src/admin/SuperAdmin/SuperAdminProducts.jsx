@@ -444,7 +444,7 @@ const SuperAdminProducts = () => {
               onSearch={setBusinessSearchTerm}
             />
             <Tabs>
-              <Tab title="Activities and Attractions">
+              <Tab title="Activities">
                 {renderBusinessCards(filteredBusinesses.activitiesAndAttractions)}
               </Tab>
               <Tab title="Accommodations">
