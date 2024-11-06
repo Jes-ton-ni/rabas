@@ -8,6 +8,7 @@ import DestinationSection from './HomePageSections/DestinationSection';
 import BusinessSection from './HomePageSections/BusinessSection';
 import { motion } from 'framer-motion'; // Import Framer Motion
 import PlanTripSection from './HomePageSections/PlanTripSection';
+import AboutSection from './HomePageSections/AboutSection';
 
 const Home = () => {
   const [loading, setLoading] = useState(true);
@@ -53,7 +54,7 @@ const Home = () => {
       <DestinationSection />
       <BusinessSection/>
       <PlanTripSection/>
-
+      <AboutSection/>
       
       {/** Footer */}
       <Footer />

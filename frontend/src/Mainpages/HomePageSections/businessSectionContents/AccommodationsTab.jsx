@@ -41,8 +41,15 @@ const accommodationDetails = [
 
 const AccommodationsTab = () => (
   <div>
-    <div className="p-4 md:p-6">
+    <div className="p-4 md:p-6"> 
+      <div className='flex justify-between items-center'>
       <h1 className='text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start'>Design Meets Comfort: Accommodation Recommendations</h1>
+      <Link to='/accomodations' target='_blank'>
+      <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
+          See More ⥬
+        </h1>
+        </Link>
+    </div>
       <Swiper
         modules={[Navigation]}
         navigation={{ nextEl: '.custom-next', prevEl: '.custom-prev' }}
@@ -121,7 +128,14 @@ const AccommodationsTab = () => (
     </div>
 
     <div className="p-4 md:p-6">
+      <div className='flex justify-between items-center'>
       <h1 className='text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start'>Traveler's Choice: Most Reviewed Stays</h1>
+      <Link to='/accomodations' target='_blank'>
+      <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
+          See More ⥬
+        </h1>
+        </Link>
+    </div>
       <Swiper
         modules={[Navigation]}
         navigation={{ nextEl: '.custom-next', prevEl: '.custom-prev' }}
@@ -200,7 +214,14 @@ const AccommodationsTab = () => (
     </div>
 
     <div className="p-4 md:p-6">
+      <div className='flex justify-between items-center'>
       <h1 className='text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center lg:text-start'>Top Accommodation Offers</h1>
+      <Link to='/accomodations' target='_blank'>
+      <h1 className='text-md font-semibold text-color1 hover:tracking-wide duration-300 hover:underline cursor-pointer'>
+          See More ⥬
+        </h1>
+        </Link>
+    </div>
       <Swiper
         modules={[Navigation]}
         navigation={{ nextEl: '.custom-next', prevEl: '.custom-prev' }}

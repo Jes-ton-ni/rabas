@@ -20,8 +20,8 @@ export default function PlanTripSection() {
   ]
 
   return (
-    <section className="py-24">
-      <div className="container mx-auto px-5">
+    <section className="py-24 bg-gradient-to-tr from-white to-light">
+      <div className="container mx-auto p-9">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           <motion.div 
             className="space-y-8"
