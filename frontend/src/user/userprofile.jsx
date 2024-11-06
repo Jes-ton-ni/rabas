@@ -333,41 +333,47 @@ const UserProfile = ({ activities = [] }) => {
     }
   };
 
-  // Fetching business data from the backend and updating Redux
   const fetchBusinessData = async () => {
     try {
+      // Fetch business data
       const response = await fetch('http://localhost:5000/get-businessData', {
         method: 'GET',
         credentials: 'include',
       });
       const data = await response.json();
+      
       if (response.ok) {
         setBusinessData(data.businessData[0]);
+        
+        // Check if there are business applications
+        if (data.businessData[0].hasApplications) {
+          await fetchBusinessApplications();
+        }
       }
     } catch (error) {
       console.error('Error fetching business data:', error);
     }
   };
-
+  
   // Fetching business applications for the logged-in user
   const fetchBusinessApplications = async () => {
     try {
       const response = await fetch('http://localhost:5000/businesses-application', {
         method: 'GET',
-        credentials: 'include' // Include cookies for session-based authentication
+        credentials: 'include', // Include cookies for session-based authentication
       });
       const data = await response.json();
-      console.log('Fetched Business Applications:', data);
       
       if (response.ok) {
         setBusinessApplications(data.business_applications); // Set fetched applications
+        console.log('Fetched Business Applications:', data);
       } else {
         console.error('Failed to fetch business applications:', data.message);
       }
     } catch (error) {
       console.error('Error fetching business applications:', error);
     }
-  };
+  };  
 
   useEffect(() => {
     checkLoginStatus(); // Check login status when component mounts
@@ -512,42 +518,46 @@ const UserProfile = ({ activities = [] }) => {
               if (application.status === 0) {
                 // Show 'Pending Application' button if status is 0
                 return (
-                  <Button key={application.application_id} className='text-white bg-yellow-500 hover:bg-yellow-600'>
-                    Pending Application
-                  </Button>
+                  <div key={`pending-${application.application_id}`}>
+                    <Button className='text-white bg-yellow-500 hover:bg-yellow-600'>
+                      Pending Application
+                    </Button>
+                  </div>
                 );
               } else if (application.status === 1) {
                 // Show business name if status is 1
                 return (
-                  <>
-                  <h1 className='font-bold mb-2'>Switch to Business:</h1>
-                  <div className='max-h-[130px] bg-light shadow-md rounded-md shadow-slate-600 ring-gray-200 ring-1   p-3 flex flex-col gap-2 overflow-y-auto scrollbar-custom'>        
-                  <button 
-                  className='text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-lg gap-1'
-                  onClick={() => window.location.href = '/businessprofileadmin'}
-                  key={application.application_id}>
-                   <Avatar src=''/>
-                    <p>{businessData.businessName}</p>
-                  </button>
-                  <button 
-                  className='text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-lg gap-1'
-                  onClick={() => window.location.href = '/businessprofileadmin'}
-                  key={application.application_id}>
-                   <Avatar src=''/>
-                    <p>{businessData.businessName}</p>
-                  </button>
+                  <div key={`approved-${application.application_id}`}>
+                    <h1 className='font-bold mb-2'>Switch to Business:</h1>
+                    {/* <div className='max-h-[130px] bg-light shadow-md rounded-md shadow-slate-600 ring-gray-200 ring-1   p-3 flex flex-col gap-2 overflow-y-auto scrollbar-custom'>         */}
+                      <button 
+                      className='text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-lg gap-1'
+                      onClick={() => window.location.href = '/businessprofileadmin'}
+                      key={application.application_id}>
+                      <Avatar src=''/>
+                        <p>{businessData.businessName}</p>
+                      </button>
+                      {/* <button 
+                      className='text-gray-500 hover:bg-color2 hover:text-white flex items-center p-2 rounded-lg gap-1'
+                      onClick={() => window.location.href = '/businessprofileadmin'}
+                      key={application.application_id}>
+                      <Avatar src=''/>
+                        <p>{businessData.businessName}</p>
+                      </button> */}
+                    {/* </div> */}
+                    {/* <Button className='text-white bg-color1 hover:bg-color2 mt-4'  > 
+                    + Add Another Business 
+                    </Button> */}
                   </div>
-                  <Button className='text-white bg-color1 hover:bg-color2 mt-4'  > 
-                   + Add Another Business 
-                 </Button>
-                  </>
                 );
               } else if (application.status === -1) {
                 // Show 'Denied' message if status is -1
                 return (
-                  <Button key={application.application_id} className='text-white bg-red-500 hover:bg-red-600'>
-                    Denied
-                  </Button>
+                  <div key={`denied-${application.application_id}`}>
+                    <Button className='text-white bg-red-500 hover:bg-red-600'>
+                      Denied
+                    </Button>
+                  </div>
                   
                 );
               }
