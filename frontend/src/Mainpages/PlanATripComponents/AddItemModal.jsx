@@ -283,7 +283,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
 
                 {/* Amenities Filter */}
                 <div className="mb-6 max-h-[230px] overflow-auto scrollbar-custom">
-                    <h3 className="text-sm font-medium sticky top-0 bg-white z-10 text-gray-700 mb-2">Amenities</h3>
+                    <h3 className="text-sm font-medium  bg-white z-10 text-gray-700 mb-2">Amenities</h3>
                     <CheckboxGroup
                         value={filters.selectedAmenities}
                         onChange={(value) => setFilters(prev => ({ ...prev, selectedAmenities: value }))}
@@ -508,7 +508,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                     </Tabs>
 
                     {/* Toggle Button for Filters */}
-                    <div className="lg:hidden mb-4 sticky top-0 z-40 bg-white">
+                    <div className="lg:hidden mb-4  bg-white">
                         <Button onClick={toggleFilters} className="w-full bg-color1 text-color3">
                             {showFilters ? 'Hide Filters' : 'Show Filters'}
                         </Button>
@@ -725,7 +725,7 @@ const AddItemModal = ({ isOpen, onClose, onAddItem }) => {
                         </motion.div>
                     )}
                 </ModalBody>
-                <ModalFooter className='fixed bottom-0 z-50 bg-white flex items-center w-full border'>
+                <ModalFooter className=' bg-white flex items-center w-full border'>
                     <Button className='max-md:w-full' color='danger' onClick={onClose}>Close</Button>
                 </ModalFooter>
             </ModalContent>
